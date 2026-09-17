@@ -10,6 +10,15 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [1.1.6] - 2026-09-17
+
+### Fixed
+
+- TUI actions now suspend Bubble Tea while running, allowing native `sudo`
+  password prompts and other interactive commands to receive terminal input.
+- Release publication is idempotent and no longer relies on a hanging upload
+  action.
+
 ## [1.1.5] - 2026-09-17
 
 ### Fixed

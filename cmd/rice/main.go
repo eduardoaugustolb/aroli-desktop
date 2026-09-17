@@ -751,6 +751,17 @@ type tuiPluginsResult struct {
 	err   error
 }
 
+type tuiActionCommand struct {
+	run            func() error
+	stdin          io.Reader
+	stdout, stderr io.Writer
+}
+
+func (c *tuiActionCommand) Run() error            { return c.run() }
+func (c *tuiActionCommand) SetStdin(r io.Reader)  { c.stdin = r }
+func (c *tuiActionCommand) SetStdout(w io.Writer) { c.stdout = w }
+func (c *tuiActionCommand) SetStderr(w io.Writer) { c.stderr = w }
+
 type tuiModel struct {
 	screen       tuiScreen
 	cursor       int
@@ -945,16 +956,12 @@ func (m tuiModel) selectedPlugins() []plugin {
 }
 
 func (m tuiModel) runAction() tea.Cmd {
-	return func() tea.Msg {
-		var err error
-		err = silenceTerminal(func() error {
-			if m.action == 2 {
-				return installPlugins(m.selectedPlugins(), false)
-			}
-			return m.actions()[m.action].command(&m)
-		})
-		return tuiResult{err: err}
-	}
+	return tea.Exec(&tuiActionCommand{run: func() error {
+		if m.action == 2 {
+			return installPlugins(m.selectedPlugins(), false)
+		}
+		return m.actions()[m.action].command(&m)
+	}}, func(err error) tea.Msg { return tuiResult{err: err} })
 }
 
 // Bubble Tea owns the terminal while the TUI is active. The installer and its

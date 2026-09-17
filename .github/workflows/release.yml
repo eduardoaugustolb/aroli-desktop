@@ -66,13 +66,15 @@ jobs:
             capture { print }
           ' CHANGELOG.md > RELEASE_NOTES.md
           [ -s RELEASE_NOTES.md ] || echo "See CHANGELOG.md for details." > RELEASE_NOTES.md
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            umbra-noctis-*.tar.gz
-            SHA256SUMS.txt
-            rice-linux-amd64
-            rice-linux-arm64
-          overwrite_files: true
-          body_path: RELEASE_NOTES.md
-          generate_release_notes: true
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          assets=(umbra-noctis-*.tar.gz SHA256SUMS.txt rice-linux-amd64 rice-linux-arm64)
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "${assets[@]}" --clobber
+            gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease=false --notes-file RELEASE_NOTES.md
+          else
+            gh release create "$GITHUB_REF_NAME" "${assets[@]}" \
+              --title "$GITHUB_REF_NAME" --notes-file RELEASE_NOTES.md
+          fi
