@@ -77,17 +77,18 @@ func TestEnsureRepositoryDryRunBootstrapsTemporaryCheckout(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = os.Chdir(originalDirectory) })
 
-	path, err := ensureRepository("", true)
+	path, cleanup, err := ensureRepositoryWithCleanup("", true)
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(cleanup)
 	if _, err := validRepo(path); err != nil {
 		t.Fatalf("dry-run checkout is invalid: %v", err)
 	}
 	if !strings.HasPrefix(filepath.Base(filepath.Dir(path)), "rice-dry-run-") {
 		t.Fatalf("dry-run checkout was not temporary: %q", path)
 	}
-	cleanupDryRunRepository(path)
+	cleanup()
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		t.Fatalf("temporary checkout still exists: %v", err)
 	}

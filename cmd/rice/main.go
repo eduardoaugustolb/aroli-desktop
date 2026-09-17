@@ -135,13 +135,11 @@ func install(args []string) error {
 			return err
 		}
 	}
-	path, err := ensureRepository(repo, opts.dryRun)
+	path, cleanup, err := ensureRepositoryWithCleanup(repo, opts.dryRun)
 	if err != nil {
 		return err
 	}
-	if opts.dryRun {
-		defer cleanupDryRunRepository(path)
-	}
+	defer cleanup()
 	backend := []string{"--lang", opts.lang}
 	if opts.dryRun {
 		backend = append(backend, "--dry-run")
@@ -163,61 +161,62 @@ func install(args []string) error {
 // ensureRepository makes a CLI installation useful even when the user has
 // never cloned the dotfiles repository. Existing checkouts always win.
 func ensureRepository(explicit string, dryRun bool) (string, error) {
+	path, _, err := ensureRepositoryWithCleanup(explicit, dryRun)
+	return path, err
+}
+
+func ensureRepositoryWithCleanup(explicit string, dryRun bool) (string, func(), error) {
+	noCleanup := func() {}
 	if explicit != "" {
-		return validRepo(explicit)
+		path, err := validRepo(explicit)
+		return path, noCleanup, err
 	}
 	if env := os.Getenv("UMBRA_RICE_REPO"); env != "" {
 		if path, err := validRepo(env); err == nil {
-			return path, nil
+			return path, noCleanup, nil
 		}
 	}
 	if cwd, err := os.Getwd(); err == nil {
 		if path, err := validRepo(cwd); err == nil {
-			return path, nil
+			return path, noCleanup, nil
 		}
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return "", err
+		return "", noCleanup, err
 	}
 	target := filepath.Join(home, ".local", "share", "umbra-noctis")
 	if path, err := validRepo(target); err == nil {
-		return path, nil
+		return path, noCleanup, nil
 	}
 	if dryRun {
 		parent, err := os.MkdirTemp("", "rice-dry-run-")
 		if err != nil {
-			return "", err
+			return "", noCleanup, err
 		}
 		dryRunTarget := filepath.Join(parent, "checkout")
 		if err := cloneRepository(dryRunTarget); err != nil {
 			_ = os.RemoveAll(parent)
-			return "", fmt.Errorf("não foi possível preparar o rice para o dry-run: %w", err)
+			return "", noCleanup, fmt.Errorf("não foi possível preparar o rice para o dry-run: %w", err)
 		}
-		return dryRunTarget, nil
+		return dryRunTarget, func() { _ = os.RemoveAll(parent) }, nil
 	}
 	if _, err := exec.LookPath("git"); err != nil {
-		return "", errors.New("git é necessário para baixar o rice")
+		return "", noCleanup, errors.New("git é necessário para baixar o rice")
 	}
 	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
-		return "", err
+		return "", noCleanup, err
 	}
 	fmt.Println("Baixando o rice pela primeira vez…")
 	if err := cloneRepository(target); err != nil {
-		return "", fmt.Errorf("não foi possível baixar o rice: %w", err)
+		return "", noCleanup, fmt.Errorf("não foi possível baixar o rice: %w", err)
 	}
-	return validRepo(target)
+	path, err := validRepo(target)
+	return path, noCleanup, err
 }
 
 var cloneRepository = func(target string) error {
 	return command("", "git", "clone", "--depth", "1", repositoryURL, target).Run()
-}
-
-func cleanupDryRunRepository(path string) {
-	parent := filepath.Dir(path)
-	if strings.HasPrefix(filepath.Base(parent), "rice-dry-run-") {
-		_ = os.RemoveAll(parent)
-	}
 }
 
 func validRepo(path string) (string, error) {
@@ -283,10 +282,11 @@ func sameFile(a, b string) bool {
 }
 
 func runBackend(kind string, args []string) error {
-	repo, err := ensureRepository("", true)
+	repo, cleanup, err := ensureRepositoryWithCleanup("", true)
 	if err != nil {
 		return err
 	}
+	defer cleanup()
 	if _, err := validRepo(repo); err != nil {
 		return errors.New("rice ainda não foi instalado; execute: rice install")
 	}
@@ -566,10 +566,11 @@ func plugins(args []string) error {
 }
 
 func pluginCatalog() ([]plugin, error) {
-	repo, err := ensureRepository("", true)
+	repo, cleanup, err := ensureRepositoryWithCleanup("", true)
 	if err != nil {
 		return nil, err
 	}
+	defer cleanup()
 	if _, err := validRepo(repo); err != nil {
 		return nil, errors.New("instale o rice antes de gerenciar opcionais: rice install")
 	}
