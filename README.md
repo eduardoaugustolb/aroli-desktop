@@ -84,8 +84,8 @@ so already-running applications reload the XCursor.
 > terminal assistant, while the explicit subcommands remain suitable for automation.
 
 ```sh
-# Install the CLI (Go 1.27+)
-go install github.com/eduardoaugustolb/umbra-noctis/cmd/rice@latest
+# Install the CLI from the current main branch (Go 1.27+)
+go install github.com/eduardoaugustolb/umbra-noctis/cmd/rice@main
 
 # Opens a guided terminal interface for first-time users
 rice
