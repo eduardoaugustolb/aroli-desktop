@@ -10,6 +10,13 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [1.1.1] - 2026-09-17
+
+### Fixed
+
+- `rice cli update` now replaces the executable actually selected by the
+  current shell, including installations managed through Go or mise.
+
 ## [1.1.0] - 2026-09-17
 
 ### Added

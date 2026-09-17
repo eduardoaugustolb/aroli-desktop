@@ -481,11 +481,7 @@ func checksumFor(asset, contents string) (string, error) {
 }
 
 func installDownloadedCLI(binary []byte) error {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	destination := filepath.Join(home, ".local", "bin", "rice")
+	destination := cliInstallPath()
 	if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil {
 		return err
 	}
@@ -505,6 +501,22 @@ func installDownloadedCLI(binary []byte) error {
 		return err
 	}
 	return os.Rename(name, destination)
+}
+
+func cliInstallPath() string {
+	if executable, err := os.Executable(); err == nil {
+		if resolved, err := filepath.EvalSymlinks(executable); err == nil {
+			executable = resolved
+		}
+		if filepath.Base(executable) == "rice" {
+			return executable
+		}
+	}
+	home, err := os.UserHomeDir()
+	if err == nil {
+		return filepath.Join(home, ".local", "bin", "rice")
+	}
+	return filepath.Join(".local", "bin", "rice")
 }
 
 type plugin struct {
