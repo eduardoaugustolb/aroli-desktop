@@ -89,5 +89,23 @@
   typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M}'
   typeset -g POWERLEVEL9K_TIME_PREFIX=''
 
+  # --- Distro icon: Omarchy on Omarchy, Arch on Arch ---
+  # p10k detects the distro from the `ID=` field of /etc/os-release with a
+  # `case *arch*` match, and "omarchy" contains "arch" (om-arch-y): without
+  # an override, Omarchy would inherit the Arch logo (U+F303). Upstream has
+  # no `omarchy` branch, so this theme forces the generic Tux (U+F17C,
+  # already present in Nerd Fonts) on Omarchy only, keeping the default
+  # detection (Arch and friends) on every other distro.
+  # (The real Omarchy mark lives at U+E900 of the `omarchy` font, which
+  # needs an explicit font family -- unavailable in prompt context.)
+  local _umbra_os_id=""
+  if [[ -r /etc/os-release ]]; then
+    _umbra_os_id=$(. /etc/os-release 2>/dev/null; printf '%s' "${ID:-}")
+  fi
+  if [[ $_umbra_os_id == omarchy ]]; then
+    typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=$'\uF17C'
+  fi
+  unset _umbra_os_id
+
   (( ! $+functions[p10k] )) || p10k reload
 }

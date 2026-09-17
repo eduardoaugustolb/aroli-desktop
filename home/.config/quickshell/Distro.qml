@@ -9,15 +9,15 @@ import QtQuick
 Singleton {
     id: root
 
-    property string id: "arch"
-    property string name: "Arch Linux"
+    property string id: "linux"
+    property string name: "Linux"
     readonly property bool omarchy: id === "omarchy"
     readonly property string glyph: omarchy ? "" : (id === "arch" ? Icons.arch : "")
     readonly property url markSource: omarchy ? Qt.resolvedUrl("assets/omarchy.svg") : ""
 
     Process {
         running: true
-        command: ["bash", "-lc", ". /etc/os-release 2>/dev/null; printf '%s\\t%s\\n' \"${ID:-arch}\" \"${PRETTY_NAME:-Arch Linux}\""]
+        command: ["bash", "-lc", ". /etc/os-release 2>/dev/null; printf '%s\\t%s\\n' \"${ID:-linux}\" \"${PRETTY_NAME:-Linux}\""]
         stdout: SplitParser {
             onRead: function(line) {
                 const pair = line.split("\t");
