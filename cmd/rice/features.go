@@ -212,6 +212,9 @@ func copyTree(src, dst string) error {
 			if err != nil {
 				return err
 			}
+			if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+				return err
+			}
 			return os.Symlink(link, target)
 		}
 		in, err := os.Open(path)
@@ -219,6 +222,9 @@ func copyTree(src, dst string) error {
 			return err
 		}
 		defer in.Close()
+		if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+			return err
+		}
 		out, err := os.OpenFile(target, os.O_CREATE|os.O_EXCL|os.O_WRONLY, info.Mode().Perm())
 		if err != nil {
 			return err
@@ -322,6 +328,141 @@ func setWallpaper(path string) error {
 		return err
 	}
 	return command("", filepath.Join(home, ".config", "hypr", "set-wallpaper.sh"), path).Run()
+}
+
+// gaming coordinates the reversible compositor layer with Feral GameMode.
+// The latter is deliberately opt-in: it only wraps a process passed to launch.
+func gaming(args []string) error {
+	if len(args) == 0 {
+		args = []string{"status"}
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	helper := filepath.Join(home, ".local", "bin", "game-mode")
+	runHelper := func(action string) (string, error) {
+		cmd := exec.Command(helper, action)
+		out, err := cmd.Output()
+		if err != nil {
+			return "", fmt.Errorf("Game Mode não está disponível: %w", err)
+		}
+		return strings.TrimSpace(string(out)), nil
+	}
+	switch args[0] {
+	case "status":
+		if len(args) > 2 || (len(args) == 2 && args[1] != "--json") {
+			return errors.New("use: rice gaming status [--json]")
+		}
+		state, err := runHelper("status")
+		if err != nil {
+			return err
+		}
+		if len(args) == 2 {
+			available := false
+			if _, err := exec.LookPath("gamemoderun"); err == nil {
+				available = true
+			}
+			return json.NewEncoder(os.Stdout).Encode(map[string]any{"active": state == "on", "gamemode_available": available})
+		}
+		fmt.Println(state)
+		return nil
+	case "on", "off", "toggle":
+		if len(args) != 1 {
+			return errors.New("use: rice gaming on|off|toggle")
+		}
+		before, err := runHelper("status")
+		if err != nil {
+			return err
+		}
+		if (args[0] == "on" || args[0] == "toggle") && before != "on" {
+			if err := prepareGameMode(); err != nil {
+				return err
+			}
+		}
+		state, err := runHelper(args[0])
+		if err != nil {
+			if before != "on" {
+				_ = restoreGameModeCoordination()
+			}
+			return err
+		}
+		if before == "on" && state == "off" {
+			if err := restoreGameModeCoordination(); err != nil {
+				return err
+			}
+		}
+		fmt.Println(state)
+		return nil
+	case "launch":
+		if len(args) < 2 {
+			return errors.New("use: rice gaming launch COMANDO [args...]")
+		}
+		wasActive, err := runHelper("status")
+		if err != nil {
+			return err
+		}
+		if wasActive != "on" {
+			if err := prepareGameMode(); err != nil {
+				return err
+			}
+			if _, err := runHelper("on"); err != nil {
+				_ = restoreGameModeCoordination()
+				return err
+			}
+		}
+		program, programArgs := args[1], args[2:]
+		if _, err := exec.LookPath("gamemoderun"); err == nil {
+			programArgs = append([]string{program}, programArgs...)
+			program = "gamemoderun"
+		}
+		cmd := command("", program, programArgs...)
+		err = cmd.Run()
+		if wasActive != "on" {
+			if _, offErr := runHelper("off"); offErr != nil && err == nil {
+				err = offErr
+			}
+			if restoreErr := restoreGameModeCoordination(); restoreErr != nil && err == nil {
+				err = restoreErr
+			}
+		}
+		return err
+	default:
+		return errors.New("use: rice gaming status|on|off|toggle|launch COMANDO [args...]")
+	}
+}
+
+// battery exposes Power Profiles Daemon's live profiles; other desktop
+// environments can change them too, so status always reads the daemon.
+func battery(args []string) error {
+	if len(args) == 0 {
+		args = []string{"status"}
+	}
+	valid := (len(args) == 1 && (args[0] == "status" || args[0] == "available" || args[0] == "next" || args[0] == "balanced" || args[0] == "performance" || args[0] == "power-saver")) || (len(args) == 2 && args[0] == "set" && (args[1] == "power-saver" || args[1] == "balanced" || args[1] == "performance"))
+	if !valid {
+		return errors.New("use: rice battery status|available|set power-saver|balanced|performance|next")
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	helper := filepath.Join(home, ".local", "bin", "battery-efficiency")
+	helperArgs := args
+	if len(args) == 1 && args[0] != "status" && args[0] != "available" && args[0] != "next" {
+		helperArgs = []string{"set", args[0]}
+	}
+	if len(helperArgs) == 2 && helperArgs[0] == "set" && helperArgs[1] == "power-saver" {
+		if game, _ := scriptState("game-mode", "status"); game == "on" {
+			return errors.New("Game Mode está ativo; desligue-o antes de ativar economia de energia")
+		}
+	}
+	cmd := exec.Command(helper, helperArgs...)
+	out, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("controle de perfil de energia indisponível: %w", err)
+	}
+	fmt.Println(strings.TrimSpace(string(out)))
+	return nil
 }
 
 func doctor(args []string) error {

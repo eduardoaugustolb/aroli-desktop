@@ -177,12 +177,23 @@ Item {
                     on: ShellState.pokeTheme
                     onActivated: ShellState.togglePokeTheme()
                 }
+                Toggle {
+                    icon: Icons.gamepad; label: I18n.tr("Game mode"); idx: 7
+                    on: ShellState.gameMode
+                    onActivated: ShellState.toggleGameMode()
+                }
+                Toggle {
+                    icon: Icons.leaf; label: ShellState.batteryProfileLabel(ShellState.batteryProfile); idx: 8
+                    visible: ShellState.batt >= 0 && ShellState.batteryProfileAvailable
+                    on: ShellState.batteryProfile !== "balanced"
+                    onActivated: ShellState.nextBatteryProfile()
+                }
                 // `on` always goes false on purpose: the other tiles switch
                 // something on and color says whether it is on, but this one is
                 // a door, not a switch. Painting it lit would promise a state
                 // that does not exist.
                 Toggle {
-                    icon: Icons.calendar; label: I18n.tr("Calendar"); idx: 7
+                    icon: Icons.calendar; label: I18n.tr("Calendar"); idx: 9
                     on: false
                     panel: "calendar"
                 }

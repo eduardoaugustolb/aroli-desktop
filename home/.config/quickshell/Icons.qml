@@ -32,6 +32,8 @@ Singleton {
     readonly property string power: "󰐥"
     readonly property string coffee: "󰅶"
     readonly property string remote: "󰢹"
+    readonly property string gamepad: "󰊗"    // md-gamepad-variant U+F10F8
+    readonly property string leaf: "󰌪"       // md-leaf U+F06CA
     readonly property string updates: ""
     readonly property string pokeball: "󰐝"   // md-pokeball U+F041D
     readonly property string timer: "󰔛"      // md-timer U+F051B

@@ -59,13 +59,15 @@ func TestValidRepo(t *testing.T) {
 
 func TestEnsureRepositoryDryRunBootstrapsTemporaryCheckout(t *testing.T) {
 	originalClone := cloneRepository
-	t.Cleanup(func() { cloneRepository = originalClone })
+	originalQuietClone := cloneRepositoryQuiet
+	t.Cleanup(func() { cloneRepository = originalClone; cloneRepositoryQuiet = originalQuietClone })
 	cloneRepository = func(target string) error {
 		if err := os.MkdirAll(target, 0o755); err != nil {
 			return err
 		}
 		return os.WriteFile(filepath.Join(target, "install.sh"), []byte("#!/bin/sh\n"), 0o755)
 	}
+	cloneRepositoryQuiet = cloneRepository
 
 	workingDirectory := t.TempDir()
 	originalDirectory, err := os.Getwd()
@@ -136,5 +138,34 @@ func TestCopyTreePreservesFilesAndLinks(t *testing.T) {
 	}
 	if link, err := os.Readlink(filepath.Join(target, "current")); err != nil || link != "theme.conf" {
 		t.Fatalf("copied link = %q, %v", link, err)
+	}
+}
+
+func TestBatteryRejectsUnknownAction(t *testing.T) {
+	if err := battery([]string{"turbo"}); err == nil {
+		t.Fatal("unknown battery action was accepted")
+	}
+}
+
+func TestExportPreferencesCopiesOnlyPortableSettings(t *testing.T) {
+	home, destination := t.TempDir(), filepath.Join(t.TempDir(), "preferences")
+	t.Setenv("HOME", home)
+	if err := os.MkdirAll(filepath.Join(home, ".config", "hypr"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(home, ".config", "quickshell-rice.json"), []byte(`{"language":"pt-BR"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(home, ".config", "hypr", "language.conf"), []byte("pt-BR"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := exportPreferences([]string{destination}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(destination, "umbra-preferences.json")); err != nil {
+		t.Fatalf("manifest not exported: %v", err)
+	}
+	if data, err := os.ReadFile(filepath.Join(destination, ".config", "hypr", "language.conf")); err != nil || string(data) != "pt-BR" {
+		t.Fatalf("language export = %q, %v", data, err)
 	}
 }

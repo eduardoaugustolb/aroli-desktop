@@ -89,6 +89,27 @@ Flickable {
             }
 
             SettingsControls.Row_ {
+                shown: ShellState.batt >= 0 && ShellState.batteryProfileAvailable
+                label: I18n.tr("Power profile")
+                hint: I18n.tr("Power saver reduces consumption; Balanced adapts to demand; Performance prioritizes speed when your hardware supports it. This changes only Power Profiles Daemon's active profile.")
+                SettingsControls.Choice_ {
+                    options: {
+                        const out = [];
+                        if (ShellState.batteryProfiles.indexOf("power-saver") >= 0) out.push(I18n.tr("Power saver"));
+                        if (ShellState.batteryProfiles.indexOf("balanced") >= 0) out.push(I18n.tr("Balanced"));
+                        if (ShellState.batteryProfiles.indexOf("performance") >= 0) out.push(I18n.tr("Performance"));
+                        return out;
+                    }
+                    current: ShellState.batteryProfileLabel(ShellState.batteryProfile)
+                    onPicked: function (v) {
+                        if (v === I18n.tr("Power saver")) ShellState.setBatteryProfile("power-saver");
+                        else if (v === I18n.tr("Performance")) ShellState.setBatteryProfile("performance");
+                        else ShellState.setBatteryProfile("balanced");
+                    }
+                }
+            }
+
+            SettingsControls.Row_ {
                 shown: ShellState.battHealth >= 0 || ShellState.battCycles >= 0
                 label: I18n.tr("Health")
                 hint: I18n.tr("Current maximum capacity against the factory capacity, according to UPower. The cycles come straight from the battery's own counter.")

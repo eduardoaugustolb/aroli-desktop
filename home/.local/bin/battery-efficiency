@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# battery-efficiency — Power Profiles Daemon selector for portable systems.
+# Other desktop environments can change the profile too, so status always
+# reads the daemon instead of retaining a private toggle state.
+
+set -euo pipefail
+
+mode="${1:-status}"
+need_daemon() {
+    command -v powerprofilesctl >/dev/null \
+        || { echo "power-profiles-daemon is not installed; install it with: rice plugins install power-profiles-daemon" >&2; exit 1; }
+}
+
+profile() {
+    local value
+    value="$(powerprofilesctl get 2>/dev/null | tr -d '[:space:]')"
+    case "$value" in balanced|power-saver|performance) printf '%s\n' "$value" ;; *) return 1 ;; esac
+}
+
+available_profiles() {
+    need_daemon
+    local found=""
+    while IFS= read -r candidate; do
+        case "$candidate" in
+            power-saver|balanced|performance)
+                [[ " $found " == *" $candidate "* ]] || found+=" $candidate" ;;
+        esac
+    done < <(powerprofilesctl list 2>/dev/null | sed -nE 's/^[*[:space:]]*([a-z-]+):.*/\1/p')
+    # Older daemon versions do not expose `list`; its guaranteed profiles are
+    # still useful, and a direct performance selection remains validated by it.
+    [[ -n "$found" ]] || found=" power-saver balanced"
+    printf '%s\n' $found
+}
+
+set_profile() {
+    need_daemon
+    case "${1:-}" in
+        power-saver|balanced|performance) powerprofilesctl set "$1"; profile ;;
+        *) echo "Use power-saver, balanced, or performance" >&2; exit 2 ;;
+    esac
+}
+
+next_profile() {
+    need_daemon
+    local current next
+    current="$(profile)" || { echo "could not read the active power profile" >&2; exit 1; }
+    case "$current" in
+        power-saver) next="balanced" ;;
+        balanced) next="performance" ;;
+        performance) next="power-saver" ;;
+    esac
+    # Performance is hardware-dependent. If unavailable, return to saver
+    # instead of leaving a quick-control click looking like it did nothing.
+    if ! powerprofilesctl set "$next" 2>/dev/null; then
+        next="power-saver"
+        powerprofilesctl set "$next"
+    fi
+    profile
+}
+
+case "$mode" in
+    status) need_daemon; profile ;;
+    available) available_profiles ;;
+    set) set_profile "${2:-}" ;;
+    next) next_profile ;;
+    *) echo "Usage: battery-efficiency {status|available|set PROFILE|next}" >&2; exit 2 ;;
+esac

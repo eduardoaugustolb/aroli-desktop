@@ -23,6 +23,7 @@ Quickshell that runs on top of the stack already provided by Omarchy.
 | Cursor | Umbra XCursor, without setting `HYPRCURSOR_THEME`. |
 | Keyboard | ABNT2 (`br`) in Hyprland. |
 | Optional packages | Each item requires individual confirmation. |
+| Adaptive modes | Session, Game, Reading, and power profiles use user-level state only. |
 
 ## Preserved components
 
@@ -47,3 +48,4 @@ To convert symlinks from a legacy install, first run with no effects:
 ```
 
 See [docs/MIGRATION.md](docs/MIGRATION.md) and [LLMS.md](LLMS.md).
+For the 2.0 workflow and compatibility matrix, see [docs/2.0.md](docs/2.0.md).

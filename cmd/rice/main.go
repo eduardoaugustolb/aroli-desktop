@@ -67,6 +67,20 @@ func run(args []string) error {
 		return snapshots(args[1:])
 	case "wallpaper", "wallpapers":
 		return wallpapers(args[1:])
+	case "gaming", "game":
+		return gaming(args[1:])
+	case "battery", "efficiency":
+		return battery(args[1:])
+	case "session", "mode":
+		return sessionProfile(args[1:])
+	case "reading":
+		return reading(args[1:])
+	case "recover":
+		return recoverDesktop(args[1:])
+	case "export":
+		return exportPreferences(args[1:])
+	case "import":
+		return importPreferences(args[1:])
 	case "cli":
 		return updateCLI(args[1:])
 	case "diagnose":
@@ -98,6 +112,12 @@ Uso:
   rice profile list|show|install NOME
   rice snapshot create|list|restore NOME
   rice wallpaper list|set|random|import|remove
+  rice gaming status|on|off|toggle|launch COMANDO [args...]
+  rice battery status|available|set power-saver|balanced|performance|next
+  rice session list|status|apply laptop|desktop|gaming|creator
+  rice reading on|off|status
+  rice recover [--dry-run|--yes] [--snapshot NOME]
+  rice export DIRETÓRIO | rice import DIRETÓRIO [--yes]
   rice cli update [--dry-run] atualiza somente o binário da CLI
   rice plugins list|install [opções] [nome...]
   rice status | check | update | rollback | prune
@@ -237,7 +257,7 @@ var cloneRepository = func(target string) error {
 	return command("", "git", "clone", "--depth", "1", repositoryURL, target).Run()
 }
 
-func cloneRepositoryQuiet(target string) error {
+var cloneRepositoryQuiet = func(target string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "git", "clone", "--depth", "1", repositoryURL, target)

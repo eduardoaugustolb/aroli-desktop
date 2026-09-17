@@ -10,6 +10,17 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [2.0.0] - 2026-09-17
+
+### Added
+
+- Coordinated session profiles, recovery, preference export/import, and
+  explicit rules between Game Mode, Reading Mode, and Power Saver.
+- A reversible Game Mode toggle in the Control Panel and `rice gaming`.
+- A Power Profile selector in the Control Panel, System Settings, and `rice
+  battery` for power-saver, balanced, and supported performance modes.
+- A read-only smoke-test release gate and a 2.0 compatibility guide.
+
 ## [1.1.7] - 2026-09-17
 
 ### Fixed
@@ -83,16 +94,6 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   interface using Charm styling, plugin selection, confirmations, and action
   feedback.
 - Added Linux amd64 and arm64 CLI release binaries with SHA-256 verification.
-
-## [Unreleased]
-
-### Added
-
-- Daily CLI workflows: transparent installation profiles, local configuration
-  snapshots, wallpaper list/set/random/import/remove commands, and `rice
-  doctor --fix` for explicitly confirmed session repairs.
-- `rice status` now reports a compact desktop health score, update state, and
-  local snapshot count.
 
 ## [1.0.0] - 2026-09-17
 

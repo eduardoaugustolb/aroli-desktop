@@ -113,6 +113,13 @@ Requires **Hyprland 0.56+**. This rice uses `hyprland.lua`, not
 | `rice snapshot restore before-tweaks` | Restores a configuration snapshot while retaining the current files as backups. |
 | `rice wallpaper list` | Lists bundled and imported wallpapers. |
 | `rice wallpaper set umbra-ember-coast.png` | Applies a wallpaper and its dynamic Pywal palette. |
+| `rice gaming on` | Temporarily disables expensive compositor effects, preserving their exact previous state. |
+| `rice gaming launch steam` | Runs a game under GameMode when the optional `gamemode` package is installed. |
+| `rice battery set power-saver` | Selects the Power Profiles Daemon energy-saver profile. |
+| `rice battery balanced` | Selects the balanced profile; `performance` is available when supported by the hardware. |
+| `rice session apply laptop` | Applies a coordinated daily-use profile. |
+| `rice recover --snapshot latest` | Recovers stuck modes and can restore the newest local snapshot. |
+| `rice export ~/umbra-preferences` | Exports portable visual preferences without credentials or personal data. |
 | `rice update --dry-run` | Shows the update plan without changing anything. |
 | `rice prune` | Lists files retired by the latest release (nothing is deleted without `--apply`). |
 | `rice plugins list` | Lists optional applications and tools that can be installed later. |
@@ -137,7 +144,7 @@ and notifies you on its own when a release lands on GitHub:
   leftovers to the Trash (with backup), never deletes directly — and never
   touches files you modified.
 - To turn off the notice: `systemctl --user disable rice-update-check.timer`.
-  Details and history in [CHANGELOG.md](CHANGELOG.md).
+Details and history in [CHANGELOG.md](CHANGELOG.md).
 
 ## Privacy and control
 

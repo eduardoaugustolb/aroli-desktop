@@ -10,6 +10,7 @@ docker	container daemon
 duf	terminal disk usage
 dust	terminal disk space analyzer
 gcc-ada	Ada compiler
+gamemode	per-game CPU/GPU optimisation daemon; use with rice gaming launch
 imv	alternative image viewer
 java-hamcrest	Java testing library
 jdk-openjdk	complete Java development kit
@@ -21,6 +22,7 @@ nano	Nano editor
 nautilus	graphical file manager
 neovim	Neovim editor
 procs	alternative process listing
+power-profiles-daemon	power-saver and balanced energy profiles for battery efficiency
 tailscale	mesh VPN
 vim	extra Vim editor
 vlc	alternative media player

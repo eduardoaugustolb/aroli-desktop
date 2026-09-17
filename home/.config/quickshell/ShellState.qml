@@ -1336,6 +1336,96 @@ Singleton {
         }
     }
 
+    // ═══════════════════════ game mode ═══════════════════════
+    // The CLI owns the snapshot and restoration contract. The shell is only a
+    // responsive control surface, so a failed process can never leave its UI
+    // saying “on” when the compositor was not actually changed.
+    property bool gameMode: false
+    function toggleGameMode() {
+        if (gameModeProc.running) return;
+        gameModeProc.command = [root.home + "/.local/bin/rice", "gaming", "toggle"];
+        gameModeProc.running = true;
+    }
+    Process {
+        id: gameModeProc
+        stdout: SplitParser {
+            onRead: function (line) { root.gameMode = line.trim() === "on"; }
+        }
+        onExited: gameModeProbe.running = true
+    }
+    Process {
+        id: gameModeProbe
+        command: [root.home + "/.local/bin/rice", "gaming", "status"]
+        running: true
+        stdout: SplitParser {
+            onRead: function (line) { root.gameMode = line.trim() === "on"; }
+        }
+    }
+    Timer {
+        interval: 10000; running: true; repeat: true
+        onTriggered: if (!gameModeProbe.running) gameModeProbe.running = true
+    }
+
+    // ═══════════════════ perfil de energia ═══════════════════
+    // The daemon is the source of truth: this also reflects changes made by
+    // other desktop environments instead of retaining a private toggle state.
+    property string batteryProfile: "balanced"
+    property bool batteryProfileAvailable: false
+    property var batteryProfiles: ["power-saver", "balanced"]
+    function batteryProfileLabel(profile) {
+        if (profile === "power-saver") return I18n.tr("Power saver");
+        if (profile === "performance") return I18n.tr("Performance");
+        return I18n.tr("Balanced");
+    }
+    function setBatteryProfile(profile) {
+        if (batteryEfficiencyProc.running || !batteryProfileAvailable) return;
+        batteryEfficiencyProc.command = [root.home + "/.local/bin/rice", "battery", "set", profile];
+        batteryEfficiencyProc.running = true;
+    }
+    function nextBatteryProfile() {
+        if (batteryEfficiencyProc.running || !batteryProfileAvailable) return;
+        batteryEfficiencyProc.command = [root.home + "/.local/bin/rice", "battery", "next"];
+        batteryEfficiencyProc.running = true;
+    }
+    Process {
+        id: batteryEfficiencyProc
+        stdout: SplitParser {
+            onRead: function (line) { root.batteryProfile = line.trim(); }
+        }
+        onExited: batteryEfficiencyProbe.running = true
+    }
+    Process {
+        id: batteryEfficiencyProbe
+        command: [root.home + "/.local/bin/rice", "battery", "status"]
+        running: true
+        stdout: SplitParser {
+            onRead: function (line) { root.batteryProfile = line.trim(); }
+        }
+        onExited: function (exitCode) { root.batteryProfileAvailable = exitCode === 0; }
+    }
+    Process {
+        id: batteryProfilesProbe
+        command: [root.home + "/.local/bin/rice", "battery", "available"]
+        running: true
+        property var found: []
+        stdout: SplitParser {
+            onRead: function (line) {
+                const profile = line.trim();
+                if (["power-saver", "balanced", "performance"].indexOf(profile) >= 0
+                    && batteryProfilesProbe.found.indexOf(profile) < 0) {
+                    batteryProfilesProbe.found = batteryProfilesProbe.found.concat([profile]);
+                }
+            }
+        }
+        onExited: function (exitCode) {
+            if (exitCode === 0 && found.length > 0) root.batteryProfiles = found;
+        }
+    }
+    Timer {
+        interval: 15000; running: true; repeat: true
+        onTriggered: if (!batteryEfficiencyProbe.running) batteryEfficiencyProbe.running = true
+    }
+
     // ═══════════════════════ pokemon del tema ═══════════════════════
     // El pokemon que sale al abrir la primera terminal se elige comparando la
     // paleta del sprite con la de pywal (~/.local/bin/poke-theme). Apagado

@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# game-mode — a reversible desktop-performance layer for a game session.
+#
+# This intentionally does not change CPU governors, GPU clocks, services, or
+# power profiles. GameMode itself owns those per-process optimisations when a
+# game is launched through `rice gaming launch`; this helper only removes the
+# compositor work that can compete with a fullscreen game.
+
+set -euo pipefail
+
+mode="${1:-status}"
+runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+state_dir="$runtime_root/quickshell-rice"
+snapshot="$state_dir/game-mode.json"
+
+need_session() {
+    command -v hyprctl >/dev/null || { echo "Hyprland is not available" >&2; exit 1; }
+    command -v jq >/dev/null || { echo "jq is required to preserve Game Mode state" >&2; exit 1; }
+}
+
+get_bool() {
+    local value
+    value="$(hyprctl getoption "$1" -j | jq -r '.bool')"
+    [[ "$value" == true || "$value" == false ]] || return 1
+    printf '%s\n' "$value"
+}
+
+active() { [[ -r "$snapshot" ]]; }
+
+apply_state() {
+    local animations="$1" blur="$2" shadow="$3"
+    hyprctl eval "hl.config({ animations = { enabled = ${animations} }, decoration = { blur = { enabled = ${blur} }, shadow = { enabled = ${shadow} } } })" >/dev/null
+}
+
+restore() {
+    need_session
+    if [[ ! -r "$snapshot" ]]; then
+        printf 'off\n'
+        return
+    fi
+    local animations blur shadow
+    if ! animations="$(jq -r '.animations' "$snapshot")" \
+        || ! blur="$(jq -r '.blur' "$snapshot")" \
+        || ! shadow="$(jq -r '.shadow' "$snapshot")" \
+        || [[ "$animations" != true && "$animations" != false ]] \
+        || [[ "$blur" != true && "$blur" != false ]] \
+        || [[ "$shadow" != true && "$shadow" != false ]]; then
+        # A broken snapshot must not leave a partial desktop state behind.
+        hyprctl reload >/dev/null || true
+        rm -f -- "$snapshot"
+        printf 'off\n'
+        return
+    fi
+    if ! apply_state "$animations" "$blur" "$shadow"; then
+        hyprctl reload >/dev/null || true
+    fi
+    rm -f -- "$snapshot"
+    printf 'off\n'
+}
+
+enable() {
+    need_session
+    active && { printf 'on\n'; return; }
+    mkdir -p "$state_dir"
+    local temp
+    temp="$(mktemp "$state_dir/game-mode.XXXXXX")"
+    jq -n \
+        --argjson animations "$(get_bool animations:enabled)" \
+        --argjson blur "$(get_bool decoration:blur:enabled)" \
+        --argjson shadow "$(get_bool decoration:shadow:enabled)" \
+        '{animations: $animations, blur: $blur, shadow: $shadow}' > "$temp"
+    mv -f -- "$temp" "$snapshot"
+    if ! apply_state false false false; then
+        restore || true
+        exit 1
+    fi
+    printf 'on\n'
+}
+
+case "$mode" in
+    on) enable ;;
+    off) restore ;;
+    toggle) if active; then restore; else enable; fi ;;
+    status) if active; then printf 'on\n'; else printf 'off\n'; fi ;;
+    *) echo "Usage: game-mode {on|off|toggle|status}" >&2; exit 2 ;;
+esac
