@@ -3,6 +3,9 @@ adwaita-fonts
 awww
 base
 base-devel
+imagemagick
+librsvg
+libxcursor
 bat
 bc
 bluetui

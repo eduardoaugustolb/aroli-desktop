@@ -61,6 +61,10 @@ your image without turning every application surface into its dominant colour.
   Threshold, Obsidian Dunes, and Ink Mountains.
 - Assisted migration for installs coming from the previous fork.
 
+Change the cursor size consistently across Hyprland and GTK with
+`umbra-cursor-size 40`. Values from 16 to 96 are accepted; relog afterwards
+so already-running applications reload the XCursor.
+
 <details>
 <summary><strong>See the rice in motion</strong></summary>
 <br>

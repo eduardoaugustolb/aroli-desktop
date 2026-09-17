@@ -86,10 +86,8 @@ end)
 ---- ENVIRONMENT VARIABLES ----
 -------------------------------
 
-hl.env("XCURSOR_THEME",   "Bibata-Modern-Ice")
-hl.env("XCURSOR_SIZE",    "19")
-hl.env("HYPRCURSOR_THEME","Bibata-Modern-Ice")
-hl.env("HYPRCURSOR_SIZE", "19")
+hl.env("XCURSOR_THEME", "Umbra")
+hl.env("XCURSOR_SIZE",  "32")
 
 
 -----------------------------
@@ -393,8 +391,9 @@ hl.config({
     master  = { new_status = "master" },
 })
 
--- Cursor: hyprcursor OFF on purpose (2026-09-06). Installing the Bibata
--- SVG theme (~/.local/share/icons/Bibata-Modern-Ice, for shake-to-find
+-- Cursor: hyprcursor OFF on purpose. Umbra is an XCursor theme, not a
+-- hyprcursor theme.
+-- SVG theme (when available, for shake-to-find
 -- sharpness) made Hyprland also use it for the NORMAL cursor and Eduardo
 -- Augusto noticed it differs from the usual XCursor bitmap. With this the normal
 -- cursor is the lifelong one; the shake enlargement scales that bitmap with

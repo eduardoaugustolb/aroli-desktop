@@ -1,6 +1,5 @@
 # Optional packages: each one requires individual confirmation in the installer.
 # Format: package<TAB>reason
-bibata-cursor-theme	alternative Bibata cursor theme
 auto-cpufreq	automatic power and CPU tuning (does not enable the service)
 cbonsai	terminal bonsai animation
 google-chrome	Google Chrome browser

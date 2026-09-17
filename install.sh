@@ -25,7 +25,7 @@ UI_LANG=             # es | en | pt-BR; empty means "ask, or take the default"
 DEFAULT_LANG=pt-BR   # default language of this fork
 REQUESTED_PHASES=()
 
-ALL_PHASES=(base aur packages repos config system graphics services sddm spicetify final)
+ALL_PHASES=(base aur packages repos cursor config system graphics services sddm spicetify final)
 # 'restore' is not part of the default run: it only happens if you name it
 # explicitly, because it undoes what 'config' did.
 ON_DEMAND_PHASES=(restore)
@@ -144,6 +144,7 @@ Phases (if you name none, all of them run in this order):
   aur         builds yay if it is missing
   packages    installs pacman.txt + extra.txt + aur.txt
   repos       clones oh-my-zsh, powerlevel10k and the zsh plugins
+  cursor      builds and installs the latest Umbra XCursor theme
   config      puts home/ into your $HOME (symlinks or copies, with backup)
   system      copies system/etc into /etc  (asks for sudo)
   graphics    detects the graphics card(s) and installs their drivers
@@ -724,6 +725,44 @@ phase_repos() {
         run mkdir -p "$(dirname "$path")"
         run git clone "${depth[@]}" "$url" "$path" && ok "$dest" || warn "could not clone $dest"
     done < "$manifest"
+}
+
+# ----------------------------------------------------------------- phase: cursor
+
+phase_cursor() {
+    heading "Umbra Cursor"
+
+    local tmp="${TMPDIR:-/tmp}/umbra-cursor"
+    local url="https://github.com/eduardoaugustolb/umbra.git"
+    local source="$tmp/themes/cursor/umbra"
+    local target="$HOME/.local/share/icons/Umbra"
+
+    if [ "$DRY" = 1 ]; then
+        skip "would clone the latest Umbra Cursor from $url"
+        skip "would build and install $target"
+        return 0
+    fi
+
+    run rm -rf "$tmp"
+    run git clone --depth 1 "$url" "$tmp" || {
+        warn "could not fetch the Umbra Cursor repository"
+        return 0
+    }
+    [ -d "$source" ] || { warn "Umbra Cursor source was not found in the repository"; return 0; }
+    command -v make >/dev/null 2>&1 || { warn "make is required to build Umbra Cursor"; return 0; }
+
+    (cd "$source" && make build) || {
+        warn "Umbra Cursor build failed; keeping the current cursor"
+        return 0
+    }
+    [ -f "$source/index.theme" ] && [ -d "$source/cursors" ] || {
+        warn "Umbra Cursor build did not produce index.theme and cursors/"
+        return 0
+    }
+    run mkdir -p "$(dirname "$target")"
+    run mkdir -p "$target"
+    run cp -a "$source/." "$target/"
+    ok "Umbra Cursor installed from the latest main revision"
 }
 
 # ----------------------------------------------------------------- phase: config
@@ -1702,6 +1741,7 @@ for phase in "${PHASES[@]}"; do
         aur)      phase_aur ;;
         packages) phase_packages ;;
         repos)    phase_repos ;;
+        cursor)   phase_cursor ;;
         config)   phase_config ;;
         system)   phase_system ;;
         graphics) phase_graphics ;;
