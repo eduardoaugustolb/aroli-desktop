@@ -4,8 +4,8 @@
 #
 # All the new machine needs is Arch and git:
 #
-#     git clone https://github.com/diegoMalagrida/dotfiles
-#     cd dotfiles
+#     git clone https://github.com/eduardoaugustolb/umbra-liminal.git
+#     cd umbra-liminal
 #     ./install.sh
 #
 # It can be re-run as many times as you like: it does not redo what is already
@@ -235,30 +235,30 @@ copy_tree() {
     fi
 }
 
-# Rewrites the /home/diego spelled out inside the repo's own files so they work
+# Rewrites the /home/eduardoaugustolb spelled out inside the repo's own files so they work
 # for whoever is installing.
 #
 # WHY THIS EXISTS. A good part of the rice points at ~/.cache/wal with an
 # ABSOLUTE path, and it has to: kitty's `include`, the GTK and
 # satty `@import url(file://...)`, hyprlock's lock background... none of them
 # expand `~` or `$HOME`, so a relative path would be resolved against whatever
-# directory the program happened to start in. On diego's machine that absolute
+# directory the program happened to start in. On Eduardo Augusto's machine that absolute
 # path is right by definition; on anyone else's it points at a home that does
 # not exist, and the result is a desktop that comes up in default colours with
 # nothing failing out loud.
 #
 # It was worse than colours: `sddm-hyprisland/install.sh` had its own source
 # directory hardcoded, so the whole `sddm` phase died with "cannot stat
-# /home/diego/.config/sddm-hyprisland/Main.qml", and
+# /home/eduardoaugustolb/.config/sddm-hyprisland/Main.qml", and
 # `luminous-autoselect.service` pointed its ExecStart at a binary under
-# /home/diego that is not there.
+# /home/eduardoaugustolb that is not there.
 #
 # This runs at the START of `config`, before anything is deployed, so every
 # phase after it -system, services, sddm, final- sees files that already say
 # the right thing. It rewrites the repo tree itself, which is deliberate and
 # the same thing the symlink repointing already did: `git diff` shows it.
 adapt_home_paths() {
-    [ "$HOME" = /home/diego ] && return 0
+    [ "$HOME" = /home/eduardoaugustolb ] && return 0
 
     # A GUARD, and not a paranoid one: this REWRITES THE REPO, so it may only
     # run when $HOME really is the installing user's home. A test harness that runs
@@ -277,8 +277,8 @@ adapt_home_paths() {
 
     # 1) contents. Text files only, and never the wallpapers or the .git.
     while IFS= read -r f; do
-        grep -Iq "/home/diego" "$f" 2>/dev/null || continue
-        run sed -i "s#/home/diego#$HOME#g" "$f"
+        grep -Iq "/home/eduardoaugustolb" "$f" 2>/dev/null || continue
+        run sed -i "s#/home/eduardoaugustolb#$HOME#g" "$f"
         n_files=$((n_files + 1))
     done < <(find "$REPO/home" -type f \
                   -not -path "*/.git/*" \
@@ -290,7 +290,7 @@ adapt_home_paths() {
     while IFS= read -r link; do
         target="$(readlink "$link")"
         case "$target" in
-            /home/diego/*) run ln -sfn "$HOME${target#/home/diego}" "$link" ;;
+            /home/eduardoaugustolb/*) run ln -sfn "$HOME${target#/home/eduardoaugustolb}" "$link" ;;
             *) continue ;;
         esac
         n_links=$((n_links + 1))
@@ -529,8 +529,8 @@ phase_base() {
         warn "sudo will ask you for your password along the way"
     fi
 
-    if [ "$USER" != diego ]; then
-        warn "your user is '$USER', not 'diego'. Some files have /home/diego written inside them;"
+    if [ "$USER" != eduardoaugustolb ]; then
+        warn "your user is '$USER', not 'eduardoaugustolb'. Some files have /home/eduardoaugustolb written inside them;"
         warn "the 'system' phase rewrites them for you, but do check the output."
     fi
 
@@ -733,7 +733,7 @@ phase_config() {
     local root="$REPO/home"
     [ -d "$root" ] || die "cannot find $root"
 
-    # First of all: if you are not diego, adapt the absolute paths the repo has
+    # First of all: if you are not Eduardo Augusto, adapt the absolute paths the repo has
     # spelled out. This has to happen BEFORE anything is laid down, because the
     # phases that come after (system, services, sddm) read these same files.
     adapt_home_paths
@@ -892,12 +892,12 @@ phase_system() {
         run sudo mkdir -p "$(dirname "$dest")"
         run sudo cp "$src" "$dest"
 
-        # Nothing under system/etc/ spells out /home/diego today -- the unit
+        # Nothing under system/etc/ spells out /home/eduardoaugustolb today -- the unit
         # that did was retired -- but a file dropped into /etc is the one place
         # where that would be invisible until it broke, so the net stays up.
-        if [ "$USER" != diego ] && [ "$DRY" = 0 ] && grep -q '/home/diego' "$dest" 2>/dev/null; then
-            sudo sed -i "s#/home/diego#$HOME#g" "$dest"
-            printf '       %s(rewrote /home/diego -> %s)%s\n' "$C_DIM" "$HOME" "$C_OFF"
+        if [ "$USER" != eduardoaugustolb ] && [ "$DRY" = 0 ] && grep -q '/home/eduardoaugustolb' "$dest" 2>/dev/null; then
+            sudo sed -i "s#/home/eduardoaugustolb#$HOME#g" "$dest"
+            printf '       %s(rewrote /home/eduardoaugustolb -> %s)%s\n' "$C_DIM" "$HOME" "$C_OFF"
         fi
         ok "/etc/$rel"
     done < <(find "$root" -type f | sort)
@@ -1401,7 +1401,7 @@ phase_spicetify() {
                 # -d sets the default too, so files spicetify creates later
                 # inherit it. X: execute only where it already applies.
                 # The braces are not decoration: in zsh, "$USER:rwX" swallows
-                # the ":r" as a history modifier and hands setfacl "u:diegowX".
+                # the ":r" as a history modifier and hands setfacl "u:eduardoaugustolbwX".
                 # This script is bash, so it would be fine either way, but the
                 # line gets copy-pasted into a shell sooner or later.
                 run sudo setfacl -Rm  "u:${USER}:rwX" /opt/spotify
@@ -1467,7 +1467,7 @@ phase_final() {
 
     # Safety net: normally `config` already did this, but if someone runs only
     # `./install.sh final` it should still add up. It is idempotent: if no
-    # /home/diego is left, it says nothing.
+    # /home/eduardoaugustolb is left, it says nothing.
     adapt_home_paths
 
     # fonts
@@ -1653,7 +1653,7 @@ phase_restore() {
 
 printf '%s' "$C_TIT"
 cat <<'HEADER'
-   diego's dotfiles -- Hyprland + Quickshell desktop
+   Eduardo Augusto's dotfiles -- Hyprland + Quickshell desktop
 HEADER
 printf '%s' "$C_OFF"
 printf '  repo:   %s\n  phases: %s\n' "$REPO" "${PHASES[*]}"

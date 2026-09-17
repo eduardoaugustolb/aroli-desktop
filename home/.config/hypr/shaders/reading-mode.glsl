@@ -1,7 +1,7 @@
 #version 320 es
 
 /*
- * Modo lectura del rice de Diego.
+ * Modo lectura del rice de Eduardo Augusto.
  *
  * Implementacion propia inspirada en el modo e-ink de surface-dots:
  * https://github.com/snes19xx/surface-dots

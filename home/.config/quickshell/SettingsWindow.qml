@@ -425,7 +425,7 @@ Scope {
                                 font.pixelSize: 10
                             }
                             Text {
-                                text: I18n.tr("Quickshell · rice de diego")
+                                text: I18n.tr("Quickshell · rice de Eduardo Augusto")
                                 color: "#454545"
                                 font.family: Appearance.fontUI
                                 font.pixelSize: 10

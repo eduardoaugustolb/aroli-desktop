@@ -84,7 +84,7 @@ Flickable {
             out.push({
                 combo: root.comboLabel(mods, key),
                 // El comentario viene del propio hyprland.conf, en castellano, y
-                // se traduce aqui: asi la config de Hyprland -que es de Diego y
+                // se traduce aqui: asi la config de Hyprland -que es de Eduardo Augusto y
                 // esta en castellano a proposito- no hay que tocarla para cambiar
                 // de idioma. La clave del diccionario es el comentario literal.
                 what: comment.length > 0 ? I18n.tr(comment) : root.dispLabel(disp, args),

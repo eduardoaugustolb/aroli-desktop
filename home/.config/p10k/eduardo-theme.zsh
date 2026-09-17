@@ -1,4 +1,4 @@
-# ~/.config/p10k/diego-theme.zsh
+# ~/.config/p10k/eduardo-theme.zsh
 # Overrides de Powerlevel10k: estilo LEAN de 1 linea, paleta pywal.
 # Se carga DESPUES de ~/.p10k.zsh (ver el source al final de ~/.zshrc).
 # Revertir: borra esa linea de source en ~/.zshrc y abre una terminal nueva.

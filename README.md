@@ -117,8 +117,8 @@ diagnóstico seguro.
 O script primeiro inspeciona os links existentes; só muda algo com `--apply`.
 
 ```sh
-./scripts/migrate-from-diego-rice.sh
-./scripts/migrate-from-diego-rice.sh --apply
+./scripts/migrate-from-legacy-rice.sh
+./scripts/migrate-from-legacy-rice.sh --apply
 ```
 
 Veja o passo a passo e as garantias em [docs/MIGRACAO.md](docs/MIGRACAO.md).

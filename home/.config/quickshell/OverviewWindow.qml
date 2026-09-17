@@ -126,7 +126,7 @@ Item {
     // alternaba entre 1100 (su sitio) y 2606, que está FUERA de la rejilla (1372
     // px de ancho), o sea fuera de la pantalla.
     //
-    // En cámara eso se veía exactamente como lo describió Diego: la ventana no
+    // En cámara eso se veía exactamente como lo describió Eduardo Augusto: la ventana no
     // se arrastra, solo se enciende la celda de destino, y al soltar aparece
     // allí. Con los bindings sueltos, Qt manda solo y la miniatura va pegada al
     // cursor, que es lo que se quería enseñar.

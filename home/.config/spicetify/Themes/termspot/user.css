@@ -849,7 +849,7 @@ button[data-testid="control-button-seek-forward-15"] > span:first-child::after {
 }
 
 /*  ================================================================
-    PARCHE LOCAL (diego) — no viene de fdeox/termspot.
+    PARCHE LOCAL (Eduardo Augusto) — no viene de fdeox/termspot.
     Si actualizas el tema desde upstream, vuelve a añadir este bloque.
     ================================================================ */
 
@@ -905,7 +905,7 @@ body.termspot-mono .termspot-reveal video {
 
 /* 5. El prompt del saludo se cortaba: la extensión lo pinta con
    'white-space: pre' y tu panel ~/main tiene ~415px útiles, insuficientes para
-   "diegomalagrida@termspot:~ $ ..." (28 caracteres solo el prompt). Con pre-wrap
+   "eduardoaugustolb@termspot:~ $ ..." (30 caracteres solo el prompt). Con pre-wrap
    hace lo que haría una terminal de verdad: seguir en la línea siguiente. El
    prefijo 'html' es para ganarle en especificidad al <style> que la extensión
    inyecta en runtime, que va después de este fichero en la cascada.

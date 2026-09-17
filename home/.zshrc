@@ -215,7 +215,7 @@ function y() {
 # END YAZI Y WRAPPER
 
 # ---- Prompt naranja+azul (overrides de Powerlevel10k) ----
-[[ -f ~/.config/p10k/diego-theme.zsh ]] && source ~/.config/p10k/diego-theme.zsh
+[[ -f ~/.config/p10k/eduardo-theme.zsh ]] && source ~/.config/p10k/eduardo-theme.zsh
 
 
 # ---- Sprites tematizados: sesga la ELECCION del pokemon segun el tema pywal ----

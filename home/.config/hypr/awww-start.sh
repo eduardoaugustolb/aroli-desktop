@@ -3,7 +3,7 @@
 # awww-start.sh -- levanta el daemon del fondo y garantiza que SIEMPRE queda un
 # fondo puesto, tambien en el primer arranque de una maquina recien instalada.
 #
-# El fallo que motiva la segunda mitad de este script: Diego instalo el repo en
+# El fallo que motiva la segunda mitad de este script: Eduardo Augusto instalo el repo en
 # una torre con Arch limpio, entro a Hyprland y se encontro la pantalla NEGRA
 # con los colores del sistema correctos. La cadena era esta:
 #
