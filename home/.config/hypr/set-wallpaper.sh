@@ -26,9 +26,21 @@ fi
 # todos los slots) y terminal, yazi, cava y fzf quedan fluorescentes. 0.2 mantiene
 # el carácter del fondo. install.sh usa el mismo valor para que el primer
 # arranque se vea igual que tras el primer cambio de fondo.
-if ! wal -i "$IMG" --saturate 0.2 -n -q -s -t; then
-  notify-send -u critical "Tema dinámico" "Pywal no pudo generar la paleta" 2>/dev/null || true
-  exit 1
+#
+# Pinned backend: okthief clusters by dominant areas, so small vivid details
+# don't hijack the accent slots. Falls back to pywal's default when okthief
+# is missing or fails. Whatever palette comes out, pywal-normalize.py then
+# reassigns the chromatic slots by hue (a green detail must not land in the
+# red slot) and `wal -R` re-exports every template from the normalized file.
+if ! wal -i "$IMG" --backend okthief --saturate 0.2 -n -q -s -t; then
+  if ! wal -i "$IMG" --saturate 0.2 -n -q -s -t; then
+    notify-send -u critical "Tema dinámico" "Pywal no pudo generar la paleta" 2>/dev/null || true
+    exit 1
+  fi
+fi
+if [ -x "$HOME/.config/hypr/scripts/pywal-normalize.py" ]; then
+  "$HOME/.config/hypr/scripts/pywal-normalize.py" >/dev/null 2>&1 \
+    && wal -R -n -q -s -t || true
 fi
 ln -sfn -- "$IMG" "$HOME/.cache/wal/lockbg"  # fondo de bloqueo sigue al wallpaper
 
