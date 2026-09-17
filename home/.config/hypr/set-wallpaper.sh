@@ -20,8 +20,13 @@ if exec 9>"${XDG_RUNTIME_DIR:-/tmp}/set-wallpaper.lock" 2>/dev/null; then
     flock 9
 fi
 
-# --saturate 0.5: sube la saturación de la paleta para colores más vivos (0.4 suave, 0.6 fuerte, quítalo para el original)
-if ! wal -i "$IMG" --saturate 0.5 -n -q -s -t; then
+# --saturate 0.2: realza un poco la paleta sin llevarla a neón. El pywal ya
+# entrega colores vivos en fondos coloridos; valores altos (0.4-0.5) suman esa
+# cantidad a la saturación HLS de TODOS los colores (se mide S=0.9-1.0 en casi
+# todos los slots) y terminal, yazi, cava y fzf quedan fluorescentes. 0.2 mantiene
+# el carácter del fondo. install.sh usa el mismo valor para que el primer
+# arranque se vea igual que tras el primer cambio de fondo.
+if ! wal -i "$IMG" --saturate 0.2 -n -q -s -t; then
   notify-send -u critical "Tema dinámico" "Pywal no pudo generar la paleta" 2>/dev/null || true
   exit 1
 fi

@@ -1514,7 +1514,9 @@ phase_final() {
             skip "would generate the pywal palette from $(basename "$wallpaper")"
             skip "would regenerate the derived themes (btop, cava, yazi, discord, spicetify, Qt)"
         else
-            wal -i "$wallpaper" -n -q && ok "pywal palette generated from $(basename "$wallpaper")"
+            # Mismo --saturate que set-wallpaper.sh: la paleta del primer
+            # arranque debe verse igual que tras el primer cambio de fondo.
+            wal -i "$wallpaper" --saturate 0.2 -n -q && ok "pywal palette generated from $(basename "$wallpaper")"
 
             # `wal` only fills ~/.cache/wal. The derived themes are written by
             # these scripts, which day to day are launched by set-wallpaper.sh;

@@ -38,10 +38,13 @@ def hexof(h, l, s):
 
 bh, bl, bs = hls(bg)
 dark = bl < 0.5
-# Acento = el colorN mas saturado (mismo criterio que btop-pywal.sh).
+# Acento = el colorN mas saturado (mismo criterio que btop-pywal.sh), con
+# saturación adaptativa: la real del fondo + empujón, con suelo (visible en
+# grises) y techo 0.50 para no llegar a neón.
 ah, al, as_ = max((hls(pal[f"color{i}"]) for i in range(1, 7)), key=lambda t: t[2])
 if as_ < 0.08:
     ah, al, as_ = hls(fg)
+s_acc = min(max(as_, 0.15) + 0.10, 0.50)
 
 step = 0.035 if dark else -0.035
 # Escalera de fondos: Discord usa varios niveles de profundidad.
@@ -78,8 +81,8 @@ def readable(col, target):
     return hexof(h, l, s)
 
 
-accent = readable(hexof(ah, 0.55 if dark else 0.45, max(as_, 0.35)), 3.0)
-accent_hi = readable(hexof(ah, 0.65 if dark else 0.38, max(as_, 0.35)), 4.5)
+accent = readable(hexof(ah, 0.55 if dark else 0.45, s_acc), 3.0)
+accent_hi = readable(hexof(ah, 0.65 if dark else 0.38, s_acc), 4.5)
 # Los nombres de canal y las marcas de tiempo van en este color: si se queda
 # al ras del minimo no se leen. 4.0 da margen.
 muted = readable(hexof(bh, bl + (0.35 if dark else -0.35), bs * 0.6), 4.0)

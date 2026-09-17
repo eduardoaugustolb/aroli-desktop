@@ -3,8 +3,10 @@
 #
 # Las paletas pywal de muchos fondos son grises (saturación ~0-20%), así que un
 # acento "tal cual" no se aprecia. Aquí tomamos el TONO (hue) dominante del
-# wallpaper y le subimos saturación/luz -> un acento vivo que cambia de color
-# con cada fondo, pero mantiene el tono real de la imagen.
+# wallpaper y partimos de SU saturación real con un empujón fijo (+0.15, suelo
+# 0.30 para que se vea en fondos grises y techo 0.55 para no llegar a neón):
+# el acento cambia de color con cada fondo y mantiene el aire del tema
+# original, sin fluorescencia.
 #
 # El color.ini de 'termspot' trae 19 esquemas propios (Fdeox, Synthwave...), así
 # que NO se sobrescribe el fichero: se inserta/reemplaza solo el bloque [pywal]
@@ -37,17 +39,23 @@ cols = [c["color%d" % i] for i in range(16)]
 sat  = lambda h: colorsys.rgb_to_hls(*h2rgb(h))[2]
 # tono dominante = color más saturado entre los cromáticos (evita negros/grises 0,7,8,15)
 best = max(cols[1:7] + cols[9:15], key=sat)
-hue  = colorsys.rgb_to_hls(*h2rgb(best))[0]
+best_hls = colorsys.rgb_to_hls(*h2rgb(best))
+hue, s_best = best_hls[0], best_hls[2]
+# Acento adaptativo: saturación real del fondo + empujón, con suelo (visible
+# en grises) y techo (nunca neón). El tinte de superficies acompaña con el
+# mismo criterio en vez de un 0.24 fijo.
+acc_sat  = min(max(s_best + 0.15, 0.30), 0.55)
+tint_sat = min(s_best + 0.08, 0.24)
 
 mk   = lambda l, s: H(*colorsys.hls_to_rgb(hue, l, s))
 bl   = colorsys.rgb_to_hls(*h2rgb(sp["background"]))[1]
 # Superficies: oscuras pero CON tono, que es lo que da el aire de fósforo. La
-# rampa (0.06 / 0.12 / 0.26 sobre el fondo) y la saturación 0.24 replican la
-# separación del esquema Fdeox de termspot, medida sobre sus propios valores.
-tint = lambda l: mk(min(l, 0.30), 0.24)
+# rampa (0.06 / 0.12 / 0.26 sobre el fondo) replica la separación del esquema
+# Fdeox de termspot, medida sobre sus propios valores.
+tint = lambda l: mk(min(l, 0.30), tint_sat)
 
-accent  = mk(0.62, 0.72)   # play / activo / barra / seleccionado
-accent2 = mk(0.72, 0.72)   # hover
+accent  = mk(0.62, acc_sat)   # play / activo / barra / seleccionado
+accent2 = mk(0.72, acc_sat)   # hover
 
 body = f"""text               = {strip(sp['foreground'])}
 subtext            = {strip(c['color8'])}
