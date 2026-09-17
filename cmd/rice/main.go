@@ -848,7 +848,12 @@ func (m tuiModel) updateHome(key string) (tea.Model, tea.Cmd) {
 			m.dryRun = m.cursor == 1
 			m.screen = tuiLanguage
 		} else if m.cursor == 2 {
-			items, err := pluginCatalog()
+			var items []plugin
+			err := silenceTerminal(func() error {
+				var err error
+				items, err = pluginCatalog()
+				return err
+			})
 			if err != nil {
 				m.message = "Erro: " + err.Error()
 				m.screen = tuiDone

@@ -10,6 +10,13 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [1.1.3] - 2026-09-17
+
+### Fixed
+
+- Kept plugin catalog bootstrap and repository cloning out of the Bubble Tea
+  screen while opening the plugin manager.
+
 ## [1.1.2] - 2026-09-17
 
 ### Fixed
