@@ -58,5 +58,6 @@ jobs:
           files: |
             umbra-noctis-*.tar.gz
             SHA256SUMS.txt
+          overwrite_files: true
           body_path: RELEASE_NOTES.md
           generate_release_notes: true
