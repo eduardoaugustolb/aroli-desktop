@@ -1,0 +1,15 @@
+[Unit]
+# Once a day is plenty: releases ship a few times per MONTH, not per hour.
+# AccuracySec + RandomizedDelaySec let systemd coalesce this with other daily
+# timers instead of waking the machine for it alone.
+Description=Umbra Liminal update check, daily
+
+[Timer]
+OnBootSec=15min
+OnUnitInactiveSec=24h
+AccuracySec=1h
+RandomizedDelaySec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

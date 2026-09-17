@@ -675,6 +675,20 @@ Scope {
                     }
 
                     BarItem {
+                        // New rice release. No count, no pulse: a still dot that
+                        // opens Settings > About, where the update lives. The
+                        // state comes from a cached file (see ShellState), so
+                        // this adds zero wakeups and zero cost in games.
+                        visible: ShellState.riceUpdate
+                        icon: Icons.sync
+                        label: ""
+                        iconColor: Colors.c3
+                        labelColor: Colors.c3
+                        onClicked: ShellState.openSettingsAt("about")
+                        onRightClicked: ShellState.riceRefresh()
+                    }
+
+                    BarItem {
                         // Sin contador diario de notificaciones, pero el modo No
                         // Molestar si tiene que verse: si no, lo dejas puesto sin
                         // saberlo y te pierdes avisos.

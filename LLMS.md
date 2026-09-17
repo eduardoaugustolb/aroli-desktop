@@ -32,6 +32,8 @@ precedência sobre conveniência.
 | `packages/pacman.txt` | Base necessária do rice. |
 | `packages/optional-*.txt` | Itens opt-in, nunca padrão. |
 | `home/` | Arquivos que serão ligados ou copiados para `$HOME`. |
+| `home/.local/bin/rice` | CLI de versão, update, rollback e limpeza (`rice --help`). |
+| `VERSION` / `CHANGELOG.md` | Fonte única da versão e histórico por release. |
 | `home/Pictures/wallpapers/` | Wallpapers padrão distribuídos pelo rice. |
 | `scripts/migrate-from-legacy-rice.sh` | Migração segura do fork legado. |
 | `OMARCHY.md` | Contrato de compatibilidade com Omarchy. |
@@ -85,7 +87,15 @@ do usuário, embora crie backup.
 ## Rede e dados
 
 - Downloads de wallpapers, atualizações, clones e consultas a AUR exigem
-  consentimento explícito.
+  consentimento explícito, com UMA exceção declarada: o timer diário
+  `rice-update-check.timer` (habilitado pelo instalador) transfere alguns
+  KB (`git ls-remote --tags` ou um GET condicional na API de releases do
+  GitHub, com ETag) uma vez ao dia e escreve só
+  `~/.cache/umbra-liminal/update.json`. Sem telemetria, sem identificadores,
+  sem corpo de resposta guardado. Desligar:
+  `systemctl --user disable rice-update-check.timer`. `rice update`,
+  `rice rollback` e `rice prune --apply` nunca rodam sozinhos: exigem o
+  comando (e confirmação, salvo `--yes` explícito do usuário).
 - Não envie relatórios de diagnóstico completos a serviços externos; remova
   nomes de usuário, caminhos pessoais, endereços IP, SSIDs e identificadores.
 - Não adicione telemetria, analytics, plugins remotos ou processos em segundo

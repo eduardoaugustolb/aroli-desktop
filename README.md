@@ -89,6 +89,26 @@ Requer **Hyprland 0.56+**. Este rice usa `hyprland.lua`, não
 | `./install.sh --lang pt-BR` | Instala o rice em português do Brasil. |
 | `./install.sh restore` | Restaura os arquivos anteriores da configuração. |
 | `./diagnose` | Diagnóstico somente leitura. |
+| `rice status` | Versão instalada, último check e ref de rollback. |
+| `rice update --dry-run` | Mostra o plano de atualização sem mudar nada. |
+| `rice prune` | Lista arquivos aposentados pela última release (nada é apagado sem `--apply`). |
+
+## Atualizações
+
+O rice segue **tags estáveis** (`vX.Y.Z`, SemVer) — nunca o `main` —
+e avisa sozinho quando sai release no GitHub:
+
+- Um timer diário (`rice-update-check.timer`, prioridade idle, sem
+  processo residente) transfere alguns KB e escreve
+  `~/.cache/umbra-liminal/update.json`. A barra/notch mostra um ponto
+  e `Settings > Sobre` mostra a versão vista.
+- Atualizar é sempre um ato seu: `rice update --dry-run` mostra o plano,
+  `rice update` pede confirmação, registra o ponto de volta e re-roda
+  o instalador. `rice rollback` desfaz. `rice prune --apply` move
+  resíduos para a Lixeira (com backup), nunca apaga direto — e nunca
+  toca em arquivos que você modificou.
+- Desligar o aviso: `systemctl --user disable rice-update-check.timer`.
+  Detalhes e histórico em [CHANGELOG.md](CHANGELOG.md).
 
 ## Privacidade e controle
 

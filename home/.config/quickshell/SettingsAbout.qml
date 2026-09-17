@@ -45,6 +45,8 @@ Flickable {
                                           else if(h>0) printf "%d h %d min", h, m;
                                           else printf "%d min", m}' /proc/uptime)"
             printf 'pkgs\\t%s\\n'   "$(pacman -Qq 2>/dev/null | wc -l) ${I18n.tr("paquetes")}"
+            printf 'rice\\t%s\\n'   "$("$HOME/.local/bin/rice" version 2>/dev/null || rice version 2>/dev/null || echo "?")"
+            printf 'rel\\t%s\\n'    "$(jq -r 'if .update_available then ((.remote // \"?\") + \" (!)\") else (.remote // \"?\") end' ~/.cache/umbra-liminal/update.json 2>/dev/null || echo "?")"
         `]
         stdout: SplitParser {
             onRead: function (line) {
@@ -152,6 +154,17 @@ Flickable {
         SettingsControls.Card_ {
             id: cRice
             title: I18n.tr("ESTE RICE")
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Versión del rice")
+                hint: root.info["rice"] || ""
+                SettingsControls.Val_ { text: root.info["rice"] || "…" }
+            }
+            SettingsControls.Row_ {
+                label: I18n.tr("Última versión vista")
+                hint: I18n.tr("Lo escribe el temporizador diario en ~/.cache/umbra-liminal/update.json. «(!)» = hay actualización: ejecuta «rice update --dry-run» en una terminal.")
+                SettingsControls.Val_ { text: root.info["rel"] || "…" }
+            }
 
             SettingsControls.Row_ {
                 label: I18n.tr("Ajustes guardados en")

@@ -1,0 +1,523 @@
+#!/usr/bin/env bash
+# rice — version, update and cleanup dispatcher for Umbra Liminal.
+#
+#   rice version              print the installed version
+#   rice status               version + update check state + backups
+#   rice check [--force]      ask GitHub for the newest stable tag (cached 24 h)
+#   rice update [--dry-run]   move this checkout to the newest stable tag
+#   rice rollback             go back to the ref recorded before the last update
+#   rice prune [--apply]      list (or trash) files orphaned by the last update
+#
+# Design rules, all learned from install.sh and pacman-updates.sh:
+# - `check` is the ONLY network command that runs unattended (systemd timer).
+#   It transfers a few KB (ls-remote or one API GET with ETag) and writes a
+#   single cache file. Everything else is on-demand and asks first.
+# - `update` only follows stable tags (vX.Y.Z). `main` is never auto-applied.
+# - Nothing is deleted. `prune --apply` moves orphans to the trash (or to
+#   ~/.dotfiles-backup when no trash exists) and `rollback` brings them back.
+# - State files the desktop rewrites at runtime (hypridle.conf, language.conf,
+#   efectos.lua, qt palettes, poke-theme/state) are never prune candidates.
+
+set -uo pipefail
+
+VERSION_FILE_CANDIDATES=()
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/umbra-liminal"
+CACHE_FILE="$CACHE_DIR/update.json"
+ETAG_FILE="$CACHE_DIR/latest.etag"
+LOCK_FILE="$CACHE_DIR/rice.lock"
+STATE_FILE="$CACHE_DIR/state.json"
+CHECK_INTERVAL=86400   # 24 h: releases ship a few times per month, not per hour
+NET_TIMEOUT=20
+REPO_SLUG="eduardoaugustolb/umbra-liminal"
+
+DRY=0
+ASSUME_YES=0
+QUIET=0
+FORCE=0
+APPLY=0
+NO_REINSTALL=0
+CHANNEL="stable"
+
+if [ -t 1 ] && [ "${NO_COLOR:-}" = "" ]; then
+    C_TIT=$'\033[1;34m'; C_OK=$'\033[32m'; C_WARN=$'\033[33m'
+    C_BAD=$'\033[31m'; C_DIM=$'\033[2m'; C_OFF=$'\033[0m'
+else
+    C_TIT=; C_OK=; C_WARN=; C_BAD=; C_DIM=; C_OFF=
+fi
+
+say()  { [ "$QUIET" = 1 ] || printf '%s\n' "$*"; }
+ok()   { [ "$QUIET" = 1 ] || printf '  %sok%s   %s\n' "$C_OK" "$C_OFF" "$*"; }
+skip() { [ "$QUIET" = 1 ] || printf '  %s--%s   %s%s%s\n' "$C_DIM" "$C_OFF" "$C_DIM" "$*" "$C_OFF"; }
+warn() { printf '  %swarn%s %s\n' "$C_WARN" "$C_OFF" "$*" >&2; }
+err()  { printf '  %sERROR%s %s\n' "$C_BAD" "$C_OFF" "$*" >&2; }
+die()  { err "$*"; exit 1; }
+
+ask() {
+    [ "$ASSUME_YES" = 1 ] && return 0
+    [ "$DRY" = 1 ] && return 1
+    [ -t 0 ] || return 1
+    local answer
+    read -r -p "  $1 [y/N] " answer
+    [[ "$answer" =~ ^[sSyY]$ ]]
+}
+
+# ------------------------------------------------------------------ repo
+
+# Where the rice checkout lives. Resolution order: explicit env, the symlink
+# install.sh lays down (~/.config/quickshell -> <repo>/home/.config/quickshell),
+# common clone locations, finally the script's own directory (running in-repo).
+find_repo() {
+    if [ -n "${UMBRA_RICE_REPO:-}" ] && [ -d "${UMBRA_RICE_REPO:-}/.git" ]; then
+        printf '%s' "$UMBRA_RICE_REPO"
+        return 0
+    fi
+    local link
+    if [ -L "$HOME/.config/quickshell" ]; then
+        link="$(readlink -f "$HOME/.config/quickshell" 2>/dev/null)"
+        case "$link" in
+            */home/.config/quickshell)
+                printf '%s' "${link%/home/.config/quickshell}"
+                return 0 ;;
+        esac
+    fi
+    local cand
+    for cand in "$HOME/umbra-liminal" "$HOME/dotfiles" "$HOME/.dotfiles"; do
+        if [ -d "$cand/.git" ]; then printf '%s' "$cand"; return 0; fi
+    done
+    local here
+    here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -d "$here/../../.git" ]; then
+        (cd "$here/../.." && pwd)
+        return 0
+    fi
+    return 1
+}
+
+REPO=""
+REPO="$(find_repo 2>/dev/null)" || REPO=""
+
+local_version() {
+    if [ -n "$REPO" ] && [ -f "$REPO/VERSION" ]; then
+        tr -d ' \t\r\n' < "$REPO/VERSION"
+    else
+        printf '0.0.0-unknown'
+    fi
+}
+
+# SemVer compare: returns 0 when $1 > $2. Handles optional leading 'v' and
+# ignores pre-release suffixes for the comparison (a plain tag always wins).
+ver_gt() {
+    local a="${1#v}" b="${2#v}"
+    a="${a%%-*}"; b="${b%%-*}"
+    [ "$a" = "$b" ] && return 1
+    local first
+    first="$(printf '%s\n%s\n' "$a" "$b" | sort -V | head -1)"
+    [ "$first" = "$b" ]
+}
+
+highest_tag() {
+    # Highest vX.Y.Z (no suffix) from a newline-separated tag list on stdin.
+    grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1
+}
+
+# ------------------------------------------------------------------ cache
+
+read_cache_field() {  # $1 = field name; prints "" when missing/unreadable
+    local f="$1"
+    [ -f "$CACHE_FILE" ] || return 0
+    if command -v jq >/dev/null 2>&1; then
+        jq -r --arg f "$f" '.[$f] // ""' "$CACHE_FILE" 2>/dev/null
+    else
+        sed -n "s/^[[:space:]]*\"$f\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" "$CACHE_FILE" | head -1
+    fi
+}
+
+write_cache() {  # $1=remote $2=available(true/false) $3=took_ms $4=source
+    mkdir -p "$CACHE_DIR"
+    local tmp now
+    tmp="$(mktemp "${TMPDIR:-/tmp}/rice-cache.XXXXXXXX")"
+    now="$(date +%s)"
+    printf '{\n  "local": "%s",\n  "remote": "%s",\n  "update_available": %s,\n  "checked_at": %s,\n  "took_ms": %s,\n  "source": "%s"\n}\n' \
+        "$(local_version)" "$1" "$2" "$now" "$3" "$4" > "$tmp"
+    mv -f "$tmp" "$CACHE_FILE"
+}
+
+record_state() {  # $1=previous_ref $2=new_ref
+    mkdir -p "$CACHE_DIR"
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/rice-state.XXXXXXXX")"
+    printf '{\n  "previous_ref": "%s",\n  "current_ref": "%s",\n  "updated_at": %s\n}\n' \
+        "$1" "$2" "$(date +%s)" > "$tmp"
+    mv -f "$tmp" "$STATE_FILE"
+}
+
+# ------------------------------------------------------------------ check
+
+remote_via_git() {
+    [ -n "$REPO" ] || return 1
+    git -C "$REPO" ls-remote --tags origin 2>/dev/null \
+        | awk '{print $2}' | sed 's#^refs/tags/##; s#\^{}$##' | highest_tag
+}
+
+# The real fetch, plainly: headers to one file, body to another.
+remote_via_api() {
+    local hdr body code tag etag
+    hdr="$(mktemp "${TMPDIR:-/tmp}/rice-hdr.XXXXXXXX")"
+    body="$(mktemp "${TMPDIR:-/tmp}/rice-body.XXXXXXXX")"
+    trap 'rm -f "$hdr" "$body"' RETURN
+    if [ -f "$ETAG_FILE" ]; then
+        code="$(curl -sS -m "$NET_TIMEOUT" -o "$body" -D "$hdr" -w '%{http_code}' \
+            -H "Accept: application/vnd.github+json" \
+            -H "If-None-Match: $(cat "$ETAG_FILE")" \
+            "https://api.github.com/repos/$REPO_SLUG/releases/latest" 2>/dev/null)"
+    else
+        code="$(curl -sS -m "$NET_TIMEOUT" -o "$body" -D "$hdr" -w '%{http_code}' \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO_SLUG/releases/latest" 2>/dev/null)"
+    fi
+    case "$code" in
+        304) read_cache_field remote; return 0 ;;
+        200)
+            etag="$(grep -i '^etag:' "$hdr" | tr -d '\r' | sed 's/^[Ee][Tt][Aa][Gg]: *//' | head -1)"
+            [ -n "$etag" ] && printf '%s' "$etag" > "$ETAG_FILE"
+            if command -v jq >/dev/null 2>&1; then
+                tag="$(jq -r '.tag_name // ""' "$body" 2>/dev/null)"
+            else
+                tag="$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$body" | head -1)"
+            fi
+            [ -n "$tag" ] && printf '%s' "$tag"
+            return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+cmd_check() {
+    mkdir -p "$CACHE_DIR"
+    exec 9> "$LOCK_FILE"
+    if ! flock -n 9; then
+        skip "another rice check is already running"
+        exit 0
+    fi
+
+    local last=0 now remote="" source="throttled" start_ms end_ms took
+    now="$(date +%s)"
+    if [ -f "$CACHE_FILE" ]; then
+        last="$(read_cache_field checked_at)"
+        [[ "$last" =~ ^[0-9]+$ ]] || last=0
+    fi
+    if [ "$FORCE" = 0 ] && [ "$last" -gt 0 ] && [ $((now - last)) -lt "$CHECK_INTERVAL" ]; then
+        say "rice: cache is fresh ($(read_cache_field remote)); use --force to re-check"
+        exit 0
+    fi
+
+    start_ms="$(date +%s%3N 2>/dev/null || echo $((now * 1000)))"
+    if remote="$(remote_via_git)" && [ -n "$remote" ]; then
+        source="git-ls-remote"
+    elif remote="$(remote_via_api)" && [ -n "$remote" ]; then
+        source="github-api"
+    else
+        warn "could not reach the update source; keeping the previous answer"
+        [ -f "$CACHE_FILE" ] || write_cache "$(local_version)" false 0 "none"
+        exit 0
+    fi
+    end_ms="$(date +%s%3N 2>/dev/null || echo $(($(date +%s) * 1000)))"
+    took=$((end_ms - start_ms))
+    local avail=false
+    ver_gt "$remote" "$(local_version)" && avail=true
+    write_cache "$remote" "$avail" "$took" "$source"
+    if [ "$avail" = true ]; then
+        say "rice: update available: $(local_version) -> $remote"
+        command -v notify-send >/dev/null 2>&1 \
+            && notify-send "Umbra Liminal $remote available" "Run: rice update --dry-run" 2>/dev/null || true
+    else
+        ok "rice is up to date ($(local_version))"
+    fi
+}
+
+# ------------------------------------------------------------------ update
+
+current_ref() {
+    if [ -n "$REPO" ]; then
+        git -C "$REPO" describe --tags --exact-match 2>/dev/null \
+            || git -C "$REPO" rev-parse --short HEAD 2>/dev/null \
+            || printf '%s' "$(local_version)"
+    else
+        printf '%s' "$(local_version)"
+    fi
+}
+
+cmd_update() {
+    [ -n "$REPO" ] || die "could not find the rice checkout (set UMBRA_RICE_REPO)"
+    [ "$CHANNEL" = stable ] || die "only --channel=stable exists; main is never auto-applied"
+    command -v git >/dev/null || die "git is missing"
+
+    local before remote
+    before="$(current_ref)"
+    FORCE=1 QUIET=1 cmd_check
+    remote="$(read_cache_field remote)"
+    [ -n "$remote" ] || die "no remote tag known; check the network and run: rice check --force"
+
+    if ! ver_gt "$remote" "$(local_version)"; then
+        # The checkout may sit on an older commit while VERSION already matches
+        # (e.g. dirty tree); compare tags too before declaring victory.
+        if [ "$before" = "$remote" ]; then
+            ok "already on $remote"
+            return 0
+        fi
+    fi
+
+    say "rice update: $before -> $remote"
+    if [ "$DRY" = 1 ]; then
+        git -C "$REPO" fetch --tags --dry-run origin 2>&1 | head -5 || true
+        say "would: git fetch origin tag $remote && git checkout $remote"
+        say "would: record rollback ref ($before) and re-run ./install.sh"
+        git -C "$REPO" log --oneline "$before..$remote" 2>/dev/null | head -20 || \
+            say "(commit list unavailable until fetch)"
+        exit 0
+    fi
+
+    if ! git -C "$REPO" diff --quiet && ! git -C "$REPO" diff --cached --quiet; then
+        if [ -z "$(git -C "$REPO" status --porcelain 2>/dev/null)" ]; then :; fi
+    fi
+    if [ -n "$(git -C "$REPO" status --porcelain 2>/dev/null)" ]; then
+        err "the checkout has unsaved changes; update refuses to run over them."
+        err "commit, stash, or discard them first (git -C \"$REPO\" status --short)."
+        exit 1
+    fi
+
+    ask "fetch and check out $remote, then re-run ./install.sh?" || {
+        skip "cancelled; nothing changed"
+        exit 0
+    }
+
+    git -C "$REPO" fetch --tags origin || die "git fetch failed"
+    git -C "$REPO" checkout "$remote" || die "git checkout $remote failed"
+    record_state "$before" "$remote"
+    ok "now on $remote (previous: $before; rollback with: rice rollback)"
+
+    if [ "$NO_REINSTALL" = 0 ] && [ -x "$REPO/install.sh" ]; then
+        say "re-applying the rice (./install.sh)..."
+        if [ "$ASSUME_YES" = 1 ]; then
+            "$REPO/install.sh" --yes || warn "./install.sh reported an error; your checkout is still on $remote"
+        else
+            "$REPO/install.sh" || warn "./install.sh reported an error; your checkout is still on $remote"
+        fi
+    fi
+    say "tip: rice prune lists files the new release retired (nothing is deleted without --apply)"
+}
+
+cmd_rollback() {
+    [ -n "$REPO" ] || die "could not find the rice checkout (set UMBRA_RICE_REPO)"
+    local prev=""
+    [ -f "$STATE_FILE" ] && prev="$(read_cache_field previous_ref 2>/dev/null || true)"
+    if command -v jq >/dev/null 2>&1 && [ -f "$STATE_FILE" ]; then
+        prev="$(jq -r '.previous_ref // ""' "$STATE_FILE" 2>/dev/null)"
+    elif [ -f "$STATE_FILE" ]; then
+        prev="$(sed -n 's/.*"previous_ref"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$STATE_FILE" | head -1)"
+    fi
+    [ -n "$prev" ] || die "no previous ref recorded (no update has run yet)"
+    say "rice rollback: $(current_ref) -> $prev"
+    if [ "$DRY" = 1 ]; then
+        say "would: git checkout $prev && re-run ./install.sh"
+        exit 0
+    fi
+    ask "go back to $prev and re-run ./install.sh?" || { skip "cancelled"; exit 0; }
+    git -C "$REPO" checkout "$prev" || die "git checkout $prev failed"
+    ok "now on $prev"
+    if [ "$NO_REINSTALL" = 0 ] && [ -x "$REPO/install.sh" ]; then
+        if [ "$ASSUME_YES" = 1 ]; then
+            "$REPO/install.sh" --yes || warn "./install.sh reported an error"
+        else
+            "$REPO/install.sh" || warn "./install.sh reported an error"
+        fi
+    fi
+}
+
+# ------------------------------------------------------------------ prune
+
+# Files the desktop rewrites while you use it: state, not config. Never trash.
+is_protected() {
+    case "$1" in
+        home/.config/hypr/hypridle.conf|home/.config/hypr/language.conf|\
+        home/.config/hypr/efectos.lua|home/.config/qt5ct/colors/*|\
+        home/.config/qt6ct/colors/*|home/.config/poke-theme/state|\
+        home/.config/spicetify/config-xpui.ini|home/.config/vlc/vlc-qt-interface.conf)
+            return 0 ;;
+    esac
+    return 1
+}
+
+# Map a repo-relative path to its deployed location. Returns 1 when the path
+# is not something install.sh deploys (docs, CI, the repo itself).
+deployed_path() {
+    case "$1" in
+        home/*) printf '%s/%s' "$HOME" "${1#home/}" ;;
+        *) return 1 ;;
+    esac
+}
+
+cmd_prune() {
+    [ -n "$REPO" ] || die "could not find the rice checkout (set UMBRA_RICE_REPO)"
+    local old new
+    if command -v jq >/dev/null 2>&1 && [ -f "$STATE_FILE" ]; then
+        old="$(jq -r '.previous_ref // ""' "$STATE_FILE" 2>/dev/null)"
+        new="$(jq -r '.current_ref // ""' "$STATE_FILE" 2>/dev/null)"
+    else
+        old=""; new=""
+    fi
+    [ -n "$old" ] && [ -n "$new" ] || die "no update recorded yet; prune compares the refs of the last update"
+
+    local removed orphans=0
+    removed="$(git -C "$REPO" diff --name-only --diff-filter=D "$old" "$new" 2>/dev/null)" \
+        || die "could not diff $old..$new"
+    [ -n "$removed" ] || { ok "no files retired between $old and $new"; return 0; }
+
+    local trash="$HOME/.local/share/Trash/files"
+    command -v gio >/dev/null 2>&1 && trash="(gio trash)"
+    local backup="$HOME/.dotfiles-backup/prune-$(date +%Y%m%d-%H%M%S)"
+    local f dest
+    while IFS= read -r f; do
+        [ -n "$f" ] || continue
+        is_protected "$f" && { skip "protected (runtime state): $f"; continue; }
+        deployed_path "$f" || { skip "not deployed (repo-only): $f"; continue; }
+        dest="$(deployed_path "$f")"
+        [ -e "$dest" ] || [ -L "$dest" ] || continue
+        # Only trash what the old release left behind: a symlink into the repo
+        # (now dangling) or a copy byte-identical to the old blob. Anything the
+        # user created or modified is listed but never touched.
+        local old_blob target
+        old_blob="$(mktemp "${TMPDIR:-/tmp}/rice-old.XXXXXXXX")"
+        if git -C "$REPO" show "$old:$f" > "$old_blob" 2>/dev/null; then
+            if [ -L "$dest" ]; then
+                target="$(readlink -f "$dest" 2>/dev/null)"
+                case "$target" in "$REPO"/*) ;; *) skip "modified by you, kept: $dest"; rm -f "$old_blob"; continue ;; esac
+            elif ! cmp -s "$old_blob" "$dest" 2>/dev/null; then
+                skip "modified by you, kept: $dest"
+                rm -f "$old_blob"
+                continue
+            fi
+        else
+            skip "cannot verify origin, kept: $dest"
+            rm -f "$old_blob"
+            continue
+        fi
+        rm -f "$old_blob"
+        orphans=$((orphans + 1))
+        if [ "$APPLY" = 0 ] || [ "$DRY" = 1 ]; then
+            say "orphan: $dest"
+        else
+            if [ "$DRY" = 0 ]; then
+                mkdir -p "$backup"
+                if command -v gio >/dev/null 2>&1; then
+                    # Copy first: if the trash move fails (e.g. across
+                    # filesystems), the backup is still there and the file
+                    # stays put instead of being reported as moved.
+                    cp -a "$dest" "$backup/" 2>/dev/null || true
+                    if gio trash "$dest" 2>/dev/null; then
+                        ok "trashed (+ backup): $dest"
+                    else
+                        mv -f "$dest" "$backup/" && ok "moved to $backup: $dest"
+                    fi
+                else
+                    mv "$dest" "$backup/" && ok "moved to $backup: $dest"
+                fi
+            fi
+        fi
+    done <<<"$removed"
+
+    if [ "$orphans" -eq 0 ]; then
+        ok "no orphaned files on disk"
+    elif [ "$APPLY" = 0 ] || [ "$DRY" = 1 ]; then
+        say "$orphans orphan(s). Nothing was moved. Run: rice prune --apply"
+    else
+        say "$orphans orphan(s) moved. Undo with: rice rollback (or restore from $backup)"
+    fi
+}
+
+# ------------------------------------------------------------------ misc
+
+cmd_version() { printf '%s\n' "$(local_version)"; }
+
+cmd_status() {
+    local remote avail checked
+    remote="$(read_cache_field remote)"
+    avail="$(read_cache_field update_available)"
+    checked="$(read_cache_field checked_at)"
+    printf 'rice      %s\n' "$(local_version)"
+    printf 'checkout  %s\n' "$(current_ref)"
+    printf 'repo      %s\n' "${REPO:-not found}"
+    if [ -n "$remote" ]; then
+        printf 'latest    %s\n' "$remote"
+        [ "$avail" = true ] && printf 'update    available (rice update --dry-run)\n' \
+            || printf 'update    none\n'
+    else
+        printf 'latest    unknown (rice check --force)\n'
+    fi
+    if [[ "$checked" =~ ^[0-9]+$ ]] && [ "$checked" -gt 0 ]; then
+        printf 'checked   %s\n' "$(date --date="@$checked" '+%Y-%m-%d %H:%M' 2>/dev/null || echo "$checked")"
+    fi
+    local prev=""
+    [ -f "$STATE_FILE" ] && prev="$(sed -n 's/.*"previous_ref"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$STATE_FILE" | head -1)"
+    [ -n "$prev" ] && printf 'rollback  %s\n' "$prev"
+}
+
+usage() {
+    cat <<'USAGE'
+Usage: rice <command> [options]
+
+Commands:
+  version             print the installed version
+  status              version, checkout, last check, rollback ref
+  check [--force]     ask GitHub for the newest stable tag (cached 24 h)
+  update [--dry-run]  check out the newest stable tag and re-run install.sh
+  rollback            return to the ref before the last update
+  prune [--apply]     list (default) or trash files retired by the last update
+
+Options:
+  -n, --dry-run     show what would happen, change nothing
+  -y, --yes         never ask (still never touches user-modified files)
+  -q, --quiet       only essential output (for timers)
+  --force           ignore the 24 h check cache
+  --apply           actually move orphans (prune only)
+  --no-reinstall    skip ./install.sh after checkout
+  --channel=stable  the only channel (main is never auto-applied)
+  -h, --help        this
+
+Examples:
+  rice status
+  rice check --force
+  rice update --dry-run
+  rice prune
+  rice prune --apply
+USAGE
+}
+
+# ------------------------------------------------------------------ main
+
+CMD=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -n|--dry-run) DRY=1 ;;
+        -y|--yes) ASSUME_YES=1 ;;
+        -q|--quiet) QUIET=1 ;;
+        --force) FORCE=1 ;;
+        --apply) APPLY=1 ;;
+        --no-reinstall) NO_REINSTALL=1 ;;
+        --channel=*) CHANNEL="${1#*=}" ;;
+        --channel) shift; CHANNEL="${1:-}"; [ -n "$CHANNEL" ] || die "--channel needs a value" ;;
+        -h|--help|help) usage; exit 0 ;;
+        version|status|check|update|rollback|prune) CMD="$1" ;;
+        *) die "unknown argument: $1 (try: rice --help)" ;;
+    esac
+    shift
+done
+[ -n "$CMD" ] || { usage; exit 1; }
+
+case "$CMD" in
+    version)  cmd_version ;;
+    status)   cmd_status ;;
+    check)    cmd_check ;;
+    update)   cmd_update ;;
+    rollback) cmd_rollback ;;
+    prune)    cmd_prune ;;
+esac
