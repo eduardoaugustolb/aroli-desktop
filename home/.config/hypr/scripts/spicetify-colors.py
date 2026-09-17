@@ -16,7 +16,7 @@
 #
 # Uso: spicetify-colors.py [ruta_color.ini]
 #      (por defecto ~/.config/spicetify/Themes/termspot/color.ini)
-import json, sys, os, re, colorsys
+import json, sys, os, re, colorsys, math
 
 HOME = os.path.expanduser("~")
 SRC  = os.path.join(HOME, ".cache/wal/colors.json")
@@ -37,8 +37,21 @@ def strip(x): return x.lstrip("#").upper()
 
 cols = [c["color%d" % i] for i in range(16)]
 sat  = lambda h: colorsys.rgb_to_hls(*h2rgb(h))[2]
-# tono dominante = color más saturado entre los cromáticos (evita negros/grises 0,7,8,15)
-best = max(cols[1:7] + cols[9:15], key=sat)
+hue_of = lambda h: colorsys.rgb_to_hls(*h2rgb(h))[0]
+def circ(a, b):
+    d = abs(a - b) % 1.0
+    return min(d, 1.0 - d)
+# Dominant hue = most saturated of the chromatic slots (skips black/gray
+# slots 0,7,8,15). A tiny vivid detail can win here while having nothing to
+# do with the wallpaper, so reject it when it sits over 90 degrees away from
+# the candidates' circular mean and the runner-up agrees with the mean.
+cands = cols[1:7] + cols[9:15]
+ranked = sorted(cands, key=sat, reverse=True)
+best = ranked[0]
+mean = math.atan2(sum(math.sin(hue_of(h) * 2 * math.pi) for h in cands) / len(cands),
+                  sum(math.cos(hue_of(h) * 2 * math.pi) for h in cands) / len(cands)) / (2 * math.pi) % 1.0
+if len(ranked) > 1 and circ(hue_of(best), mean) > 0.25 and circ(hue_of(ranked[1]), mean) <= 0.25:
+    best = ranked[1]
 best_hls = colorsys.rgb_to_hls(*h2rgb(best))
 hue, s_best = best_hls[0], best_hls[2]
 # Acento adaptativo: saturación real del fondo + empujón, con suelo (visible

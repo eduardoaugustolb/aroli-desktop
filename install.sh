@@ -1514,9 +1514,22 @@ phase_final() {
             skip "would generate the pywal palette from $(basename "$wallpaper")"
             skip "would regenerate the derived themes (btop, cava, yazi, discord, spicetify, Qt)"
         else
-            # Mismo --saturate que set-wallpaper.sh: la paleta del primer
-            # arranque debe verse igual que tras el primer cambio de fondo.
-            wal -i "$wallpaper" --saturate 0.2 -n -q && ok "pywal palette generated from $(basename "$wallpaper")"
+            # Same backend and --saturate as set-wallpaper.sh: the first
+            # boot palette must look like after the first wallpaper change.
+            # Falls back to pywal's default backend when okthief is missing.
+            if ! wal -i "$wallpaper" --backend okthief --saturate 0.2 -n -q; then
+                wal -i "$wallpaper" --saturate 0.2 -n -q || {
+                    warn "could not generate the initial palette"
+                    return 0
+                }
+            fi
+            ok "pywal palette generated from $(basename "$wallpaper")"
+            # Hue-normalize the slots (see set-wallpaper.sh) and re-export
+            # every template from the normalized palette.
+            if [ -x "$HOME/.config/hypr/scripts/pywal-normalize.py" ]; then
+                "$HOME/.config/hypr/scripts/pywal-normalize.py" >/dev/null 2>&1 \
+                    && wal -R -n -q -s -t || true
+            fi
 
             # `wal` only fills ~/.cache/wal. The derived themes are written by
             # these scripts, which day to day are launched by set-wallpaper.sh;

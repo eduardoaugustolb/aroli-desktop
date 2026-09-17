@@ -18,7 +18,7 @@ for d in "$HOME/.config/Vencord" "$HOME/.config/equibop" "$HOME/.config/VencordD
 done
 
 CSS=$(python3 - "$J" <<'PY'
-import colorsys, json, sys
+import colorsys, json, sys, math
 
 c = json.load(open(sys.argv[1]))
 pal, sp = c["colors"], c["special"]
@@ -40,8 +40,19 @@ bh, bl, bs = hls(bg)
 dark = bl < 0.5
 # Acento = el colorN mas saturado (mismo criterio que btop-pywal.sh), con
 # saturación adaptativa: la real del fondo + empujón, con suelo (visible en
-# grises) y techo 0.50 para no llegar a neón.
-ah, al, as_ = max((hls(pal[f"color{i}"]) for i in range(1, 7)), key=lambda t: t[2])
+# grises) y techo 0.50 para no llegar a neón. Igual que en spicetify, se
+# descarta un ganador que no tenga nada que ver con el fondo (a mas de 90
+# grados de la media circular) cuando el segundo sí la representa.
+cands = [hls(pal[f"color{i}"]) for i in range(1, 7)]
+ranked = sorted(cands, key=lambda t: t[2], reverse=True)
+ah, al, as_ = ranked[0]
+mean = math.atan2(sum(math.sin(t[0] * 2 * math.pi) for t in cands) / len(cands),
+                  sum(math.cos(t[0] * 2 * math.pi) for t in cands) / len(cands)) / (2 * math.pi) % 1.0
+def circ(a, b):
+    d = abs(a - b) % 1.0
+    return min(d, 1.0 - d)
+if len(ranked) > 1 and circ(ah, mean) > 0.25 and circ(ranked[1][0], mean) <= 0.25:
+    ah, al, as_ = ranked[1]
 if as_ < 0.08:
     ah, al, as_ = hls(fg)
 s_acc = min(max(as_, 0.15) + 0.10, 0.50)
