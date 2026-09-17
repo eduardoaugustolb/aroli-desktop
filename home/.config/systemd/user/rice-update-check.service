@@ -1,16 +1,16 @@
 [Unit]
-# Umbra Liminal update check: asks GitHub for the newest stable tag.
+# Umbra Noctis update check: asks GitHub for the newest stable tag.
 #
 # This is the ONLY unattended network the rice performs, and it is tiny: one
 # `git ls-remote --tags` (a few KB) or one conditional API GET with ETag (a
 # 304 with an empty body when nothing changed). It writes a single cache file
-# (~/.cache/umbra-liminal/update.json) and exits. The shell UI only READS that
+# (~/.cache/umbra-noctis/update.json) and exits. The shell UI only READS that
 # file (inotify, no polling, no network in QML).
 #
 # Performance budget: <1 s CPU per day, 0 resident processes. Type=oneshot
 # means nothing stays in memory; the idle scheduling means a check that lands
 # mid-game does not steal a frame.
-Description=Umbra Liminal update check (tiny GitHub tag query)
+Description=Umbra Noctis update check (tiny GitHub tag query)
 Documentation=file://%h/.local/bin/rice
 
 [Service]

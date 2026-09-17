@@ -1,6 +1,6 @@
-# Umbra Liminal on Omarchy
+# Umbra Noctis on Omarchy
 
-Umbra Liminal is **Omarchy-friendly**: an Umbra layer for Arch, Hyprland, and
+Umbra Noctis is **Omarchy-friendly**: an Umbra layer for Arch, Hyprland, and
 Quickshell that runs on top of the stack already provided by Omarchy.
 
 ## Compatibility rules
@@ -10,14 +10,14 @@ Quickshell that runs on top of the stack already provided by Omarchy.
 - Keep customizations in `~/.config`, `~/.local/share`, and this clone.
 - Prefer the `omarchy` commands for system operations: `omarchy update`,
   `omarchy pkg`, and `omarchy theme`.
-- Liminal starts its Quickshell shell after `WAYLAND_DISPLAY` is
+- Noctis starts its Quickshell shell after `WAYLAND_DISPLAY` is
   available. A brief flash of the native bar may appear during login.
 
-## What Liminal changes
+## What Noctis changes
 
 | Area | Behavior |
 | --- | --- |
-| Shell | Liminal Quickshell notch and panels. |
+| Shell | Noctis Quickshell notch and panels. |
 | Palette | Pywal extracts colors from the selected wallpaper. |
 | Language | Shell, Hyprlock, and SDDM in pt-BR. |
 | Cursor | Umbra XCursor, without setting `HYPRCURSOR_THEME`. |

@@ -46,7 +46,7 @@ Flickable {
                                           else printf "%d min", m}' /proc/uptime)"
             printf 'pkgs\\t%s\\n'   "$(pacman -Qq 2>/dev/null | wc -l) ${I18n.tr("packages")}"
             printf 'rice\\t%s\\n'   "$("$HOME/.local/bin/rice" version 2>/dev/null || rice version 2>/dev/null || echo "?")"
-            printf 'rel\\t%s\\n'    "$(jq -r 'if .update_available then ((.remote // \"?\") + \" (!)\") else (.remote // \"?\") end' ~/.cache/umbra-liminal/update.json 2>/dev/null || echo "?")"
+            printf 'rel\\t%s\\n'    "$(jq -r 'if .update_available then ((.remote // \"?\") + \" (!)\") else (.remote // \"?\") end' ~/.cache/umbra-noctis/update.json 2>/dev/null || echo "?")"
         `]
         stdout: SplitParser {
             onRead: function (line) {
@@ -162,7 +162,7 @@ Flickable {
             }
             SettingsControls.Row_ {
                 label: I18n.tr("Latest release seen")
-                hint: I18n.tr("Written by the daily timer in ~/.cache/umbra-liminal/update.json. “(!)” means an update is available: run “rice update --dry-run” in a terminal.")
+                hint: I18n.tr("Written by the daily timer in ~/.cache/umbra-noctis/update.json. “(!)” means an update is available: run “rice update --dry-run” in a terminal.")
                 SettingsControls.Val_ { text: root.info["rel"] || "…" }
             }
 

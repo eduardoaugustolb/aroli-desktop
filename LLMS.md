@@ -1,7 +1,7 @@
-# Operating guide for AI agents — Umbra Liminal
+# Operating guide for AI agents — Umbra Noctis
 
 This document defines how agents should install, audit, and fix Umbra
-Liminal without taking control away from the user. Safety and privacy take
+Noctis without taking control away from the user. Safety and privacy take
 precedence over convenience.
 
 ## Non-negotiable principles
@@ -92,7 +92,7 @@ replaces user configurations, although it creates a backup.
   `rice-update-check.timer` (enabled by the installer) transfers a few
   KB (`git ls-remote --tags` or a conditional GET against the GitHub
   releases API, with ETag) once a day and only writes
-  `~/.cache/umbra-liminal/update.json`. No telemetry, no identifiers,
+  `~/.cache/umbra-noctis/update.json`. No telemetry, no identifiers,
   no cached response body. To turn it off:
   `systemctl --user disable rice-update-check.timer`. `rice update`,
   `rice rollback`, and `rice prune --apply` never run on their own: they
@@ -106,5 +106,5 @@ replaces user configurations, although it creates a backup.
 ## Contributions
 
 Preserve [LICENSE](LICENSE), the upstream attribution, and the Umbra
-Liminal identity. Every new package must be classified as essential or
+Noctis identity. Every new package must be classified as essential or
 optional; when in doubt, treat it as optional.

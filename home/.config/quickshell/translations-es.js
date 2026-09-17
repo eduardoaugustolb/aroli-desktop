@@ -350,7 +350,7 @@ var es = {
     "Workspace": "Escritorio",
     "Workspace map": "Mapa de escritorios",
     "Workspaces": "Workspaces",
-    "Written by the daily timer in ~/.cache/umbra-liminal/update.json. “(!)” means an update is available: run “rice update --dry-run” in a terminal.": "Lo escribe el temporizador diario en ~/.cache/umbra-liminal/update.json. «(!)» = hay actualización: ejecuta «rice update --dry-run» en una terminal.",
+    "Written by the daily timer in ~/.cache/umbra-noctis/update.json. “(!)” means an update is available: run “rice update --dry-run” in a terminal.": "Lo escribe el temporizador diario en ~/.cache/umbra-noctis/update.json. «(!)» = hay actualización: ejecuta «rice update --dry-run» en una terminal.",
     "Wrong password": "Contraseña incorrecta",
     "Yes": "Sí",
     "Your computer": "Tu equipo",

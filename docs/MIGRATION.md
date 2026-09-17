@@ -1,4 +1,4 @@
-# Migrating from the legacy fork to Umbra Liminal
+# Migrating from the legacy fork to Umbra Noctis
 
 `scripts/migrate-from-legacy-rice.sh` only swaps `~/.config` symlinks that
 still point at `~/.local/share/diegoMalagrida-dotfiles`. The legacy clone is
@@ -8,7 +8,7 @@ not deleted, to allow manual rollback.
 # Inspect the changes, without writing anything.
 ./scripts/migrate-from-legacy-rice.sh
 
-# Create ~/.local/share/umbra-liminal and relink the detected symlinks.
+# Create ~/.local/share/umbra-noctis and relink the detected symlinks.
 ./scripts/migrate-from-legacy-rice.sh --apply
 ```
 

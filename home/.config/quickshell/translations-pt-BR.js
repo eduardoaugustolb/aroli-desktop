@@ -353,7 +353,7 @@ var ptBR = {
     "Workspace": "Área de trabalho",
     "Workspace map": "Mapa de áreas de trabalho",
     "Workspaces": "Áreas de trabalho",
-    "Written by the daily timer in ~/.cache/umbra-liminal/update.json. “(!)” means an update is available: run “rice update --dry-run” in a terminal.": "Escrito pelo temporizador diário em ~/.cache/umbra-liminal/update.json. «(!)» = há atualização: rode «rice update --dry-run» no terminal.",
+    "Written by the daily timer in ~/.cache/umbra-noctis/update.json. “(!)” means an update is available: run “rice update --dry-run” in a terminal.": "Escrito pelo temporizador diário em ~/.cache/umbra-noctis/update.json. «(!)» = há atualização: rode «rice update --dry-run» no terminal.",
     "Wrong password": "Senha incorreta",
     "Yes": "Sim",
     "Your computer": "Seu computador",

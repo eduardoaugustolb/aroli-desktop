@@ -4,8 +4,8 @@
 #
 # All the new machine needs is Arch and git:
 #
-#     git clone https://github.com/eduardoaugustolb/umbra-liminal.git
-#     cd umbra-liminal
+#     git clone https://github.com/eduardoaugustolb/umbra-noctis.git
+#     cd umbra-noctis
 #     ./install.sh
 #
 # It can be re-run as many times as you like: it does not redo what is already
@@ -498,7 +498,7 @@ apply_language() {
 # ----------------------------------------------------------------- phase: base
 
 phase_base() {
-    heading "Preflight checks (Umbra Liminal $(cat "$REPO/VERSION" 2>/dev/null || echo "unversioned"))"
+    heading "Preflight checks (Umbra Noctis $(cat "$REPO/VERSION" 2>/dev/null || echo "unversioned"))"
 
     [ "$(id -u)" -ne 0 ] || die "do not run this as root. Run it as your user; it will ask for sudo when it needs to."
     ok "regular user ($USER)"

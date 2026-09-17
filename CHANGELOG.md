@@ -1,4 +1,4 @@
-# Changelog — Umbra Liminal
+# Changelog — Umbra Noctis
 
 All notable changes to this rice are documented here, newest first.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -24,6 +24,6 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
 
 ### Added
 
-- First versioned release of Umbra Liminal. Everything before this tag is
+- First versioned release of Umbra Noctis. Everything before this tag is
   unversioned history; from here on every user-visible change lands under
   a `vX.Y.Z` tag with release notes.

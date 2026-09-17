@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Migrates symlinks from the legacy fork to Umbra Liminal.
+# Migrates symlinks from the legacy fork to Umbra Noctis.
 # Without --apply, it only shows the plan.
 set -euo pipefail
 
 apply=0
 source_dir="$HOME/.local/share/diegoMalagrida-dotfiles"
-target_dir="$HOME/.local/share/umbra-liminal"
+target_dir="$HOME/.local/share/umbra-noctis"
 
 usage() {
     printf '%s\n' 'Usage: migrate-from-legacy-rice.sh [--apply] [--source PATH] [--target PATH]'

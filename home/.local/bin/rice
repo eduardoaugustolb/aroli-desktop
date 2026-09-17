@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rice — version, update and cleanup dispatcher for Umbra Liminal.
+# rice — version, update and cleanup dispatcher for Umbra Noctis.
 #
 #   rice version              print the installed version
 #   rice status               version + update check state + backups
@@ -21,14 +21,14 @@
 set -uo pipefail
 
 VERSION_FILE_CANDIDATES=()
-CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/umbra-liminal"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/umbra-noctis"
 CACHE_FILE="$CACHE_DIR/update.json"
 ETAG_FILE="$CACHE_DIR/latest.etag"
 LOCK_FILE="$CACHE_DIR/rice.lock"
 STATE_FILE="$CACHE_DIR/state.json"
 CHECK_INTERVAL=86400   # 24 h: releases ship a few times per month, not per hour
 NET_TIMEOUT=20
-REPO_SLUG="eduardoaugustolb/umbra-liminal"
+REPO_SLUG="eduardoaugustolb/umbra-noctis"
 
 DRY=0
 ASSUME_YES=0
@@ -81,7 +81,7 @@ find_repo() {
         esac
     fi
     local cand
-    for cand in "$HOME/umbra-liminal" "$HOME/dotfiles" "$HOME/.dotfiles"; do
+    for cand in "$HOME/umbra-noctis" "$HOME/dotfiles" "$HOME/.dotfiles"; do
         if [ -d "$cand/.git" ]; then printf '%s' "$cand"; return 0; fi
     done
     local here
@@ -228,7 +228,7 @@ cmd_check() {
     if [ "$avail" = true ]; then
         say "rice: update available: $(local_version) -> $remote"
         command -v notify-send >/dev/null 2>&1 \
-            && notify-send "Umbra Liminal $remote available" "Run: rice update --dry-run" 2>/dev/null || true
+            && notify-send "Umbra Noctis $remote available" "Run: rice update --dry-run" 2>/dev/null || true
     else
         ok "rice is up to date ($(local_version))"
     fi

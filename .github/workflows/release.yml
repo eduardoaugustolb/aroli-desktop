@@ -43,9 +43,9 @@ jobs:
           fetch-depth: 0
       - name: Checksums
         run: |
-          git archive --format=tar.gz --prefix="umbra-liminal-${GITHUB_REF_NAME}/" \
-            -o "umbra-liminal-${GITHUB_REF_NAME}.tar.gz" "$GITHUB_REF_NAME"
-          sha256sum "umbra-liminal-${GITHUB_REF_NAME}.tar.gz" > SHA256SUMS.txt
+          git archive --format=tar.gz --prefix="umbra-noctis-${GITHUB_REF_NAME}/" \
+            -o "umbra-noctis-${GITHUB_REF_NAME}.tar.gz" "$GITHUB_REF_NAME"
+          sha256sum "umbra-noctis-${GITHUB_REF_NAME}.tar.gz" > SHA256SUMS.txt
       - name: Extract CHANGELOG entry
         run: |
           awk -v tag="[${GITHUB_REF_NAME#v}]" '
@@ -56,7 +56,7 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: |
-            umbra-liminal-*.tar.gz
+            umbra-noctis-*.tar.gz
             SHA256SUMS.txt
           body_path: RELEASE_NOTES.md
           generate_release_notes: true

@@ -1195,7 +1195,7 @@ Singleton {
     property bool riceUpdate: false
     FileView {
         id: riceUpdateFile
-        path: Quickshell.env("HOME") + "/.cache/umbra-liminal/update.json"
+        path: Quickshell.env("HOME") + "/.cache/umbra-noctis/update.json"
         watchChanges: true
         onFileChanged: reload()
         onLoaded: {

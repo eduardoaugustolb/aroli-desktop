@@ -658,12 +658,12 @@ fi
 heading "Rice version and updates"
 
 if [ -f "$REPO/VERSION" ]; then
-    good "Umbra Liminal $(tr -d ' \t\r\n' < "$REPO/VERSION")"
+    good "Umbra Noctis $(tr -d ' \t\r\n' < "$REPO/VERSION")"
 else
     eye "no VERSION file in the repo"
 fi
 
-rice_cache="${XDG_CACHE_HOME:-$HOME/.cache}/umbra-liminal/update.json"
+rice_cache="${XDG_CACHE_HOME:-$HOME/.cache}/umbra-noctis/update.json"
 if [ -f "$rice_cache" ]; then
     rice_remote="$(sed -n 's/^[[:space:]]*"remote"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$rice_cache" | head -1)"
     rice_avail="$(sed -n 's/^[[:space:]]*"update_available"[[:space:]]*:[[:space:]]*\(true\|false\).*/\1/p' "$rice_cache" | head -1)"

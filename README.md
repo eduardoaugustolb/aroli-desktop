@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="home/Pictures/wallpapers/umbra-ink-mountains.png" alt="Ink mountains — Umbra Liminal wallpaper" width="100%">
+  <img src="home/Pictures/wallpapers/umbra-ink-mountains.png" alt="Ink mountains — Umbra Noctis wallpaper" width="100%">
 </p>
 
 <p align="center">
   <sub>U M B R A &nbsp; / &nbsp; L I M I N A L</sub>
 </p>
 
-<h1 align="center">Umbra Liminal</h1>
+<h1 align="center">Umbra Noctis</h1>
 
 <p align="center">
   A rice for <strong>Omarchy</strong>, Arch Linux, Hyprland, and Quickshell.<br>
@@ -25,8 +25,8 @@
 
 ## The threshold
 
-**Umbra Liminal** is the visual layer of the Umbra workspace on top of the
-stable Omarchy base. "Liminal" is the crossing point between system and
+**Umbra Noctis** is the visual layer of the Umbra workspace on top of the
+stable Omarchy base. "Noctis" evokes the project's nocturnal, premium visual language between system and
 person: the rice keeps the structure — notch, dark surfaces, cutouts, and
 luminance bands — and lets each wallpaper set the mood of the environment
 with Pywal.
@@ -44,7 +44,7 @@ changes, but it is still recognizable as Umbra.
   <img src="home/Pictures/wallpapers/umbra-obsidian-dunes.png" alt="Obsidian Dunes — bundled wallpaper" width="49%">
 </p>
 
-## What ships with Liminal
+## What ships with Noctis
 
 - Complete Quickshell interface, with notch, launcher, panels, and overview.
 - Interface translation in **Brazilian Portuguese** and ABNT2 keyboard layout.
@@ -71,8 +71,8 @@ changes, but it is still recognizable as Umbra.
 > installs no packages, and asks for no privileges.
 
 ```sh
-git clone https://github.com/eduardoaugustolb/umbra-liminal.git
-cd umbra-liminal
+git clone https://github.com/eduardoaugustolb/umbra-noctis.git
+cd umbra-noctis
 
 # see exactly what would happen
 ./install.sh --dry-run --lang pt-BR
@@ -101,7 +101,7 @@ and notifies you on its own when a release lands on GitHub:
 
 - A daily timer (`rice-update-check.timer`, idle priority, no
   resident process) transfers a few KB and writes
-  `~/.cache/umbra-liminal/update.json`. The bar/notch shows a dot
+  `~/.cache/umbra-noctis/update.json`. The bar/notch shows a dot
   and `Settings > About` shows the version seen.
 - Updating is always your own act: `rice update --dry-run` shows the plan,
   `rice update` asks for confirmation, records the rollback point, and re-runs
@@ -113,7 +113,7 @@ and notifies you on its own when a release lands on GitHub:
 
 ## Privacy and control
 
-Liminal does not decide your desktop for you.
+Noctis does not decide your desktop for you.
 
 - Extra apps never come by default: each item in
   `packages/optional-*.txt` requires individual confirmation.
@@ -128,7 +128,7 @@ collect or expose credentials, tokens, history, or personal profiles.
 
 ## Omarchy-friendly
 
-Umbra Liminal works on top of Omarchy without replacing its foundation. It does
+Umbra Noctis works on top of Omarchy without replacing its foundation. It does
 not edit `/usr/share/omarchy/` and keeps customizations in the appropriate
 user paths. See [OMARCHY.md](OMARCHY.md) for compatibility, limits, and
 safe diagnostics.
@@ -148,7 +148,7 @@ See the step-by-step walkthrough and guarantees in [docs/MIGRATION.md](docs/MIGR
 
 <p align="center">
   <sub>
-    Umbra Liminal · Umbra identity on open platforms<br>
+    Umbra Noctis · Umbra identity on open platforms<br>
     Code under <a href="LICENSE">GPL-3.0</a> · details in <a href="docs/IDENTITY.md">Identity</a>
   </sub>
 </p>
