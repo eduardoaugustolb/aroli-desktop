@@ -79,15 +79,20 @@ so already-running applications reload the XCursor.
 > Read the plan before writing to the system. Dry-run mode changes no files,
 > installs no packages, and asks for no privileges.
 
+> [!TIP]
+> `rice` is the recommended installation path. It gives first-time users a guided
+> terminal assistant, while the explicit subcommands remain suitable for automation.
+
 ```sh
-git clone https://github.com/eduardoaugustolb/umbra-noctis.git
-cd umbra-noctis
+# Install the CLI (Go 1.27+)
+go install github.com/eduardoaugustolb/umbra-noctis/cmd/rice@latest
 
-# see exactly what would happen
-./install.sh --dry-run --lang pt-BR
+# Opens a guided terminal interface for first-time users
+rice
 
-# install only after reviewing the plan
-./install.sh --lang pt-BR
+# Or use the non-interactive commands
+rice install --dry-run --lang pt-BR
+rice install --lang pt-BR
 ```
 
 Requires **Hyprland 0.56+**. This rice uses `hyprland.lua`, not
@@ -95,13 +100,20 @@ Requires **Hyprland 0.56+**. This rice uses `hyprland.lua`, not
 
 | Command | Result |
 | --- | --- |
-| `./install.sh --dry-run --lang pt-BR` | Shows the plan without changing anything. |
-| `./install.sh --lang pt-BR` | Installs the rice in Brazilian Portuguese. |
-| `./install.sh restore` | Restores the previous configuration files. |
-| `./diagnose` | Read-only diagnostics. |
+| `rice` | Opens the guided terminal interface. |
+| `rice install --dry-run --lang pt-BR` | Shows the plan without changing anything. |
+| `rice install --lang pt-BR` | Installs the rice in Brazilian Portuguese. |
+| `rice install restore` | Restores the previous configuration files. |
+| `rice diagnose` | Read-only diagnostics. |
 | `rice status` | Installed version, last check, and rollback ref. |
 | `rice update --dry-run` | Shows the update plan without changing anything. |
 | `rice prune` | Lists files retired by the latest release (nothing is deleted without `--apply`). |
+| `rice plugins list` | Lists optional applications and tools that can be installed later. |
+| `rice plugins install btop` | Installs only the selected optional item, after confirmation. |
+| `rice cli update --dry-run` | Checks the CLI release and its verified binary update plan. |
+| `rice cli update` | Updates only the CLI binary after verifying SHA-256. |
+| `rice install --resume` | Continues from the last successfully completed installation phase. |
+| `rice logs` | Shows the last 100 lines of the latest installation log. |
 
 ## Updates
 

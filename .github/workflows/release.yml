@@ -26,6 +26,11 @@ jobs:
           bash -n diagnose
           bash -n home/.local/bin/rice
           bash -n scripts/migrate-from-legacy-rice.sh
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27.x"
+      - name: Go CLI
+        run: go test ./...
       - name: Installer dry-run plan
         run: |
           # install.sh targets Arch; outside Arch only the arg parsing and
@@ -41,11 +46,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27.x"
+      - name: Build CLI releases
+        run: |
+          for arch in amd64 arm64; do
+            GOOS=linux GOARCH="$arch" go build -trimpath -ldflags "-s -w -X main.version=${GITHUB_REF_NAME}" -o "rice-linux-$arch" ./cmd/rice
+          done
       - name: Checksums
         run: |
           git archive --format=tar.gz --prefix="umbra-noctis-${GITHUB_REF_NAME}/" \
             -o "umbra-noctis-${GITHUB_REF_NAME}.tar.gz" "$GITHUB_REF_NAME"
-          sha256sum "umbra-noctis-${GITHUB_REF_NAME}.tar.gz" > SHA256SUMS.txt
+          sha256sum "umbra-noctis-${GITHUB_REF_NAME}.tar.gz" rice-linux-amd64 rice-linux-arm64 > SHA256SUMS.txt
       - name: Extract CHANGELOG entry
         run: |
           awk -v tag="[${GITHUB_REF_NAME#v}]" '
@@ -58,6 +71,8 @@ jobs:
           files: |
             umbra-noctis-*.tar.gz
             SHA256SUMS.txt
+            rice-linux-amd64
+            rice-linux-arm64
           overwrite_files: true
           body_path: RELEASE_NOTES.md
           generate_release_notes: true

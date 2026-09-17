@@ -14,6 +14,8 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
 
 ### Added
 
+- Go `rice` CLI with a guided terminal interface, individual optional-package management (`rice plugins list` and `rice plugins install`), verified self-updates, resumable installation checkpoints, and persistent install logs.
+
 - Release and update system: `VERSION` as the single source of truth,
   `rice` CLI (`version`, `status`, `check`, `update`, `rollback`, `prune`),
   background check via systemd user timer (24 h, idle priority, zero

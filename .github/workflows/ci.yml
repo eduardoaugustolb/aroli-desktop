@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  cli:
+    name: Go CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27.x"
+      - name: Format
+        run: test -z "$(gofmt -l cmd/rice)"
+      - name: Unit tests and race detector
+        run: go test -race ./...
+      - name: Static analysis
+        run: go vet ./...
+      - name: Build
+        run: go build ./cmd/rice
+
+  installer:
+    name: Installer compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax
+        run: |
+          bash -n install.sh
+          bash -n diagnose
+          bash -n home/.local/bin/rice
+          bash -n scripts/migrate-from-legacy-rice.sh
+      - name: Installer dry-run and shell interface
+        run: |
+          bash install.sh --help >/dev/null
+          bash install.sh --dry-run packages >/dev/null

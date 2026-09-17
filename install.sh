@@ -66,6 +66,35 @@ run() {
     "$@"
 }
 
+
+# A failed package download should not make a long installation start at zero.
+# Checkpoints are opt-in: a normal rerun still reapplies every idempotent phase.
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/umbra-noctis"
+RUN_LOG=""
+CHECKPOINT_FILE=""
+RESUME=0
+
+init_run_state() {
+    [ "$DRY" = 1 ] && return 0
+    mkdir -p "$STATE_DIR" || return 0
+    RUN_LOG="$STATE_DIR/install-$(date +%Y%m%d-%H%M%S).log"
+    CHECKPOINT_FILE="$STATE_DIR/install.checkpoint"
+    # Keep the terminal live while preserving a supportable record of the run.
+    exec > >(tee -a "$RUN_LOG") 2>&1
+    printf '  log:    %s\n' "$RUN_LOG"
+}
+
+phase_is_done() {
+    [ "$RESUME" = 1 ] && [ -n "$CHECKPOINT_FILE" ] && grep -qx "$1" "$CHECKPOINT_FILE" 2>/dev/null
+}
+
+mark_phase_done() {
+    [ "$DRY" = 1 ] || [ -z "$CHECKPOINT_FILE" ] || printf '%s\n' "$1" >> "$CHECKPOINT_FILE"
+}
+
+clear_checkpoint() {
+    [ "$DRY" = 1 ] || [ -z "$CHECKPOINT_FILE" ] || rm -f "$CHECKPOINT_FILE"
+}
 ask() {
     [ "$ASSUME_YES" = 1 ] && return 0
     [ "$DRY" = 1 ] && return 0
@@ -135,6 +164,7 @@ Options:
   -y, --yes         never ask (for unattended runs)
       --copy        copy the configs instead of symlinking them
       --link        symlink the configs into the repo (default)
+      --resume      continue after a failed run, skipping completed phases
       --lang es|en|pt-BR  what the desktop speaks (default pt-BR; it asks if you do not
                     say, and Settings changes it later anyway)
   -h, --help        this
@@ -175,6 +205,7 @@ while [ $# -gt 0 ]; do
         -y|--yes|--si) ASSUME_YES=1 ;;
         --copy|--copiar) MODE=copy ;;
         --link|--enlazar) MODE=link ;;
+        --resume) RESUME=1 ;;
         --lang|--idioma)
             shift; [ $# -gt 0 ] || die "--lang needs a value: es, en or pt-BR"
             set_lang "$1" ;;
@@ -186,6 +217,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+init_run_state
 if [ ${#REQUESTED_PHASES[@]} -eq 0 ]; then
     PHASES=("${ALL_PHASES[@]}")
 else
@@ -574,9 +606,65 @@ phase_aur() {
     ok "yay installed"
 }
 
+# Package downloads are normally the slowest part of a fresh setup. Configure
+# pacman before its first transaction, not later in the unrelated system phase.
+prepare_package_downloads() {
+    local jobs current
+    jobs="$(nproc 2>/dev/null || echo 4)"
+    [ "$jobs" -gt 10 ] && jobs=10
+    [ "$jobs" -lt 2 ] && jobs=2
+    current="$(grep -E '^[[:space:]]*ParallelDownloads[[:space:]]*=' /etc/pacman.conf 2>/dev/null | tail -1 | tr -dc '0-9')"
+    if [ "$current" = "$jobs" ]; then
+        skip "pacman parallel downloads already set to $jobs"
+    elif [ "$DRY" = 1 ]; then
+        skip "would set pacman ParallelDownloads = $jobs"
+    elif command -v sudo >/dev/null 2>&1; then
+        if grep -qE '^[[:space:]]*#?[[:space:]]*ParallelDownloads[[:space:]]*=' /etc/pacman.conf; then
+            sudo sed -i "s/^[[:space:]]*#\?[[:space:]]*ParallelDownloads[[:space:]]*=.*/ParallelDownloads = $jobs/" /etc/pacman.conf
+        else
+            printf '\n# Umbra: parallel downloads for the initial package transaction\nParallelDownloads = %s\n' "$jobs" | sudo tee -a /etc/pacman.conf >/dev/null
+        fi
+        ok "pacman downloads: $jobs in parallel"
+    else
+        warn "cannot tune pacman downloads without sudo"
+    fi
+
+    # Reflector is optional on a minimal Arch install. If it exists, refresh
+    # mirrors once before the large transaction; its timer maintains them later.
+    if command -v reflector >/dev/null 2>&1 && [ "$DRY" = 0 ]; then
+        if ask "refresh the 20 fastest mirrors before downloading packages?"; then
+            run sudo reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist \
+                && ok "fast mirrors selected" || warn "mirror refresh failed; keeping the current list"
+        fi
+    elif ! command -v reflector >/dev/null 2>&1; then
+        skip "reflector is not installed yet; package mirrors are left unchanged"
+    fi
+}
+
+check_install_capacity() {
+    if [ "$DRY" = 1 ]; then
+        skip "would verify at least 12 GiB free for packages and caches"
+        return 0
+    fi
+    doing packages || return 0
+    local available required=12582912 # 12 GiB, in KiB; packages + caches need headroom.
+    available="$(df -Pk "$HOME" 2>/dev/null | awk 'NR==2 {print $4}')"
+    if [[ "$available" =~ ^[0-9]+$ ]]; then
+        if [ "$available" -lt "$required" ]; then
+            warn "only $((available / 1024 / 1024)) GiB free in $HOME; a full desktop needs about 12 GiB free"
+            warn "free space first, then re-run. No package download was started."
+            return 1
+        fi
+        ok "$((available / 1024 / 1024)) GiB free for packages and caches"
+    else
+        warn "could not measure free disk space"
+    fi
+}
 # ----------------------------------------------------------------- phase: packages
 
 phase_packages() {
+    check_install_capacity || die "not enough free disk space for a reliable installation"
+    prepare_package_downloads
     heading "Packages"
 
     local native=() aur=()
@@ -586,6 +674,8 @@ phase_packages() {
                           | grep -vE '^\s*(#|$)' | tr -d ' \t' | grep -v '^yay$' | sort -u)
 
     printf '  %d packages from the official repos, %d from the AUR\n' "${#native[@]}" "${#aur[@]}"
+    printf "  order: core packages first; AUR after that; optional apps stay deferred\n"
+    printf "  estimate: reserve about 12 GiB; download time depends on your mirror and connection\n"
 
     # Arch's old Python client is named `tldr`; it conflicts with tealdeer,
     # the Rust client this desktop uses.  The conflict is not resolved by
@@ -607,16 +697,20 @@ phase_packages() {
     # `omarchy update`). Installing new packages with -Syu is intentional
     # here, so opt out explicitly as the guard message instructs.
     if [ ${#native[@]} -gt 0 ]; then
-        run sudo env OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -Syu --needed --noconfirm --disable-download-timeout -- "${native[@]}" \
-            && ok "official repos up to date" \
-            || packages_failed "${native[@]}"
+        if command -v omarchy-pkg-add >/dev/null 2>&1; then
+            run omarchy-pkg-add "${native[@]}" && ok "official packages installed through Omarchy" || packages_failed "${native[@]}"
+        else
+            run sudo env OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -Syu --needed --noconfirm --disable-download-timeout -- "${native[@]}" && ok "official repos up to date" || packages_failed "${native[@]}"
+        fi
     fi
 
     if [ ${#aur[@]} -gt 0 ]; then
-        command -v yay >/dev/null || { warn "no yay: skipping the AUR"; return 0; }
-        run yay -S --needed --noconfirm --disable-download-timeout -- "${aur[@]}" \
-            && ok "AUR up to date" \
-            || warn "yay errored on some AUR package. The rest did install."
+        if command -v omarchy-pkg-aur-add >/dev/null 2>&1; then
+            run omarchy-pkg-aur-add "${aur[@]}" && ok "AUR packages installed through Omarchy" || warn "Omarchy reported an error while installing AUR packages"
+        else
+            command -v yay >/dev/null || { warn "no yay: skipping the AUR"; return 0; }
+            run yay -S --needed --noconfirm --disable-download-timeout -- "${aur[@]}" && ok "AUR up to date" || warn "yay errored on some AUR package. The rest did install."
+        fi
     fi
 
     install_optional_packages
@@ -634,21 +728,24 @@ install_optional_packages() {
         skip "optional packages require individual confirmation"
         return 0
     }
-
     choose_optional_manifest "$official_manifest" official
     choose_optional_manifest "$aur_manifest" aur
 
     if [ ${#official[@]} -gt 0 ]; then
-        run sudo env OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -S --needed --noconfirm -- "${official[@]}" \
-            && ok "selected optional official packages installed" \
-            || warn "some selected optional official packages could not be installed"
+        if command -v omarchy-pkg-add >/dev/null 2>&1; then
+            run omarchy-pkg-add "${official[@]}" && ok "selected optional packages installed through Omarchy" || warn "Omarchy could not install some selected packages"
+        else
+            run sudo env OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -S --needed --noconfirm -- "${official[@]}" && ok "selected optional official packages installed" || warn "some selected optional official packages could not be installed"
+        fi
     fi
 
     if [ ${#aur[@]} -gt 0 ]; then
-        command -v yay >/dev/null || { warn "no yay: skipping selected AUR packages"; return 0; }
-        run yay -S --needed --noconfirm -- "${aur[@]}" \
-            && ok "selected optional AUR packages installed" \
-            || warn "some selected optional AUR packages could not be installed"
+        if command -v omarchy-pkg-aur-add >/dev/null 2>&1; then
+            run omarchy-pkg-aur-add "${aur[@]}" && ok "selected AUR packages installed through Omarchy" || warn "Omarchy could not install some selected AUR packages"
+        else
+            command -v yay >/dev/null || { warn "no yay: skipping selected AUR packages"; return 0; }
+            run yay -S --needed --noconfirm -- "${aur[@]}" && ok "selected AUR packages installed" || warn "some selected AUR packages could not be installed"
+        fi
     fi
 }
 
@@ -826,6 +923,13 @@ EOF
     for f in "$root"/.local/bin/*; do
         [ -e "$f" ] || continue
         local base; base="$(basename "$f")"
+        # `rice` is the compiled Go CLI. It installs and updates itself before
+        # this phase runs; copying the historical shell dispatcher here would
+        # replace it and make the user lose the interactive interface.
+        if [ "$base" = rice ]; then
+            skip ".local/bin/rice managed by the Go CLI"
+            continue
+        fi
         run cp -a "$f" "$HOME/.local/bin/$base"
         run chmod +x "$HOME/.local/bin/$base"
         ok ".local/bin/$base"
@@ -1736,6 +1840,10 @@ printf '%s' "$C_OFF"
 printf '  repo:   %s\n  phases: %s\n' "$REPO" "${PHASES[*]}"
 
 for phase in "${PHASES[@]}"; do
+    if phase_is_done "$phase"; then
+        skip "$phase already completed in the interrupted run (--resume)"
+        continue
+    fi
     case "$phase" in
         base)     phase_base ;;
         aur)      phase_aur ;;
@@ -1751,8 +1859,10 @@ for phase in "${PHASES[@]}"; do
         final)    phase_final ;;
         restore)  phase_restore ;;
     esac
+    mark_phase_done "$phase"
 done
 
+clear_checkpoint
 heading "Done"
 if [ "$DRY" = 1 ]; then
     printf '  That was a dry run: nothing was touched.\n  Drop --dry-run to do it for real.\n\n'
