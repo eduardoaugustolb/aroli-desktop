@@ -33,9 +33,10 @@ files, with Spanish and Brazilian Portuguese dictionaries (see
 
 ## 2. Workflow
 
-1. Clone and preview before touching anything:
+1. Build or install the CLI, then preview before touching anything:
    ```sh
-   ./install.sh --dry-run --lang pt-BR
+   go build -o /tmp/rice ./cmd/rice
+   /tmp/rice install --dry-run --lang pt-BR
    ```
 2. Create a worktree + branch for each change (keeps `main` clean):
    ```sh
@@ -96,7 +97,8 @@ Fix stuff                                   # vague, capitalized
 - Python helpers: `python3 -m py_compile <script>` must pass.
 - Palette/i18n changes: verify placeholder parity (`{0}`, `{1}`, `{2}`)
   between dictionaries and keep key sets identical.
-- Installer changes: run `./install.sh --dry-run` and read the plan.
+- Go CLI changes: run `go test -race ./...`, `go vet ./...`, and `gofmt -l cmd/rice`.
+- Installer changes: run `/tmp/rice install --dry-run` (or `./install.sh --dry-run` when testing the backend) and read the plan.
 - Runtime changes: switch wallpapers once (`Super+Shift+W`) and confirm
   the bar, terminal, and derived app themes (btop, Discord, Spotify)
   follow the new palette.
