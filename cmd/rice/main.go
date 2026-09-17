@@ -198,7 +198,7 @@ func ensureRepositoryWithCleanup(explicit string, dryRun bool) (string, func(), 
 			return "", noCleanup, err
 		}
 		dryRunTarget := filepath.Join(parent, "checkout")
-		if err := cloneRepository(dryRunTarget); err != nil {
+		if err := cloneRepositoryQuiet(dryRunTarget); err != nil {
 			_ = os.RemoveAll(parent)
 			return "", noCleanup, fmt.Errorf("não foi possível preparar o rice para o dry-run: %w", err)
 		}
@@ -220,6 +220,14 @@ func ensureRepositoryWithCleanup(explicit string, dryRun bool) (string, func(), 
 
 var cloneRepository = func(target string) error {
 	return command("", "git", "clone", "--depth", "1", repositoryURL, target).Run()
+}
+
+func cloneRepositoryQuiet(target string) error {
+	cmd := exec.Command("git", "clone", "--depth", "1", repositoryURL, target)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = io.Discard
+	cmd.Stderr = io.Discard
+	return cmd.Run()
 }
 
 func validRepo(path string) (string, error) {
@@ -965,13 +973,36 @@ func (m tuiModel) View() tea.View {
 	case tuiDone:
 		body = tuiTitle.Render("\n  "+m.message+"\n\n") + tuiMuted.Render("  Enter/r: voltar   q: sair")
 	}
-	view := tea.NewView(tuiPanel.Render(tuiTitle.Render("Umbra Noctis") + "\n" + tuiMuted.Render("rice · assistente") + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
+	view := tea.NewView(tuiPanel.Render(tuiTitle.Render("Umbra Noctis") + "\n" + tuiMuted.Render("rice · assistente") + "\n" + tuiAccent.Render(m.breadcrumb()) + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
 	view.AltScreen = true
 	return view
 }
 
+func (m tuiModel) breadcrumb() string {
+	switch m.screen {
+	case tuiLanguage:
+		if m.dryRun {
+			return "Início › Instalação › Plano › Idioma"
+		}
+		return "Início › Instalação › Idioma"
+	case tuiPlugins:
+		return "Início › Plugins"
+	case tuiConfirm:
+		if m.action == 2 {
+			return "Início › Plugins › Confirmar"
+		}
+		return "Início › Instalação › Confirmar"
+	case tuiRunning:
+		return "Início › Executando"
+	case tuiDone:
+		return "Início › Resultado"
+	default:
+		return "Início"
+	}
+}
+
 func (m tuiModel) viewHome() string {
-	lines := []string{}
+	lines := []string{"\n  Início", ""}
 	for i, action := range m.actions() {
 		prefix := "  "
 		if i == m.cursor {

@@ -10,6 +10,17 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [1.1.4] - 2026-09-17
+
+### Fixed
+
+- Suppressed temporary repository clone output at the subprocess level so it
+  cannot leak into the Bubble Tea screen.
+
+### Changed
+
+- Added screen titles and breadcrumbs throughout the TUI navigation flow.
+
 ## [1.1.3] - 2026-09-17
 
 ### Fixed
