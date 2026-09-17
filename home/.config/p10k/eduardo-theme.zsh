@@ -12,18 +12,18 @@
   local orange=4 blue=6 cream=7 muted=8
   local red=1 green=2 yellow=3 dim=8
 
+  # Respiro entre el icono de Omarchy y el directorio; sin esto quedan
+  # visualmente pegados en fuentes Nerd Font compactas.
+  typeset -g POWERLEVEL9K_ICON_PADDING=moderate
+
   # --- Segmentos: 1 linea, curados y utiles ---
-  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon dir vcs prompt_char)
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs prompt_char)
+  # Solo alertas importantes a la derecha; evita una nube de versiones.
   typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
-    status                  # codigo de error del ultimo comando
-    command_execution_time  # cuanto tardo el ultimo comando (>=2s)
-    background_jobs         # trabajos en segundo plano
-    direnv                  # entorno direnv
-    virtualenv pyenv        # python (venv / pyenv)
-    node_version            # node (solo en proyectos node)
-    rust_version            # rust (solo en proyectos rust)
-    go_version              # go (solo en proyectos go)
-    time                    # hora
+    status                  # solo aparece cuando el comando falla
+    command_execution_time  # solo aparece en comandos lentos
+    background_jobs         # solo aparece si hay jobs activos
+    time                    # hora, siempre al final
   )
 
   # --- Estilo LEAN: fuera fondos y separadores powerline ---
@@ -39,8 +39,7 @@
 
   # Quita el fondo de todos los segmentos que uso (transparente)
   local seg
-  for seg in OS_ICON DIR PROMPT_CHAR STATUS COMMAND_EXECUTION_TIME BACKGROUND_JOBS \
-             DIRENV VIRTUALENV PYENV NODE_VERSION RUST_VERSION GO_VERSION TIME; do
+  for seg in OS_ICON DIR PROMPT_CHAR STATUS COMMAND_EXECUTION_TIME BACKGROUND_JOBS TIME; do
     typeset -g POWERLEVEL9K_${seg}_BACKGROUND=
   done
   local st
@@ -55,6 +54,8 @@
   typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND=$cream
   typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=true
   typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND=$muted
+  typeset -g POWERLEVEL9K_DIR_TRUNCATION_LENGTH=3
+  typeset -g POWERLEVEL9K_DIR_TRUNCATION_SYMBOL='…/'
 
   typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=$green
   typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=$yellow
@@ -103,7 +104,7 @@
     _umbra_os_id=$(. /etc/os-release 2>/dev/null; printf '%s' "${ID:-}")
   fi
   if [[ $_umbra_os_id == omarchy ]]; then
-    typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=$'\uF17C'
+    typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=$'\uF17C '
   fi
   unset _umbra_os_id
 
