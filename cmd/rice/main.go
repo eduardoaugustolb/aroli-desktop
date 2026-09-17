@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -765,7 +765,7 @@ func tui() error {
 	if !termIsInteractive() {
 		return errors.New("a TUI precisa de um terminal interativo; use 'rice help' para os comandos")
 	}
-	_, err := tea.NewProgram(newTUIModel(), tea.WithAltScreen()).Run()
+	_, err := tea.NewProgram(newTUIModel()).Run()
 	return err
 }
 
@@ -787,7 +787,7 @@ func (m tuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			m.message = "Ação concluída com sucesso."
 		}
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		key := msg.String()
 		if key == "ctrl+c" || key == "q" || key == "esc" {
 			if m.screen == tuiHome || m.screen == tuiDone {
@@ -913,7 +913,7 @@ func (m tuiModel) runAction() tea.Cmd {
 	}
 }
 
-func (m tuiModel) View() string {
+func (m tuiModel) View() tea.View {
 	var body string
 	switch m.screen {
 	case tuiHome:
@@ -929,7 +929,9 @@ func (m tuiModel) View() string {
 	case tuiDone:
 		body = tuiTitle.Render("\n  "+m.message+"\n\n") + tuiMuted.Render("  Enter/r: voltar   q: sair")
 	}
-	return tuiPanel.Render(tuiTitle.Render("Umbra Noctis") + "\n" + tuiMuted.Render("rice · assistente") + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair"))
+	view := tea.NewView(tuiPanel.Render(tuiTitle.Render("Umbra Noctis") + "\n" + tuiMuted.Render("rice · assistente") + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
+	view.AltScreen = true
+	return view
 }
 
 func (m tuiModel) viewHome() string {
