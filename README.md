@@ -105,7 +105,14 @@ Requires **Hyprland 0.56+**. This rice uses `hyprland.lua`, not
 | `rice install --lang pt-BR` | Installs the rice in Brazilian Portuguese. |
 | `rice install restore` | Restores the previous configuration files. |
 | `rice diagnose` | Read-only diagnostics. |
+| `rice doctor` | Checks the local desktop integration; `--fix` offers safe session repairs. |
 | `rice status` | Installed version, last check, and rollback ref. |
+| `rice profile list` | Lists curated, transparent installation profiles. |
+| `rice profile install creator` | Installs a named set of phases; its optional apps remain visible and confirmable. |
+| `rice snapshot create before-tweaks` | Saves the supported visual configuration paths locally. |
+| `rice snapshot restore before-tweaks` | Restores a configuration snapshot while retaining the current files as backups. |
+| `rice wallpaper list` | Lists bundled and imported wallpapers. |
+| `rice wallpaper set umbra-ember-coast.png` | Applies a wallpaper and its dynamic Pywal palette. |
 | `rice update --dry-run` | Shows the update plan without changing anything. |
 | `rice prune` | Lists files retired by the latest release (nothing is deleted without `--apply`). |
 | `rice plugins list` | Lists optional applications and tools that can be installed later. |
@@ -138,9 +145,12 @@ Noctis does not decide your desktop for you.
 
 - Extra apps never come by default: each item in
   `packages/optional-*.txt` requires individual confirmation.
-- Runs with `--yes`, CI, or no terminal **do not install optionals**.
+- Runs with `--yes`, CI, or no terminal **do not install unselected
+  optionals**; named items and documented profiles remain explicit choices.
 - The project adds no telemetry, analytics, or remote services.
 - The installer preserves backups of replaced configurations.
+- Snapshots are stored locally in `~/.local/share/umbra-noctis/snapshots` and
+  never include credentials, browser data, or personal documents.
 - The project does not touch `/boot`, the bootloader, or partitions.
 
 For automations and AI agents, [LLMS.md](LLMS.md) is the operating contract:

@@ -59,6 +59,14 @@ func run(args []string) error {
 		return plugins(args[1:])
 	case "logs":
 		return showLogs(args[1:])
+	case "doctor":
+		return doctor(args[1:])
+	case "profile", "profiles":
+		return profiles(args[1:])
+	case "snapshot", "snapshots":
+		return snapshots(args[1:])
+	case "wallpaper", "wallpapers":
+		return wallpapers(args[1:])
 	case "cli":
 		return updateCLI(args[1:])
 	case "diagnose":
@@ -69,7 +77,9 @@ func run(args []string) error {
 	case "help", "--help", "-h":
 		usage(os.Stdout)
 		return nil
-	case "status", "check", "update", "rollback", "prune":
+	case "status":
+		return status()
+	case "check", "update", "rollback", "prune":
 		return runBackend("rice", args)
 	default:
 		return fmt.Errorf("comando desconhecido %q (use 'rice help')", args[0])
@@ -84,6 +94,10 @@ Uso:
   rice install [opções] [fase...]
   rice diagnose
   rice logs [--list]         mostra o registro da instalação mais recente
+  rice doctor [--fix]        verifica e repara integrações locais conhecidas
+  rice profile list|show|install NOME
+  rice snapshot create|list|restore NOME
+  rice wallpaper list|set|random|import|remove
   rice cli update [--dry-run] atualiza somente o binário da CLI
   rice plugins list|install [opções] [nome...]
   rice status | check | update | rollback | prune

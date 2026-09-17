@@ -86,6 +86,14 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
 
 ## [Unreleased]
 
+### Added
+
+- Daily CLI workflows: transparent installation profiles, local configuration
+  snapshots, wallpaper list/set/random/import/remove commands, and `rice
+  doctor --fix` for explicitly confirmed session repairs.
+- `rice status` now reports a compact desktop health score, update state, and
+  local snapshot count.
+
 ## [1.0.0] - 2026-09-17
 
 ### Added

@@ -14,7 +14,9 @@ precedence over convenience.
    session, or sending any data over the network.
 3. **No automatic bloatware.** The `packages/optional-*.txt` files
    contain optional apps and tools. Each package requires individual
-   confirmation; `--yes`, CI, and non-interactive runs must skip them.
+   confirmation; `--yes`, CI, and non-interactive runs must skip them unless
+   the user explicitly names each package (or invokes a documented profile
+   whose optional package list is shown in full).
 4. **Privacy by default.** Do not read, print, store, send, or version
    keys, tokens, passwords, cookies, history, browser profiles, messaging
    data, or files in `~/.ssh`, `~/.gnupg`, `~/.config/gh`, and the like.

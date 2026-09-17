@@ -76,6 +76,9 @@ func TestEnsureRepositoryDryRunBootstrapsTemporaryCheckout(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = os.Chdir(originalDirectory) })
+	// Keep a real local installation from changing what this isolated test
+	// exercises: it must reach the temporary dry-run checkout branch.
+	t.Setenv("HOME", t.TempDir())
 
 	path, cleanup, err := ensureRepositoryWithCleanup("", true)
 	if err != nil {
@@ -98,5 +101,40 @@ func TestRunRejectsUnknownCommand(t *testing.T) {
 	err := run([]string{"not-a-command"})
 	if err == nil || !strings.Contains(err.Error(), "comando desconhecido") {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestProfileByName(t *testing.T) {
+	p, err := profileByName("creator")
+	if err != nil || len(p.plugins) == 0 {
+		t.Fatalf("creator profile = %#v, %v", p, err)
+	}
+	if _, err := profileByName("does-not-exist"); err == nil {
+		t.Fatal("unknown profile was accepted")
+	}
+}
+
+func TestCopyTreePreservesFilesAndLinks(t *testing.T) {
+	source, target := t.TempDir(), filepath.Join(t.TempDir(), "snapshot")
+	if err := os.WriteFile(filepath.Join(source, "theme.conf"), []byte("umbra"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(source, "nested"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "nested", "colors"), []byte("violet"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink("theme.conf", filepath.Join(source, "current")); err != nil {
+		t.Fatal(err)
+	}
+	if err := copyTree(source, target); err != nil {
+		t.Fatal(err)
+	}
+	if data, err := os.ReadFile(filepath.Join(target, "nested", "colors")); err != nil || string(data) != "violet" {
+		t.Fatalf("copied data = %q, %v", data, err)
+	}
+	if link, err := os.Readlink(filepath.Join(target, "current")); err != nil || link != "theme.conf" {
+		t.Fatalf("copied link = %q, %v", link, err)
 	}
 }
