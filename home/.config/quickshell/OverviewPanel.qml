@@ -497,7 +497,7 @@ Item {
         elide: Text.ElideRight
         text: {
             const t = root.hoverTl;
-            if (!t) return I18n.tr("Arrastra una ventana a otro escritorio · clic derecho la cierra · clic con la rueda la vuelve flotante");
+            if (!t) return I18n.tr("Drag a window to another workspace · right-click closes it · middle-click makes it floating");
             if (t.title && t.title.length > 0) return t.title;
             const c = t.lastIpcObject;
             return c ? (c["class"] || "") : "";

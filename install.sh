@@ -22,7 +22,7 @@ DRY=0
 ASSUME_YES=0
 MODE=link            # link | copy
 UI_LANG=             # es | en | pt-BR; empty means "ask, or take the default"
-DEFAULT_LANG=pt-BR   # idioma padrão deste fork
+DEFAULT_LANG=pt-BR   # default language of this fork
 REQUESTED_PHASES=()
 
 ALL_PHASES=(base aur packages repos config system graphics services sddm spicetify final)
@@ -106,9 +106,9 @@ ask_lang() {
         en|EN) UI_LANG=en ;;
         es|ES) UI_LANG=es ;;
         pt-BR|pt-br|PT-BR|ptbr|PTBR) UI_LANG=pt-BR ;;
-        # Enter a secas = lo que ya hablaba el escritorio. Y 'es' tecleado a mano
-        # tiene que ASIGNAR: cuando el defecto pasó a ser lo que hay instalado, un
-        # caso vacío aquí dejaba UI_LANG en 'en' y se ignoraba lo que pedías.
+        # Bare Enter = whatever the desktop already spoke. And a hand-typed 'es'
+        # must ASSIGN: when the default became what is installed, an
+        # empty case here left UI_LANG as 'en' and ignored what you asked.
         '') ;;
         *) warn "'$answer' is not es, en or pt-BR; keeping $DEFAULT_LANG" ;;
     esac
@@ -245,10 +245,10 @@ copy_tree() {
 # expand `~` or `$HOME`, so a relative path would be resolved against whatever
 # directory the program happened to start in. On Eduardo Augusto's machine that absolute
 # path is right by definition; on anyone else's it points at a home that does
-# not exist, and the result is a desktop that comes up in default colours with
+# not exist, and the result is a desktop that comes up in default colors with
 # nothing failing out loud.
 #
-# It was worse than colours: `sddm-hyprisland/install.sh` had its own source
+# It was worse than colors: `sddm-hyprisland/install.sh` had its own source
 # directory hardcoded, so the whole `sddm` phase died with "cannot stat
 # /home/eduardoaugustolb/.config/sddm-hyprisland/Main.qml", and
 # `luminous-autoselect.service` pointed its ExecStart at a binary under
@@ -621,9 +621,9 @@ phase_packages() {
     install_optional_packages
 }
 
-# Ferramentas pesadas e aplicações pessoais nunca entram por padrão. Cada item
-# opcional exige autorização individual; em execução não interativa, nenhum é
-# instalado.
+# Heavy tools and personal apps never come in by default. Each optional
+# item requires individual approval; in non-interactive runs, none is
+# installed.
 install_optional_packages() {
     local official_manifest="$REPO/packages/optional-pacman.txt"
     local aur_manifest="$REPO/packages/optional-aur.txt"
@@ -849,6 +849,15 @@ EOF
         run sh -c "printf 'on\n' > '$pokestate'" && ok "poke-theme state seeded"
     fi
 
+    # 7b) the en-US rename: efectos.lua is now effects.lua. The writer
+    #     (Config.qml) and the loader (hyprland.lua) both use the new name, so
+    #     carry the live settings over instead of resetting them. At $HOME and
+    #     not at $root on purpose: in --copy mode the live file is the copy.
+    local old_fx="$HOME/.config/hypr/efectos.lua" new_fx="$HOME/.config/hypr/effects.lua"
+    if [ -f "$old_fx" ] && [ ! -f "$new_fx" ]; then
+        run mv -- "$old_fx" "$new_fx" && ok "efectos.lua migrated to effects.lua (en-US rename)"
+    fi
+
     # 8) the language. Last, because it edits files that have just been laid
     #    down, and before the 'sddm' phase, which copies one of them into /usr.
     apply_language
@@ -902,6 +911,21 @@ phase_system() {
         fi
         ok "/etc/$rel"
     done < <(find "$root" -type f | sort)
+
+    # The paccache drop-in was renamed to uninstalled.conf for en-US. On a
+    # copied install the old drop-in otherwise stays in /etc and paccache runs
+    # twice. Preserve it beside the file instead of deleting it, so the
+    # migration is reversible and never replaces an earlier backup.
+    local old_paccache=/etc/systemd/system/paccache.service.d/desinstalados.conf
+    local old_paccache_backup="$old_paccache.before-en-us-rename"
+    if [ -e "$old_paccache" ]; then
+        if [ -e "$old_paccache_backup" ]; then
+            warn "legacy paccache drop-in kept: backup already exists at $old_paccache_backup"
+        else
+            run sudo mv -- "$old_paccache" "$old_paccache_backup" \
+                && ok "legacy paccache drop-in moved aside (en-US rename)"
+        fi
+    fi
 
     run sudo systemctl daemon-reload
     run sudo sysctl --system >/dev/null 2>&1
@@ -1374,7 +1398,7 @@ phase_sddm() {
 # its stock look no matter what the repo ships.
 #
 # WHY IT IS A PHASE OF ITS OWN. The `config` phase already lays down
-# ~/.config/spicetify with the termspot theme and the pywal colour scheme, and
+# ~/.config/spicetify with the termspot theme and the pywal color scheme, and
 # `set-wallpaper.sh` already calls `spicetify refresh` on every wallpaper
 # change... but `refresh` only does anything once spicetify has been APPLIED at
 # least once, and applying means writing inside /opt/spotify, which needs sudo.
@@ -1432,14 +1456,14 @@ phase_spicetify() {
         ok "empty prefs created (Spotify fills it in on first run)"
     fi
 
-    # Seed the colours before applying, so the very first paint is already the
+    # Seed the colors before applying, so the very first paint is already the
     # pywal ones instead of whatever the theme ships with.
     local gen="$HOME/.config/hypr/scripts/spicetify-colors.py"
     local theme="$HOME/.config/spicetify/Themes/termspot"
     if [ -r "$gen" ] && [ -r "$HOME/.cache/wal/colors.json" ] && [ "$DRY" = 0 ]; then
         mkdir -p "$theme"
         python3 "$gen" "$theme/color.ini" >/dev/null 2>&1 \
-            && ok "colours generated from the current pywal palette"
+            && ok "colors generated from the current pywal palette"
     fi
 
     run spicetify config current_theme termspot color_scheme pywal >/dev/null 2>&1
@@ -1536,7 +1560,7 @@ phase_final() {
             # these scripts, which day to day are launched by set-wallpaper.sh;
             # that one cannot be called here because it needs a live compositor
             # for the wallpaper itself. Without this, a fresh install would leave
-            # Discord, Spotify, btop, cava and yazi on their stock colours until
+            # Discord, Spotify, btop, cava and yazi on their stock colors until
             # the first wallpaper change. They only read ~/.cache/wal and write
             # config files: no session needed.
             local regenerated=0 s
@@ -1591,11 +1615,11 @@ phase_restore() {
 
     local backup_root="$HOME/.dotfiles-backup"
     local which=""
-    [ -d "$backup_root" ] && # La MÁS RECIENTE por fecha de modificación, no la última alfabéticamente.
-    # Con `sort | tail -1` cualquier carpeta que empiece por letra -las que dejan
-    # los despliegues a mano, tipo `i18n-...` o `pre-deploy-...`- se ordenaba
-    # después de las fechadas `2026...` y tapaba a la buena. Restaurar es la red
-    # de seguridad: no puede depender de cómo se llame la carpeta.
+    [ -d "$backup_root" ] && # The MOST RECENT by modification date, not the last alphabetically.
+    # With `sort | tail -1` any folder starting with a letter -the ones left
+    # by manual deploys, like `i18n-...` or `pre-deploy-...`- would sort
+    # after the dated `2026...` ones and hide the good one. Restore is the safety
+    # net: it cannot depend on what the folder is named.
     which="$(find "$backup_root" -maxdepth 1 -mindepth 1 -type d -printf '%T@ %p\n' \
         | sort -rn | head -1 | cut -d' ' -f2-)"
 

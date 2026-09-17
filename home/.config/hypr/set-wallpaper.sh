@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
-# set-wallpaper.sh <imagen> — cambia el fondo y re-tematiza TODO (pywal) en caliente.
+# set-wallpaper.sh <image> - changes the wallpaper and re-themes EVERYTHING (pywal) live.
 set -uo pipefail
 IMG="${1:-}"
-[ -z "$IMG" ] && { echo "uso: set-wallpaper.sh <imagen>"; exit 1; }
-[ -f "$IMG" ] || { echo "no existe: $IMG"; exit 1; }
+[ -z "$IMG" ] && { echo "usage: set-wallpaper.sh <image>"; exit 1; }
+[ -f "$IMG" ] || { echo "does not exist: $IMG"; exit 1; }
 IMG="$(realpath -- "$IMG")" || exit 1
 
-# Serializa la cadena entera: el picker lanza este script con execDetached en
-# cada seleccion, y dos wal concurrentes dejan el escritorio MEZCLADO (fondo de
-# A con paleta de B, colors.json a medio escribir). Con el lock, cada seleccion
-# espera a que termine la anterior en vez de pisarla. Mismo patron que
-# pacman-updates.sh. Los trabajos en segundo plano cierran el fd 9 (9>&-) para
-# no retener el lock mas alla del propio script.
+# Serializes the entire pipeline: the picker launches this script with
+# execDetached for each selection, and two concurrent wal runs leave a MIXED
+# desktop (A's wallpaper with B's palette, half-written colors.json). With the
+# lock, each selection waits for the previous one rather than overwriting it.
+# Same pattern as pacman-updates.sh. Background jobs close fd 9 (9>&-) so they
+# do not retain the lock beyond this script.
 #
-# Ojo con el `if`: un `exec 9>...` suelto que falle -por ejemplo un lock de
-# otro usuario en /tmp- mata el script entero ahi mismo y sin decir nada, y el
-# fondo no cambiaria. Asi, si el lock no se puede abrir, se sigue sin el.
+# The `if` is important: a standalone failing `exec 9>...` -for example, due
+# to another user's lock in /tmp- terminates this script silently, leaving the
+# wallpaper unchanged. This continues without the lock if it cannot be opened.
 if exec 9>"${XDG_RUNTIME_DIR:-/tmp}/set-wallpaper.lock" 2>/dev/null; then
     flock 9
 fi
 
-# --saturate 0.2: realza un poco la paleta sin llevarla a neón. El pywal ya
-# entrega colores vivos en fondos coloridos; valores altos (0.4-0.5) suman esa
-# cantidad a la saturación HLS de TODOS los colores (se mide S=0.9-1.0 en casi
-# todos los slots) y terminal, yazi, cava y fzf quedan fluorescentes. 0.2 mantiene
-# el carácter del fondo. install.sh usa el mismo valor para que el primer
-# arranque se vea igual que tras el primer cambio de fondo.
+# --saturate 0.2: slightly enhances the palette without making it neon. Pywal
+# already produces vivid colors from colorful wallpapers; high values (0.4-0.5)
+# add that amount to EVERY color's HLS saturation (S=0.9-1.0 in almost every
+# slot), making the terminal, yazi, cava, and fzf fluorescent. 0.2 retains the
+# wallpaper's character. install.sh uses the same value so the first launch
+# looks like the first wallpaper change.
 #
 # Pinned backend: okthief clusters by dominant areas, so small vivid details
 # don't hijack the accent slots. Falls back to pywal's default when okthief
@@ -34,7 +34,7 @@ fi
 # red slot) and `wal -R` re-exports every template from the normalized file.
 if ! wal -i "$IMG" --backend okthief --saturate 0.2 -n -q -s -t; then
   if ! wal -i "$IMG" --saturate 0.2 -n -q -s -t; then
-    notify-send -u critical "Tema dinámico" "Pywal no pudo generar la paleta" 2>/dev/null || true
+    notify-send -u critical "Dynamic theme" "Pywal could not generate the palette" 2>/dev/null || true
     exit 1
   fi
 fi
@@ -42,75 +42,73 @@ if [ -x "$HOME/.config/hypr/scripts/pywal-normalize.py" ]; then
   "$HOME/.config/hypr/scripts/pywal-normalize.py" >/dev/null 2>&1 \
     && wal -R -n -q -s -t || true
 fi
-ln -sfn -- "$IMG" "$HOME/.cache/wal/lockbg"  # fondo de bloqueo sigue al wallpaper
+ln -sfn -- "$IMG" "$HOME/.cache/wal/lockbg"  # Lock-screen background follows the wallpaper
 
-# El login (tema hyprisland de SDDM) sigue al wallpaper igual que el bloqueo.
-# Corre como tú, no como root: ver el comentario de cabecera de login-sync.sh.
-# En segundo plano porque re-encoda la imagen y no tiene por qué retrasar la
-# transición del fondo, que es lo que se ve.
+# The login screen (SDDM's hyprisland theme) follows the wallpaper like the
+# lock screen. It runs as the user, not root: see login-sync.sh's header
+# comment. It runs in the background because it re-encodes the image and should
+# not delay the visible wallpaper transition.
 [ -x "$HOME/.config/sddm-hyprisland/login-sync.sh" ] &&
     "$HOME/.config/sddm-hyprisland/login-sync.sh" "$IMG" >/dev/null 2>&1 9>&- &
 
-# Color REAL de la franja donde vive la barra. Hace falta porque la barra no
-# tiene superficie propia: sus cuerpos se pintan directamente sobre el
-# wallpaper, y para saber si se van a ver hay que medir contra lo que hay
-# DETRAS. El `background` de pywal no sirve para eso: es un derivado oscurecido
-# de la paleta, no un trozo de la imagen (medido con este mismo fondo: 0.011 de
-# luminancia contra 0.087 de la franja de verdad, ocho veces mas oscura), asi
-# que calcular contra el deja los cuerpos apagados justo donde el fondo es
-# claro. Esto promedia el 5 % de arriba de la imagen y lo deja donde Colors.qml
-# lo vigila. Si magick falla, el fichero queda vacio y Colors tira del
-# background de pywal como antes.
+# Actual color of the strip where the bar lives. This is needed because the bar
+# has no surface of its own: its elements draw directly over the wallpaper, so
+# visibility must be measured against what is BEHIND them. Pywal's `background`
+# is unsuitable: it is a darkened palette derivative, not part of the image
+# (measured on this wallpaper: 0.011 luminance versus 0.087 for the real strip,
+# eight times darker), so using it dims elements where the wallpaper is light.
+# This averages the image's top 5% and writes it where Colors.qml watches it.
+# If magick fails, the file stays empty and Colors falls back to pywal's
+# background as before.
 magick "$IMG" -gravity north -crop '100%x5%+0+0' +repage -alpha off -resize 1x1! txt:- 2>/dev/null \
   | awk 'NR==2 && $3 ~ /^#[0-9A-Fa-f]{6}$/ {print $3}' > "$HOME/.cache/wal/bar-strip.txt" || true
 
-# Spotify, LO PRIMERO de los recargados y en segundo plano.
+# Spotify, FIRST among reloaded components and in the background.
 #
-# Estaba el último de la lista y se notaba: la barra y las terminales ya habían
-# cambiado de color y Spotify seguía azul un segundo y medio largo. Medido sobre
-# el vídeo del escritorio, cambiando el fondo con Spotify delante: el fondo
-# entraba, la barra cambiaba, y el repintado de Spotify llegaba 1,3-1,7 s
-# después. No es que sea lento -el push por DevTools tarda 0,07 s- es que le
-# tocaba el último turno detrás de yazi, cava, btop y discord.
+# It was last in the list and it showed: the bar and terminals had already
+# changed color while Spotify remained blue for more than a second. Measured
+# from desktop video while changing the wallpaper with Spotify in front: the
+# wallpaper appeared, the bar changed, and Spotify repainted 1.3-1.7 seconds
+# later. It is not slow -the DevTools push takes 0.07 seconds- it was simply
+# queued after yazi, cava, btop, and discord.
 #
-# Ahora sale aquí, con la paleta recién escrita y ANTES de que empiece la
-# transición del fondo, y en segundo plano para no retrasarla. Así el fondo y la
-# ventana más grande de la pantalla cambian a la vez, que es como se lee que el
-# sistema entero es uno.
+# It now runs here with the newly written palette and BEFORE the wallpaper
+# transition begins, in the background so it does not delay it. This lets the
+# wallpaper and the largest window on screen change together, making the whole
+# system read as one.
 ~/.config/hypr/scripts/spicetify-pywal.sh >/dev/null 2>&1 9>&- &
 
-# El fondo es visual; un fallo de awww no invalida la paleta recién generada.
-# apply estilo ilyamiro: transición aleatoria + desde el centro + 144fps + 1s
+# The wallpaper is visual; an awww failure does not invalidate the new palette.
+# ilyamiro-style apply: random transition + from center + 144fps + 1s
 awww_transitions=(simple fade left right top bottom wipe grow center outer random wave)
 awww_rt="${awww_transitions[RANDOM % ${#awww_transitions[@]}]}"
 awww img "$IMG" --transition-type "$awww_rt" --transition-pos 0.5,0.5 --transition-fps 144 --transition-duration 1 >/dev/null 2>&1 || awww img "$IMG" >/dev/null 2>&1 || true
 
-# Recargas de daemons vivos.
-# Quickshell (barra + notch) NO necesita recarga: Colors.qml vigila
-# ~/.cache/wal/colors.json y se recolorea solo.
+# Reload live daemons.
+# Quickshell (bar + notch) does NOT need a reload: Colors.qml watches
+# ~/.cache/wal/colors.json and recolors itself.
 pkill -SIGUSR1 -x kitty  2>/dev/null || true
 hyprctl reload           >/dev/null 2>&1 || true
-# swaync retirado el 2026-08-05: el servidor de notificaciones es el de Quickshell
+# swaync removed on 2026-08-05: Quickshell provides the notification server
 ~/.config/hypr/scripts/yazi-pywal.sh 2>/dev/null || true
 ~/.config/hypr/scripts/cava-pywal.sh 2>/dev/null || true
-# VS Code retirado el 2026-08-11: el tematizado por pywal quedaba feo mirase
-# como se mirase, y no hay forma de que un editor entero salga bonito a partir
-# de cinco colores de un fondo de pantalla. Se queda con su tema de fabrica.
-# El script esta guardado en ~/.audit-backups/2026-08-12/bak-files/.
+# VS Code removed on 2026-08-11: pywal theming looked bad in every variation,
+# and an entire editor cannot look good from five wallpaper colors. It retains
+# its default theme. The script is stored in ~/.audit-backups/2026-08-12/bak-files/.
 ~/.config/hypr/scripts/btop-pywal.sh 2>/dev/null || true
-# Aplicaciones Qt: escribe las paletas de qt5ct y qt6ct y las secciones de
-# color de kdeglobals. Las dos familias se recolorean SIN reiniciarlas, porque
-# su tema de plataforma vigila el .conf y el script lo reescribe conservando el
-# inodo -- que es justo lo que hace que el watcher se entere; con el truco
-# habitual de temporal + rename, no se entera nunca.
+# Qt applications: write qt5ct and qt6ct palettes and kdeglobals color
+# sections. Both families recolor WITHOUT restarting because their platform
+# theme watches the .conf and the script rewrites it while preserving the inode,
+# which is what lets the watcher detect it; with the usual temp + rename trick,
+# it never does.
 ~/.config/hypr/scripts/qt-pywal.py >/dev/null 2>&1 || true
-# Y las GTK/libadwaita que ya esten abiertas, por el portal de apariencia.
+# Also update already-open GTK/libadwaita applications through the appearance portal.
 ~/.config/hypr/scripts/gtk-pywal.sh >/dev/null 2>&1 || true
 ~/.config/hypr/scripts/discord-pywal.sh 2>/dev/null || true
-# (spicetify ya se ha lanzado arriba, antes de la transición del fondo)
-# Re-ordena los sprites de pokemon para la paleta nueva (~0.1 s) para que la
-# proxima terminal ya saque los que pegan. Si falla, pokefetch tira del azar.
-# (ruta absoluta: hyprland no siempre hereda ~/.local/bin en el PATH)
+# (spicetify was already launched above, before the wallpaper transition)
+# Reorders Pokemon sprites for the new palette (~0.1 s) so the next terminal
+# immediately picks matching ones. If it fails, pokefetch uses randomness.
+# (absolute path: Hyprland does not always inherit ~/.local/bin in PATH)
 [ -x "$HOME/.local/bin/poke-theme" ] && "$HOME/.local/bin/poke-theme" rank -q >/dev/null 2>&1 9>&- &
-# (rofi, btop, wlogout, hyprlock leen sus colores al abrirse -> sin recarga)
+# (rofi, btop, wlogout, and hyprlock read colors on launch -> no reload)
 exit 0

@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-# Empuja la paleta de pywal a la ventana de Spotify YA ABIERTA, en caliente.
+# Pushes the pywal palette to an ALREADY OPEN Spotify window, live.
 #
-# Por que existe esto: 'spicetify apply' recompila a disco pero no toca el Spotify
-# abierto, y 'spicetify watch' hace una RECARGA COMPLETA del xpui (destello de 1-2s
-# y pierdes el scroll). Ademas el mantenedor de spicetify reconoce que ese camino
-# falla a menudo en Linux (spicetify/cli#1091: "We send a valid javascript via
+# Why this exists: 'spicetify apply' rebuilds on disk but does not touch open
+# Spotify, while 'spicetify watch' fully reloads xpui (1-2 s flash and lost
+# scroll). The Spicetify maintainer acknowledges this often fails on Linux:
 # DevTools websocket [...] On Linux it mostly fails").
 #
-# Aqui vamos por debajo: al mismo WebSocket de DevTools, pero en vez de pedir una
-# recarga solo reescribimos las variables CSS --spice-*. El repintado es inmediato
-# y no se pierde ni el scroll ni el estado de la UI.
+# Instead, use the DevTools WebSocket directly and rewrite only --spice-* CSS
+# variables. Repainting is immediate, preserving scroll and UI state.
 #
-# Requiere que Spotify se haya lanzado con --remote-debugging-port (lo pone el
-# override ~/.local/share/applications/spotify.desktop).
+# Requires Spotify to be launched with --remote-debugging-port (set by the
+# ~/.local/share/applications/spotify.desktop override).
 #
-# Salida: 0 si los colores se aplicaron; !=0 si no se pudo (Spotify cerrado, sin
-# puerto, etc.) para que quien llame decida si hace falta el reinicio de siempre.
+# Exit status: 0 if colors were applied; nonzero if not (Spotify closed, no port,
+# and so on), allowing the caller to decide whether a restart is needed.
 #
-# Uso: spicetify-push-colors.py [ruta_color.ini] [--puerto N] [--seccion pywal]
+# Usage: spicetify-push-colors.py [color.ini path] [--port N] [--section pywal]
 import base64, json, os, re, socket, struct, sys, urllib.request
 
 PUERTO = 9333
@@ -43,17 +41,17 @@ def morir(msg, codigo=1):
     sys.exit(codigo)
 
 
-# ---- 1. leer la seccion del color.ini ---------------------------------------
-# A mano y no con configparser: el color.ini de termspot lleva 20 secciones y
-# comentarios con ';', y aqui solo queremos una.
+# ---- 1. read the color.ini section ------------------------------------------
+# Parse manually rather than using configparser: termspot color.ini has 20
+# sections and ';' comments, while only one section is needed.
 def leer_seccion(ruta, seccion):
     try:
         texto = open(ruta).read()
     except OSError as e:
-        morir("no puedo leer %s: %s" % (ruta, e))
+        morir("cannot read %s: %s" % (ruta, e))
     m = re.search(r"^\[%s\][^\[]*" % re.escape(seccion), texto, re.M)
     if not m:
-        morir("no hay seccion [%s] en %s" % (seccion, ruta))
+        morir("section [%s] is missing from %s" % (seccion, ruta))
     colores = {}
     for linea in m.group(0).splitlines()[1:]:
         linea = linea.strip()
@@ -64,18 +62,17 @@ def leer_seccion(ruta, seccion):
         if re.fullmatch(r"[0-9A-F]{6}", v):
             colores[k.strip()] = v
     if not colores:
-        morir("la seccion [%s] no tiene colores validos" % seccion)
+        morir("section [%s] has no valid colors" % seccion)
     return colores
 
 
-# ---- 2. cliente WebSocket minimo (RFC 6455) ---------------------------------
-# No hay websocat ni el modulo 'websockets' en el sistema, y para mandar cuatro
-# mensajes no merece la pena una dependencia: el handshake y el enmarcado son
-# cortos. Los frames de cliente van SIEMPRE enmascarados; los del servidor no.
+# ---- 2. minimal WebSocket client (RFC 6455) ---------------------------------
+# No websocat or websockets module is installed; a dependency is unnecessary
+# for four messages. Client frames are always masked; server frames are not.
 class WS:
     def __init__(self, url, origin, timeout=4):
         if not url.startswith("ws://"):
-            raise ValueError("url no ws://: %s" % url)
+            raise ValueError("URL is not ws://: %s" % url)
         hostport, _, path = url[5:].partition("/")
         host, _, puerto = hostport.partition(":")
         self.s = socket.create_connection((host, int(puerto or 80)), timeout=timeout)
@@ -89,7 +86,7 @@ class WS:
                 "Connection: Upgrade\r\n"
                 "Sec-WebSocket-Key: %s\r\n"
                 "Sec-WebSocket-Version: 13\r\n"
-                # Chromium 111+ exige que el Origin este en --remote-allow-origins
+                # Chromium 111+ requires Origin in --remote-allow-origins.
                 "Origin: %s\r\n"
                 "\r\n" % (path, hostport, clave, origin)
             ).encode()
@@ -98,19 +95,19 @@ class WS:
         while b"\r\n\r\n" not in buf:
             trozo = self.s.recv(4096)
             if not trozo:
-                raise RuntimeError("el servidor cerro durante el handshake")
+                raise RuntimeError("server closed during handshake")
             buf += trozo
         cabeceras, _, resto = buf.partition(b"\r\n\r\n")
         primera = cabeceras.split(b"\r\n")[0].decode(errors="replace")
         if "101" not in primera:
-            raise RuntimeError("handshake rechazado: %s" % primera)
+            raise RuntimeError("handshake rejected: %s" % primera)
         self.buf = resto
 
     def _leer(self, n):
         while len(self.buf) < n:
             trozo = self.s.recv(65536)
             if not trozo:
-                raise RuntimeError("conexion cerrada")
+                raise RuntimeError("connection closed")
             self.buf += trozo
         out, self.buf = self.buf[:n], self.buf[n:]
         return out
@@ -118,7 +115,7 @@ class WS:
     def enviar(self, texto):
         datos = texto.encode()
         n = len(datos)
-        cab = bytearray([0x81])  # FIN + opcode texto
+        cab = bytearray([0x81])  # FIN + text opcode
         if n < 126:
             cab.append(0x80 | n)
         elif n < 1 << 16:
@@ -139,14 +136,14 @@ class WS:
             elif n == 127:
                 n = struct.unpack(">Q", self._leer(8))[0]
             carga = self._leer(n) if n else b""
-            if b1 & 0x80:  # el servidor no deberia enmascarar, pero por si acaso
+            if b1 & 0x80:  # servers should not mask, but handle it just in case
                 mascara, carga = carga[:4], carga[4:]
                 carga = bytes(c ^ mascara[i % 4] for i, c in enumerate(carga))
             if opcode == 0x9:  # ping -> pong
                 self.enviar("")
                 continue
             if opcode == 0x8:
-                raise RuntimeError("el servidor cerro la conexion")
+                raise RuntimeError("server closed the connection")
             if opcode in (0x1, 0x2):
                 return carga.decode(errors="replace")
 
@@ -157,30 +154,28 @@ class WS:
             pass
 
 
-# ---- 3. localizar la pestana del xpui ---------------------------------------
+# ---- 3. locate the xpui tab -------------------------------------------------
 def objetivo(puerto):
     try:
         with urllib.request.urlopen("http://127.0.0.1:%d/json" % puerto, timeout=3) as r:
             objetivos = json.load(r)
     except Exception as e:
-        morir("no hay puerto de depuracion en %d (%s). Spotify cerrado, o lanzado "
-              "sin --remote-debugging-port" % (puerto, e), 2)
+        morir("no debugging port on %d (%s). Spotify is closed or was launched "
+               "without --remote-debugging-port" % (puerto, e), 2)
     paginas = [t for t in objetivos if t.get("type") == "page" and t.get("webSocketDebuggerUrl")]
     if not paginas:
-        morir("el puerto responde pero no hay ninguna pagina abierta", 3)
-    # la UI principal es xpui; si no la encontramos, la primera pagina sirve
+        morir("port responds but no page is open", 3)
+    # The main UI is xpui; fall back to the first page.
     for t in paginas:
         if "xpui" in (t.get("url") or ""):
             return t
     return paginas[0]
 
 
-# ---- 4. el JS que se ejecuta dentro de Spotify -------------------------------
+# ---- 4. JavaScript executed inside Spotify ----------------------------------
 def construir_js(colores):
-    # Ademas de las --spice-*, recalculamos --termspot-mono-filter. El tema lo
-    # deriva del acento en su updateMonoFilter(), pero solo lo llama al cambiar
-    # de cancion: sin esto las caratulas se quedarian con el tinte anterior hasta
-    # la siguiente. La formula es la misma que la suya (theme.js).
+    # Also recalculate --termspot-mono-filter. The theme only updates it on a
+    # track change, leaving album art tinted with the previous accent otherwise.
     return """(() => {
   const c = %s;
   const el = document.documentElement;
@@ -211,7 +206,7 @@ def construir_js(colores):
 })()""" % json.dumps(colores)
 
 
-# ---- 5. main -----------------------------------------------------------------
+# ---- 5. main ----------------------------------------------------------------
 def main():
     colores = leer_seccion(INI, SECCION)
     t = objetivo(PUERTO)
@@ -222,13 +217,13 @@ def main():
             "method": "Runtime.evaluate",
             "params": {"expression": construir_js(colores), "returnByValue": True},
         }))
-        # puede llegar algun evento suelto antes de nuestra respuesta
+        # An unrelated event may arrive before our response.
         for _ in range(20):
             msg = json.loads(ws.recibir())
             if msg.get("id") == 1:
                 break
         else:
-            morir("sin respuesta del evaluate", 4)
+            morir("no response to evaluate", 4)
     finally:
         ws.cerrar()
 
@@ -236,8 +231,8 @@ def main():
         morir("CDP: %s" % msg["error"], 5)
     res = msg.get("result", {})
     if res.get("exceptionDetails"):
-        morir("excepcion en Spotify: %s" % res["exceptionDetails"].get("text"), 6)
-    print("aplicados %s colores en caliente" % res.get("result", {}).get("value"))
+        morir("Spotify exception: %s" % res["exceptionDetails"].get("text"), 6)
+    print("applied %s colors live" % res.get("result", {}).get("value"))
 
 
 if __name__ == "__main__":

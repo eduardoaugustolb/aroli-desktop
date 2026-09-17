@@ -8,7 +8,7 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   renamed deployed path, config format that old installs cannot read).
 - `MINOR`: new feature that stays compatible (new panel, script, package,
   translation, optional).
-- `PATCH`: fix or docs with no behaviour change for existing installs.
+- `PATCH`: fix or docs with no behavior change for existing installs.
 
 ## [Unreleased]
 

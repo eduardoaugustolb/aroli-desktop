@@ -1,9 +1,9 @@
-// ControlPanel.qml — el centro de control, desplegado DESDE el notch.
+// ControlPanel.qml — the control center, unfolded FROM the notch.
 //
-// Sustituye al "control center" de swaync (que era una ventana GTK suya y por
-// eso no se podía meter aquí dentro). Izquierda: reproductor vertical. Centro:
-// sliders y conmutadores. Derecha: el historial de notificaciones, servido por
-// nuestro propio NotificationServer (ver ShellState.qml).
+// Replaces swaync's "control center" (a GTK window of its own, hence
+// impossible to fit in here). Left: vertical player. Center: sliders and
+// toggles. Right: notification history, served by our own NotificationServer
+// (see ShellState.qml).
 import Quickshell
 import Quickshell.Services.Notifications
 import QtQuick
@@ -13,17 +13,17 @@ import QtQuick.Layouts
 Item {
     id: root
 
-    // absorbe clics en el hueco para que no cierren el panel
+    // swallows clicks in the gap so they never close the panel
     MouseArea { anchors.fill: parent }
 
     RowLayout {
         anchors { fill: parent; leftMargin: 24; rightMargin: 22; topMargin: 20; bottomMargin: 20 }
         spacing: 20
 
-        // ═════════════ izquierda: reproductor vertical ═════════════
-        // Es el reproductor de la referencia, pero DENTRO de Super+D: comparte
-        // la misma superficie y el mismo cierre por clic fuera que el resto del
-        // centro de control.
+        // ═════════════ left: vertical player ═════════════
+        // It is the reference player, but INSIDE Super+D: sharing
+        // the same surface and the same click-outside close as the rest of
+        // the control center.
         MediaPanel {
             Layout.preferredWidth: 260
             Layout.fillHeight: true
@@ -31,7 +31,7 @@ Item {
 
         Rectangle { Layout.fillHeight: true; width: 1; color: "#1e1e1e" }
 
-        // ═════════════════ centro: controles ═════════════════
+        // ═════════════════ center: controls ═════════════════
         ColumnLayout {
             Layout.preferredWidth: 410
             Layout.fillHeight: true
@@ -46,14 +46,14 @@ Item {
                 onMoved: function (v) { ShellState.setVolume(v); }
                 onIconClicked: ShellState.toggleMute()
             }
-            // En un equipo sin panel interno (una torre) no hay ningún
-            // /sys/class/backlight, brightnessctl no encuentra nada y `bright`
-            // se queda en -1 para siempre. El slider salía igualmente: a cero,
-            // inmóvil y sin efecto. Un mando que no manda nada miente sobre lo
-            // que puedes hacer, así que la fila desaparece entera y el volumen
-            // se queda solo. Al ser un ColumnLayout, un item invisible no ocupa
-            // sitio y el hueco se cierra solo (mismo criterio que Ajustes, que
-            // ya escondía su fila de brillo con `shown`).
+            // On a box with no internal panel (a tower) there is no
+            // /sys/class/backlight, brightnessctl finds nothing and `bright`
+            // stays -1 forever. The slider still showed: at zero, stuck and
+            // with no effect. A knob commanding nothing lies about what you
+            // can do, so the whole row goes and volume stays alone. Being a
+            // ColumnLayout, an invisible item takes no room and the gap closes
+            // on its own (same rule as Settings, which already hid its
+            // brightness row with `shown`).
             NotchSlider {
                 visible: ShellState.bright >= 0
                 Layout.fillWidth: true
@@ -63,39 +63,39 @@ Item {
                 onMoved: function (v) { ShellState.setBrightness(v); }
             }
 
-            // ---- conmutadores ----
+            // ---- toggles ----
             GridLayout {
                 Layout.fillWidth: true
                 Layout.topMargin: 2
                 columns: 5
                 columnSpacing: 10
 
-                // Una sola diana por tarjeta. Si tiene panel dedicado, cualquier
-                // clic abre ese panel; su interruptor vive ya en la cabecera de
-                // Red/Bluetooth. Los demás conmutadores sí actúan aquí mismo.
+                // One target per tile. With a dedicated panel, any click
+                // opens that panel; its switch already lives in the Net/
+                // Bluetooth header. The rest of the toggles do act right here.
                 component Toggle: Rectangle {
                     id: tg
                     property string icon: ""
                     property string label: ""
                     property bool on: false
-                    property string panel: ""      // "" = sin panel dedicado
-                    property int idx: 0            // su turno en la cascada
+                    property string panel: ""      // "" = no dedicated panel
+                    property int idx: 0            // its turn in the cascade
                     signal activated()
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: 58
 
-                    // CASCADA. Los seis aparecian a la vez, que es lo mismo que
-                    // decir que no aparecian: un bloque que se enciende no tiene
-                    // direccion y no se puede seguir con la vista. Escalonados,
-                    // el ojo los recorre de izquierda a derecha y el panel se
-                    // lee como algo que se despliega.
+                    // CASCADE. All six appeared at once, which is the same as
+                    // saying none appeared: a block switching on has no
+                    // direction and cannot be followed by eye. Staggered, the
+                    // eye walks them left to right and the panel reads as
+                    // something unfolding.
                     //
-                    // OJO: aqui NO se toca la opacidad. El fundido ya lo hace
-                    // el NotchLayer que contiene este panel, y dos opacidades
-                    // encadenadas se multiplican: no se ve mas suave, se ve que
-                    // llega tarde. La capa se encarga de aparecer; la cascada,
-                    // solo de colocarse. Un gesto, un dueno.
+                    // NOTE: opacity stays untouched here. The fade is already
+                    // done by the NotchLayer holding this panel, and two chained
+                    // opacities multiply: not smoother, visibly late. The layer
+                    // handles appearing; the cascade, only placing. One gesture,
+                    // one owner.
                     property real ent: ShellState.mode === "control" ? 1 : 0
                     Behavior on ent {
                         SequentialAnimation {
@@ -143,7 +143,7 @@ Item {
                 }
 
                 Toggle {
-                    icon: ShellState.netIcon; label: I18n.tr("Red"); idx: 0
+                    icon: ShellState.netIcon; label: I18n.tr("Network"); idx: 0
                     on: ShellState.online
                     panel: "network"
                 }
@@ -153,22 +153,22 @@ Item {
                     panel: "bluetooth"
                 }
                 Toggle {
-                    icon: ShellState.dnd ? "󰂛" : "󰂚"; label: I18n.tr("No molestar"); idx: 2
+                    icon: ShellState.dnd ? "󰂛" : "󰂚"; label: I18n.tr("Do not disturb"); idx: 2
                     on: ShellState.dnd
                     onActivated: ShellState.dnd = !ShellState.dnd
                 }
                 Toggle {
-                    icon: Icons.coffee; label: I18n.tr("Cafeína"); idx: 3
+                    icon: Icons.coffee; label: I18n.tr("Caffeine"); idx: 3
                     on: ShellState.caffeine
                     onActivated: ShellState.caffeine = !ShellState.caffeine
                 }
                 Toggle {
-                    icon: Icons.moon; label: I18n.tr("Luz noct."); idx: 4
+                    icon: Icons.moon; label: I18n.tr("Night light"); idx: 4
                     on: ShellState.nightLight
                     onActivated: ShellState.toggleNightLight()
                 }
                 Toggle {
-                    icon: Icons.remote; label: I18n.tr("Remoto"); idx: 5
+                    icon: Icons.remote; label: I18n.tr("Remote"); idx: 5
                     on: ShellState.remoteMode
                     onActivated: ShellState.toggleRemoteMode()
                 }
@@ -177,12 +177,12 @@ Item {
                     on: ShellState.pokeTheme
                     onActivated: ShellState.togglePokeTheme()
                 }
-                // `on` va siempre a false a propósito: los demás cuadros encienden
-                // algo y el color dice si está encendido, pero este es una puerta,
-                // no un interruptor. Pintarlo encendido prometería un estado que no
-                // existe.
+                // `on` always goes false on purpose: the other tiles switch
+                // something on and color says whether it is on, but this one is
+                // a door, not a switch. Painting it lit would promise a state
+                // that does not exist.
                 Toggle {
-                    icon: Icons.calendar; label: I18n.tr("Calendario"); idx: 7
+                    icon: Icons.calendar; label: I18n.tr("Calendar"); idx: 7
                     on: false
                     panel: "calendar"
                 }
@@ -190,7 +190,7 @@ Item {
 
             Item { Layout.fillHeight: true }
 
-            // ---- tiempo + sistema (heredado del Sidebar retirado) ----
+            // ---- time + system (inherited from the retired Sidebar) ----
             RowLayout {
                 Layout.fillWidth: true
                 Layout.topMargin: 2
@@ -207,9 +207,9 @@ Item {
                     color: "#b0b0b0"; elide: Text.ElideRight
                     font.family: Appearance.fontUI; font.pixelSize: 11
                 }
-                // Los tres glifos con porcentajes eran indescifrables sin saber
-                // de memoria qué significaba cada uno. Ahora esto es una puerta
-                // con nombre: conserva el vistazo rápido y abre las gráficas.
+                // Three glyphs with percentages were unreadable without knowing
+                // by heart what each meant. Now this is a named door: keeps the
+                // quick glance and opens the graphs.
                 Rectangle {
                     id: performanceLink
                     Layout.preferredWidth: 222
@@ -231,7 +231,7 @@ Item {
                             Layout.fillWidth: true
                             spacing: 0
                             Text {
-                                text: I18n.tr("Tu equipo")
+                                text: I18n.tr("Your computer")
                                 color: performanceMa.containsMouse ? Colors.accent : "#cfcfcf"
                                 font.family: Appearance.fontUI; font.pixelSize: 10
                                 font.weight: Font.DemiBold
@@ -264,7 +264,7 @@ Item {
 
         Rectangle { Layout.fillHeight: true; width: 1; color: "#1e1e1e" }
 
-        // ══════════════════ derecha: notificaciones ══════════════════
+        // ══════════════════ right: notifications ══════════════════
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -274,7 +274,7 @@ Item {
                 Layout.fillWidth: true
                 spacing: 8
                 Text {
-                    text: I18n.tr("Notificaciones")
+                    text: I18n.tr("Notifications")
                     color: "#ffffff"
                     font.family: Appearance.fontUI; font.pixelSize: 12; font.weight: Font.DemiBold
                 }
@@ -307,7 +307,7 @@ Item {
                 }
                 Text {
                     visible: ShellState.notifCount > 0
-                    text: I18n.tr("Limpiar")
+                    text: I18n.tr("Clear")
                     color: clearMa.containsMouse ? Colors.accent : "#7d7d7d"
                     font.family: Appearance.fontUI; font.pixelSize: 11
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
@@ -320,30 +320,30 @@ Item {
                 }
             }
 
-            // ─────────── el ratón se lee UNA vez, y se lee aquí ───────────
-            // Cada fila tenía su MouseArea y la equis otra encima. De ahí salían
-            // tres fallos, y los tres se notan justo al ir a cerrar una:
+            // ─────────── the mouse reads ONCE, and reads here ───────────
+            // Each row had its MouseArea and the x another on top. Three bugs
+            // came out, all felt right when closing one:
             //
-            //   · el cuerpo va en StyledText (el marcado que mande la app), y un
-            //     Text con marcado ACEPTA eventos de hover para poder detectar
-            //     enlaces: se comía el de la fila. Medido: sobre el título la
-            //     fila se encendía y la equis salía; dos líneas más abajo, nada.
-            //     La mayor parte de la superficie de cada fila era zona muerta.
-            //   · la equis aparecía con `visible`, así que entraba y salía del
-            //     layout: la columna de texto se ensanchaba 23 px en cuanto le
-            //     quitabas el ratón. Es el menor de los tres, pero es geometría
-            //     que se mueve sola justo debajo del puntero.
-            //   · y al descartar una, el modelo es un array NUEVO (ver
-            //     ShellState.notifications): se rehacen todos los delegados con el
-            //     hover a cero. Como la mano no se ha movido no llega ningún
-            //     evento que lo corrija, y la lista se queda mintiendo: equis
-            //     encendida sobre una fila apagada, y el segundo clic en el mismo
-            //     sitio no cierra nada porque cae en el hueco.
+            //   · the body goes in StyledText (whatever markup the app sends),
+            //     and a Text with markup ACCEPTS hover events to detect links:
+            //     it ate the row's. Measured: over the title the row lit and the
+            //     x showed; two lines down, nothing. Most of each row's surface
+            //     was dead zone.
+            //   · the x appeared with `visible`, so it joined and left the
+            //     layout: the text column widened 23 px the moment the mouse
+            //     left it. The smallest of the three, but geometry moving alone
+            //     right under the pointer.
+            //   · and discarding one, the model is a NEW array (see
+            //     ShellState.notifications): every delegate rebuilds with hover
+            //     at zero. The hand never moved so no event arrives to correct
+            //     it, and the list stays lying: x lit over a dark row, and the
+            //     second click in the same spot closes nothing, landing in the
+            //     gap.
             //
-            // Con un solo MouseArea por encima de la lista hay un único dueño de
-            // "qué hay debajo del puntero". Y —esto es lo que arregla el tercero—
-            // ese dueño puede volver a mirarlo cuando la lista cambia, sin tener
-            // que esperar a que la mano se mueva.
+            // With a single MouseArea above the list one owner holds "what sits
+            // under the pointer". And —this is what fixes the third— that owner
+            // can look again when the list changes, without waiting for the hand
+            // to move.
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -357,10 +357,10 @@ Item {
                     boundsBehavior: Flickable.StopAtBounds
                     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded; width: 4 }
 
-                    property int hoverIdx: -1        // fila bajo el puntero; -1 = ninguna
-                    property bool overClose: false   // ...y encima de su equis
+                    property int hoverIdx: -1        // row under the pointer; -1 = none
+                    property bool overClose: false   // ...and over its x
 
-                    // (mx, my) en coordenadas del visor, que es como las da el ratón.
+                    // (mx, my) in viewer coordinates, which is how the mouse reports them.
                     function track(mx, my) {
                         const y = my + notifList.contentY;
                         const i = notifList.indexAt(notifList.width / 2, y);
@@ -371,19 +371,19 @@ Item {
                             notifList.overClose = false;
                             return;
                         }
-                        // La diana no se escribe a mano: se le pregunta al layout
-                        // dónde ha dejado la equis y se le dan los 6 px de margen que
-                        // tenía la MouseArea que vivía ahí. Si mañana cambia el
-                        // espaciado de la fila, la diana se mueve sola.
+                        // The target is never handwritten: the layout is asked
+                        // where it left the x, plus the 6 px margin the
+                        // MouseArea living there had. If the row spacing ever
+                        // changes, the target moves alone.
                         const p = equis.mapToItem(fila, 0, 0);
                         notifList.overClose = mx >= p.x - 6 && mx <= p.x + equis.width + 6
                             && (y - fila.y) >= p.y - 6 && (y - fila.y) <= p.y + equis.height + 6;
                     }
 
-                    // Volver a mirar sin que el ratón se haya movido: al cerrar una
-                    // notificación las de abajo suben y quien queda bajo el puntero
-                    // ya es otra fila. forceLayout porque si no se mide la lista de
-                    // antes y la equis sale encendida en la fila equivocada.
+                    // Looking again with no mouse move: closing one slides the
+                    // ones below up and whoever sits under the pointer is
+                    // already another row. forceLayout, or the list measures
+                    // stale and the x lights on the wrong row.
                     function retrack() {
                         if (!listMa.containsMouse) {
                             notifList.hoverIdx = -1;
@@ -395,7 +395,7 @@ Item {
                     }
 
                     onCountChanged: Qt.callLater(notifList.retrack)
-                    // Con la rueda son las filas las que se mueven, no la mano.
+                    // With the wheel the rows move, not the hand.
                     onContentYChanged: if (listMa.containsMouse) notifList.track(listMa.mouseX, listMa.mouseY)
 
                     delegate: Rectangle {
@@ -403,8 +403,8 @@ Item {
                         required property var modelData
                         required property int index
                         readonly property bool hovered: notifList.hoverIdx === nrow.index
-                        // Lo único que la fila le cuenta a la lista: dónde tiene la
-                        // equis, para que sepa a quién va dirigido el clic.
+                        // All the row tells the list: where its x sits,
+                        // so it knows who the click is for.
                         readonly property Item closeItem: equis
 
                         width: notifList.width
@@ -464,11 +464,11 @@ Item {
                             Text {
                                 id: equis
                                 Layout.alignment: Qt.AlignTop
-                                // Opacidad, no `visible`: la equis ocupa su hueco esté
-                                // encendida o no, así que la fila mide lo mismo con
-                                // ratón y sin ratón. Reservarle el sitio no cuesta
-                                // nada y quita del medio la clase de fallo en la que
-                                // lo que persigues se mueve porque lo persigues.
+                                // Opacity, not `visible`: the x holds its slot lit
+                                // or not, so the row measures the same with and
+                                // without mouse. Reserving the seat costs nothing
+                                // and removes the failure class where what you
+                                // chase moves because you chase it.
                                 opacity: nrow.hovered ? 1 : 0
                                 text: "󰅖"
                                 color: nrow.hovered && notifList.overClose ? Colors.crit : "#7d7d7d"
@@ -483,7 +483,7 @@ Item {
                 MouseArea {
                     id: listMa
                     anchors.fill: parent
-                    z: 1                     // por encima de las filas: el hover es suyo
+                    z: 1                     // above the rows: hover is its own
                     hoverEnabled: true
                     acceptedButtons: Qt.LeftButton
                     cursorShape: notifList.overClose ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -504,7 +504,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: ShellState.notifCount === 0
-                text: I18n.tr("Sin notificaciones")
+                text: I18n.tr("No notifications")
                 color: "#5e5e5e"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter

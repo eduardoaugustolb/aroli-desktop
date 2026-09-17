@@ -1,21 +1,19 @@
 #!/usr/bin/env bash
-# Selección de región SOBRE LA PANTALLA CONGELADA. Escribe el PNG en stdout.
+# Region selection ON THE FROZEN SCREEN. Writes the PNG to stdout.
 #
-# EL PROBLEMA: slurp roba el foco, y todo lo que vive del foco se cierra antes
-# de que llegues a disparar — el notch (Super+D), el lanzador, un menú
-# contextual, un desplegable. Capturabas el escritorio vacío justo donde estaba
-# lo que querías fotografiar.
+# THE PROBLEM: slurp steals focus, closing everything that depends on it before
+# you capture: the notch (Super+D), launcher, context menu, or dropdown. The
+# resulting screenshot showed an empty desktop where the target had been.
 #
-# LA SOLUCIÓN: hyprpicker deja una COPIA de la pantalla por encima de todo. A
-# partir de ese instante, lo que hay debajo puede cerrarse, moverse o morirse:
-# lo que eliges y lo que se recorta es la foto, no el escritorio vivo. La
-# captura pasa a ser una cosa independiente de lo que estuvieras haciendo.
+# THE SOLUTION: hyprpicker places a COPY of the screen above everything. From
+# that point on, what is below may close, move, or disappear: selection and
+# cropping apply to the image, not the live desktop.
 #
-# Además apunta qué panel del notch estaba abierto y lo vuelve a abrir al
-# terminar (congelar manda el foco fuera, y eso cancela su grab), así que hacer
-# una captura ya no te cierra el centro de control.
+# It also records which notch panel was open and restores it afterward. Freezing
+# moves focus away and cancels its grab, so capturing no longer closes Control
+# Center.
 #
-# Salida 1 si cancelas (ESC o clic sin arrastrar).
+# Exits with 1 when canceled (Esc or a click without dragging).
 set -uo pipefail
 
 freeze=""
@@ -24,8 +22,7 @@ panel=""
 salir() {
     [ -n "$freeze" ] && kill "$freeze" 2>/dev/null
     freeze=""
-    # Descongelar antes de restaurar: si no, el panel se abriría por debajo de
-    # la foto y no lo verías reaparecer.
+    # Unfreeze before restoring, or the panel would open below the image.
     [ -n "$panel" ] && qs ipc call notch restore "$panel" >/dev/null 2>&1
     return 0
 }
@@ -36,15 +33,12 @@ if command -v qs >/dev/null 2>&1; then
 fi
 
 if command -v hyprpicker >/dev/null 2>&1; then
-    # -r congela también los monitores inactivos; -z quita la lupa del
-    # cuentagotas (aquí solo queremos el congelado, no elegir un color).
-    # timeout es la red: si este script muere de mala manera (SIGKILL, y el
-    # trap no llega a correr), hyprpicker se quedaria vivo y verias la pantalla
-    # congelada para siempre. Asi se descongela sola a los 3 minutos.
+    # -r freezes inactive monitors too; -z removes the eyedropper magnifier.
+    # A timeout is the safety net: if this script dies badly (SIGKILL, so the
+    # trap cannot run), hyprpicker would otherwise leave the screen frozen.
     timeout 180 hyprpicker -r -z >/dev/null 2>&1 &
     freeze=$!
-    # Que la capa congelada esté arriba ANTES de slurp; si no, la selección se
-    # dibuja debajo y no ves lo que estás recortando.
+    # The frozen layer must be above slurp, or its selection is drawn beneath it.
     sleep 0.2
 fi
 

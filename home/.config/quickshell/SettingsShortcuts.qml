@@ -24,7 +24,7 @@ import QtQuick.Layouts
 Flickable {
     id: root
 
-    property string note: I18n.tr("Se leen de ~/.config/hypr/hyprland.conf. Super+K abre esta misma lista.")
+    property string note: I18n.tr("Read from ~/.config/hypr/hyprland.conf. Super+K opens this same list.")
     property var binds: []
     readonly property int matchCount: cShell.visibleRows + cWin.visibleRows + cWs.visibleRows
         + cApps.visibleRows + cSys.visibleRows
@@ -98,17 +98,17 @@ Flickable {
         "SUPER": "Super", "SHIFT": "Shift", "CTRL": "Ctrl", "CONTROL": "Ctrl", "ALT": "Alt"
     })
     readonly property var keyNames: ({
-        "comma": ",", "period": ".", "slash": "/", "space": I18n.tr("Espacio"), "TAB": "Tab",
-        "Print": I18n.tr("Impr Pant"), "return": I18n.tr("Intro"), "escape": "Esc",
+        "comma": ",", "period": ".", "slash": "/", "space": I18n.tr("Space"), "TAB": "Tab",
+        "Print": I18n.tr("Print Scr"), "return": I18n.tr("Enter"), "escape": "Esc",
         "left": "←", "right": "→", "up": "↑", "down": "↓",
-        "mouse_down": I18n.tr("rueda ↓"), "mouse_up": I18n.tr("rueda ↑"),
-        "mouse:272": I18n.tr("clic izq."), "mouse:273": I18n.tr("clic der."),
-        "XF86AudioRaiseVolume": I18n.tr("Subir volumen"), "XF86AudioLowerVolume": I18n.tr("Bajar volumen"),
-        "XF86AudioMute": I18n.tr("Silenciar"), "XF86AudioMicMute": I18n.tr("Silenciar micro"),
-        "XF86AudioNext": I18n.tr("Siguiente"), "XF86AudioPrev": I18n.tr("Anterior"),
-        "XF86AudioPlay": I18n.tr("Reproducir"), "XF86AudioPause": I18n.tr("Pausa"),
-        "XF86MonBrightnessUp": I18n.tr("Subir brillo"), "XF86MonBrightnessDown": I18n.tr("Bajar brillo"),
-        "XF86PowerOff": I18n.tr("Botón de encendido")
+        "mouse_down": I18n.tr("wheel ↓"), "mouse_up": I18n.tr("wheel ↑"),
+        "mouse:272": I18n.tr("left click"), "mouse:273": I18n.tr("right click"),
+        "XF86AudioRaiseVolume": I18n.tr("Volume up"), "XF86AudioLowerVolume": I18n.tr("Volume down"),
+        "XF86AudioMute": I18n.tr("Mute"), "XF86AudioMicMute": I18n.tr("Mute mic"),
+        "XF86AudioNext": I18n.tr("Next"), "XF86AudioPrev": I18n.tr("Previous"),
+        "XF86AudioPlay": I18n.tr("Play"), "XF86AudioPause": I18n.tr("Pause"),
+        "XF86MonBrightnessUp": I18n.tr("Brightness up"), "XF86MonBrightnessDown": I18n.tr("Brightness down"),
+        "XF86PowerOff": I18n.tr("Power button")
     })
 
     function comboLabel(mods, key) {
@@ -126,13 +126,13 @@ Flickable {
     }
 
     readonly property var dispNames: ({
-        "killactive": I18n.tr("cerrar la ventana"), "exit": I18n.tr("salir de Hyprland"),
-        "togglefloating": I18n.tr("flotante sí/no"), "fullscreen": I18n.tr("pantalla completa"),
-        "pseudo": "pseudo-tile", "togglesplit": I18n.tr("cambiar el split"),
-        "movefocus": I18n.tr("mover el foco"), "movewindow": I18n.tr("mover la ventana"),
-        "resizeactive": I18n.tr("redimensionar"), "workspace": I18n.tr("ir al escritorio"),
-        "movetoworkspace": I18n.tr("llevar al escritorio"), "layoutmsg": "layout",
-        "togglespecialworkspace": I18n.tr("escritorio especial")
+        "killactive": I18n.tr("close the window"), "exit": I18n.tr("quit Hyprland"),
+        "togglefloating": I18n.tr("floating on/off"), "fullscreen": I18n.tr("fullscreen"),
+        "pseudo": "pseudo-tile", "togglesplit": I18n.tr("change the split"),
+        "movefocus": I18n.tr("move the focus"), "movewindow": I18n.tr("move the window"),
+        "resizeactive": I18n.tr("resize"), "workspace": I18n.tr("go to workspace"),
+        "movetoworkspace": I18n.tr("send to workspace"), "layoutmsg": "layout",
+        "togglespecialworkspace": I18n.tr("special workspace")
     })
 
     function dispLabel(disp, args) {
@@ -168,7 +168,7 @@ Flickable {
 
         SettingsControls.Card_ {
             id: cShell
-            title: I18n.tr("EL SHELL")
+            title: I18n.tr("THE SHELL")
             Repeater {
                 model: root.ofGroup("shell")
                 onItemAdded: cShell.recount()
@@ -179,7 +179,7 @@ Flickable {
 
         SettingsControls.Card_ {
             id: cWin
-            title: I18n.tr("VENTANAS")
+            title: I18n.tr("WINDOWS")
             Repeater {
                 model: root.ofGroup("win")
                 onItemAdded: cWin.recount()
@@ -190,7 +190,7 @@ Flickable {
 
         SettingsControls.Card_ {
             id: cWs
-            title: I18n.tr("ESCRITORIOS")
+            title: I18n.tr("WORKSPACES")
             Repeater {
                 model: root.ofGroup("ws")
                 onItemAdded: cWs.recount()
@@ -201,7 +201,7 @@ Flickable {
 
         SettingsControls.Card_ {
             id: cApps
-            title: I18n.tr("APPS Y SCRIPTS")
+            title: I18n.tr("APPS AND SCRIPTS")
             Repeater {
                 model: root.ofGroup("apps")
                 onItemAdded: cApps.recount()
@@ -212,7 +212,7 @@ Flickable {
 
         SettingsControls.Card_ {
             id: cSys
-            title: I18n.tr("SISTEMA")
+            title: I18n.tr("SYSTEM")
             Repeater {
                 model: root.ofGroup("sys")
                 onItemAdded: cSys.recount()
@@ -224,14 +224,14 @@ Flickable {
         SettingsControls.Note_ {
             Layout.topMargin: 10
             visible: root.binds.length === 0
-            text: I18n.tr("No se ha podido leer ningún atajo de hyprland.conf.")
+            text: I18n.tr("No shortcuts could be read from hyprland.conf.")
         }
 
         SettingsControls.Note_ {
             Layout.topMargin: 10
             visible: root.binds.length > 0 && ShellState.settingsQuery.length > 0
                      && !cShell.visible && !cWin.visible && !cWs.visible && !cApps.visible && !cSys.visible
-            text: I18n.tr("Ningún atajo coincide con «{0}».", ShellState.settingsQuery)
+            text: I18n.tr("No shortcut matches “{0}”.", ShellState.settingsQuery)
         }
     }
 

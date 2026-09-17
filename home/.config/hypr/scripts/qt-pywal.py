@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
-"""Genera la paleta de las aplicaciones Qt a partir de la de pywal.
+"""Generates the Qt application palette from the pywal palette.
 
-El escritorio va con QT_QPA_PLATFORMTHEME=qt6ct (ver environment.d), y VLC
--la unica app Qt5- con qt5ct desde el envoltorio ~/.local/bin/vlc. Los dos
-temas de plataforma leen su paleta de un fichero, y ese fichero lo escribe
-esto.
+The desktop uses QT_QPA_PLATFORMTHEME=qt6ct (see environment.d), and VLC
+-the only Qt5 app- uses qt5ct through the ~/.local/bin/vlc wrapper. Both
+platform themes read their palette from a file, and this script writes that
+file.
 
-Antes el escritorio iba con el tema gtk3 y solo hacia falta para Qt5. El
-motivo de cambiar: con gtk3, Qt6 SI heredaba los colores (su plugin qgtk3 lee
-widgets GTK reales) pero solo al abrir la ventana, asi que las que ya estaban
-abiertas se quedaban con la paleta vieja hasta reiniciarlas. Qt5 nunca los
-heredo: su qgtk3 aporta dialogos, fuentes y hints, jamas colores -medido con
-un binario Qt5 minimo, con gtk3 y sin gtk3 daba lo mismo-, y por eso VLC salia
-blanco (#efefef sobre #ffffff) en medio de un escritorio de pywal.
+Previously, the desktop used the gtk3 theme and this was only needed for Qt5.
+The reason for changing: with gtk3, Qt6 did inherit colors (its qgtk3 plugin
+reads real GTK widgets), but only when opening a window, so already-open
+windows kept the old palette until restarted. Qt5 never inherited them: its
+qgtk3 provides dialogs, fonts, and hints, never colors -tested with a minimal
+Qt5 binary, with and without gtk3 gave the same result-, which made VLC white
+(#efefef on #ffffff) in the middle of a pywal desktop.
 
-Las salidas son tres:
+There are three outputs:
 
-  1. El esquema de qt5ct (~/.config/qt5ct/colors/pywal.conf), para VLC.
-  2. El de qt6ct, para el resto del escritorio Qt.
-  3. Las secciones de color de ~/.config/kdeglobals, que es lo que leen las
-     apps de KDE Frameworks cuando piden colores por su cuenta (KColorScheme).
-     Ahi habia un esquema lila estatico, 'MaterialYouDark', heredado de los
-     metapaquetes viejos, que no tenia nada que ver con el fondo.
+   1. The qt5ct scheme (~/.config/qt5ct/colors/pywal.conf), for VLC.
+   2. The qt6ct scheme, for the rest of the Qt desktop.
+   3. The color sections in ~/.config/kdeglobals, which KDE Frameworks apps
+      read when they request colors independently (KColorScheme). It had a
+      static lilac 'MaterialYouDark' scheme inherited from old metapackages,
+      unrelated to the wallpaper.
 
-De cada uno de los dos *ct solo se escribe lo suyo si esta instalado; si
-falta, no se crea basura que nadie lee.
+Each of the two *ct configurations is only written if it is installed; if it
+is missing, no unused files are created.
 """
 
 import colorsys
@@ -40,7 +40,7 @@ CONFIG = os.path.expanduser("~/.config")
 BACKUPS = os.path.expanduser(f"~/.config-rice-backups/{date.today().isoformat()}")
 
 
-# --- utilidades de color -----------------------------------------------------
+# --- color utilities ---------------------------------------------------------
 
 def rgb(h):
     h = h.lstrip("#")
@@ -52,7 +52,7 @@ def hexa(t):
 
 
 def lum(h):
-    """Luminancia relativa (WCAG), para decidir claro/oscuro y contrastes."""
+    """Relative luminance (WCAG), used for light/dark decisions and contrast."""
     def lin(c):
         return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
     r, g, b = rgb(h)
@@ -66,12 +66,11 @@ def contrast(a, b):
 
 
 def shade(h, amount):
-    """Aclara (amount>0) u oscurece (amount<0) moviendo la L de HLS.
+    """Lightens (amount>0) or darkens (amount<0) by changing HLS L.
 
-    Se hace en HLS y no mezclando con blanco/negro para no lavar el tinte: los
-    fondos de pywal suelen ser casi negros con un tinte de la imagen, y ese
-    tinte es justo lo que hace que la ventana parezca del mismo mundo que el
-    escritorio.
+    This is done in HLS rather than mixing with white/black to avoid washing
+    out the tint: pywal backgrounds are usually near-black with an image tint,
+    which is what makes the window feel like part of the desktop.
     """
     r, g, b = rgb(h)
     hh, ll, ss = colorsys.rgb_to_hls(r, g, b)
@@ -80,25 +79,24 @@ def shade(h, amount):
 
 
 def mix(a, b, t):
-    """Mezcla lineal: t=0 devuelve a, t=1 devuelve b."""
+    """Linear blend: t=0 returns a, t=1 returns b."""
     ra, ga, ba = rgb(a)
     rb, gb, bb = rgb(b)
     return hexa((ra + (rb - ra) * t, ga + (gb - ga) * t, ba + (bb - ba) * t))
 
 
 def legible(fondo, *candidatos):
-    """El candidato que mas contraste da sobre 'fondo'."""
+    """The candidate with the highest contrast against 'fondo'."""
     return max(candidatos, key=lambda c: contrast(fondo, c))
 
 
 def semantico(base, fondo, tono, sat_min=0.45):
-    """Un color de aviso (error, exito, atencion) con el tinte de la paleta.
+    """A semantic color (error, success, warning) tinted by the palette.
 
-    Los tres semanticos no pueden salir de pywal tal cual: con un fondo azul,
-    color1 sale azul y un mensaje de error en azul no avisa de nada. Se coge la
-    luz y la saturacion de la paleta -para que siga siendo de esta casa- pero se
-    fuerza el tono al que la gente ya sabe leer, y se sube la luz hasta que se
-    lea sobre el fondo.
+    The three semantic colors cannot come directly from pywal: with a blue
+    wallpaper, color1 is blue and a blue error message signals nothing. The
+    palette's lightness and saturation are retained, but the hue is forced to
+    one people already understand and lightness is raised until readable.
     """
     r, g, b = rgb(base)
     _, ll, ss = colorsys.rgb_to_hls(r, g, b)
@@ -112,7 +110,7 @@ def semantico(base, fondo, tono, sat_min=0.45):
     return color
 
 
-# --- paleta ------------------------------------------------------------------
+# --- palette -----------------------------------------------------------------
 
 def construir(wal):
     c = wal["colors"]
@@ -120,15 +118,15 @@ def construir(wal):
     bg, fg = esp["background"], esp["foreground"]
     accent = c["color4"]
     oscuro = lum(bg) < 0.5
-    # Signo del relieve: sobre fondo oscuro las superficies suben, sobre fondo
-    # claro bajan. Sin esto, un wallpaper claro dejaria los botones invisibles.
+    # Surface direction: on a dark background, surfaces rise; on a light one,
+    # they recede. Without this, a light wallpaper would make buttons invisible.
     s = 1 if oscuro else -1
 
     p = {}
     p["window"] = bg
     p["windowtext"] = fg
-    # Las vistas (listas, cajas de texto) se hunden un pelin respecto a la
-    # ventana; los botones suben. Es el mismo relieve que usa Fusion.
+    # Views (lists and text boxes) recede slightly relative to the window;
+    # buttons rise. This is the same surface treatment used by Fusion.
     p["base"] = shade(bg, -0.030 * s)
     p["alternatebase"] = shade(bg, 0.035 * s)
     p["text"] = fg
@@ -141,12 +139,12 @@ def construir(wal):
     p["dark"] = shade(p["button"], -0.10 * s)
     p["shadow"] = shade(bg, -0.06 * s)
     p["highlight"] = accent
-    # El texto seleccionado se elige por contraste medido, no a ojo: con
-    # acentos oscuros (un azul de noche) el fondo de pywal encima no se leia.
+    # Selected text is chosen by measured contrast, not by eye: with dark
+    # accents (night blue), the pywal background on top was unreadable.
     p["highlightedtext"] = legible(accent, bg, fg, c["color15"], c["color0"])
     if contrast(accent, p["highlightedtext"]) < 4.5:
-        # Si la paleta no da ningun color legible sobre el acento, blanco o
-        # negro: una seleccion que no se lee es peor que un color de fuera.
+        # If the palette has no readable color over the accent, use white or
+        # black: an unreadable selection is worse than an external color.
         p["highlightedtext"] = legible(accent, "#ffffff", "#000000")
     p["link"] = c["color6"] if contrast(bg, c["color6"]) >= 3.5 else shade(accent, 0.15 * s)
     p["linkvisited"] = c["color5"] if contrast(bg, c["color5"]) >= 3.5 else shade(c["color5"], 0.15 * s)
@@ -154,18 +152,18 @@ def construir(wal):
     p["tooltiptext"] = fg
     p["placeholder"] = mix(fg, bg, 0.55)
     p["accent"] = accent
-    # Deshabilitado: no un gris cualquiera, sino el propio texto acercado al
-    # fondo, que es lo que hace que se lea como "apagado" y no como "roto".
+    # Disabled: not an arbitrary gray, but the text itself moved toward the
+    # background, which reads as "dimmed" rather than "broken".
     p["disabledtext"] = mix(fg, bg, 0.62)
     p["border"] = shade(bg, 0.14 * s)
     return p
 
 
-# --- salida 1: esquema de color de qt5ct / qt6ct ------------------------------
+# --- output 1: qt5ct / qt6ct color scheme -----------------------------------
 
-# Orden de QPalette::ColorRole tal y como lo serializa qt5ct/qt6ct: una lista
-# de colores separados por comas, por indice de rol. Los tres grupos (activo,
-# deshabilitado, inactivo) llevan la lista entera.
+# QPalette::ColorRole order as serialized by qt5ct/qt6ct: a comma-separated
+# color list by role index. All three groups (active, disabled, inactive) use
+# the complete list.
 ROLES = [
     "windowtext", "button", "light", "midlight", "dark", "mid", "text",
     "brighttext", "buttontext", "base", "window", "shadow", "highlight",
@@ -188,7 +186,7 @@ def lista_colores(p, grupo):
         if grupo == "inactive" and rol == "highlight":
             v = mix(p["highlight"], p["window"], 0.35)
         fuera.append(v)
-    # qt5ct/qt6ct esperan #AARRGGBB
+    # qt5ct/qt6ct expect #AARRGGBB
     return ", ".join("#ff" + v.lstrip("#").lower() for v in fuera)
 
 
@@ -196,8 +194,8 @@ def escribir_esquema(p, destino):
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     texto = (
         "[ColorScheme]\n"
-        "; generado por qt-pywal.py a partir de ~/.cache/wal/colors.json\n"
-        "; se reescribe en cada cambio de fondo: no editar a mano\n"
+        "; generated by qt-pywal.py from ~/.cache/wal/colors.json\n"
+        "; rewritten on every wallpaper change: do not edit manually\n"
         f"active_colors={lista_colores(p, 'active')}\n"
         f"disabled_colors={lista_colores(p, 'disabled')}\n"
         f"inactive_colors={lista_colores(p, 'inactive')}\n"
@@ -206,11 +204,11 @@ def escribir_esquema(p, destino):
 
 
 def asegurar_conf_ct(carpeta, esquema):
-    """Deja el qt5ct.conf/qt6ct.conf apuntando al esquema, sin pisar el resto.
+    """Points qt5ct.conf/qt6ct.conf to the scheme without overwriting the rest.
 
-    Si el usuario nunca ha abierto qt5ct, el fichero no existe y se crea con lo
-    minimo. Si existe, solo se tocan las tres claves que hacen falta para que
-    la paleta se aplique.
+    If the user has never opened qt5ct, the file does not exist and is created
+    with the minimum configuration. If it exists, only keys needed to apply the
+    palette are touched.
     """
     nombre = os.path.basename(carpeta)
     conf = os.path.join(carpeta, f"{nombre}.conf")
@@ -223,9 +221,8 @@ def asegurar_conf_ct(carpeta, esquema):
     if not os.path.exists(conf):
         os.makedirs(carpeta, exist_ok=True)
         cuerpo = "[Appearance]\n" + "".join(f"{k}={v}\n" for k, v in claves.items())
-        # Los dialogos de fichero siguen siendo los de GTK: es lo que usa el
-        # resto del escritorio, y el unico trozo del tema gtk3 que interesaba
-        # conservar al pasar a qt6ct.
+        # File dialogs remain GTK dialogs: that is what the rest of the desktop
+        # uses and the only gtk3 theme component worth keeping with qt6ct.
         cuerpo += "standard_dialogs=gtk3\n"
         escribir_en_sitio(conf, cuerpo)
         return
@@ -236,8 +233,8 @@ def asegurar_conf_ct(carpeta, esquema):
     for linea in lineas:
         if linea.startswith("["):
             if en_appearance:
-                # Detras de la ultima clave de la seccion, no detras del hueco
-                # en blanco que la separa de la siguiente.
+                # After the section's last key, not after the blank line that
+                # separates it from the next section.
                 while salida and not salida[-1].strip():
                     salida.pop()
                 for k, v in claves.items():
@@ -261,16 +258,15 @@ def asegurar_conf_ct(carpeta, esquema):
     elif "[Appearance]" not in "\n".join(salida):
         salida.append("[Appearance]")
         salida += [f"{k}={v}" for k, v in claves.items()]
-    # El .conf se toca EL ULTIMO y siempre, aunque no haya cambiado nada: es el
-    # fichero que vigila el tema de plataforma, y ese toque es la senal de "vuelve
-    # a leer los colores" para las aplicaciones que ya estan abiertas.
+    # The .conf is always touched LAST, even when unchanged: the platform theme
+    # watches it, and this signals already-open applications to reload colors.
     escribir_en_sitio(conf, "\n".join(salida) + "\n")
 
 
-# --- salida 2: kdeglobals ----------------------------------------------------
+# --- output 2: kdeglobals ----------------------------------------------------
 
 def grupos_kde(p):
-    """Las secciones [Colors:*] y [WM] de kdeglobals con la paleta de pywal."""
+    """kdeglobals [Colors:*] and [WM] sections using the pywal palette."""
     comun = {
         "DecorationFocus": p["highlight"],
         "DecorationHover": p["highlight"],
@@ -329,12 +325,11 @@ def tema_de_iconos_existe(nombre):
 
 
 def primer_tema_de_iconos():
-    """El tema de iconos para las apps Qt: el mismo que usa GTK.
+    """The icon theme for Qt apps: the same one used by GTK.
 
-    Se lee del settings.ini de GTK3 en vez de fijarlo aqui para que las dos
-    mitades del escritorio ensenen el mismo icono. Con breeze-dark, un kdialog
-    sacaba el circulo azul de KDE -un azul fijo, ajeno a pywal- donde el resto
-    del escritorio ensena el de Adwaita.
+    It is read from GTK3's settings.ini instead of being set here so both
+    halves of the desktop show the same icon. With breeze-dark, kdialog showed
+    KDE's fixed blue circle where the rest of the desktop showed Adwaita's.
     """
     ini = os.path.join(CONFIG, "gtk-3.0", "settings.ini")
     try:
@@ -359,9 +354,8 @@ def actualizar_kdeglobals(p):
         respaldo(ruta)
 
     nuevas = grupos_kde(p)
-    # Se conserva todo lo que no sea color (fuentes, KFileDialog, iconos...) y
-    # se sustituyen enteras las secciones de color, para no dejar mezclada la
-    # paleta vieja con la nueva.
+    # Preserve everything non-color-related (fonts, KFileDialog, icons...) and
+    # fully replace color sections to avoid mixing the old and new palettes.
     fuera, seccion, saltando = [], None, False
     generales, kde = {}, {}
     for linea in previo:
@@ -390,10 +384,9 @@ def actualizar_kdeglobals(p):
                 kde[m.group(1)] = True
                 continue
         if seccion == "Icons":
-            # El tema de iconos se reescribe siempre con el de GTK: apuntaba a
-            # 'breeze-plus-dark', que se fue con los metapaquetes viejos y
-            # dejaba a las apps de KDE sin iconos, y con breeze-dark ensenaban
-            # el azul fijo de KDE donde el resto del escritorio ensena Adwaita.
+            # Always rewrite the icon theme using GTK's: it pointed to
+            # 'breeze-plus-dark', removed with old metapackages, leaving KDE
+            # apps without icons; breeze-dark showed KDE's fixed blue instead.
             if re.match(r"Theme\s*=", linea):
                 continue
         fuera.append(linea)
@@ -401,27 +394,27 @@ def actualizar_kdeglobals(p):
     texto = "\n".join(fuera).strip("\n")
 
     def anadir_a_seccion(txt, nombre, pares):
-        """Mete claves dentro de una seccion existente, o la crea al final."""
+        """Adds keys to an existing section or creates it at the end."""
         marca = f"[{nombre}]"
         if marca in txt:
             partes = txt.split(marca, 1)
             resto = partes[1].lstrip("\n")
-            if resto.startswith("["):  # seccion vacia: que no se peguen
+            if resto.startswith("["):  # Empty section: keep sections separate.
                 resto = "\n" + resto
             return partes[0] + marca + "\n" + "".join(f"{k}={v}\n" for k, v in pares.items()) + resto
         return txt + f"\n\n{marca}\n" + "".join(f"{k}={v}\n" for k, v in pares.items())
 
     texto = anadir_a_seccion(texto, "General", {"ColorScheme": "Pywal"})
     texto = anadir_a_seccion(texto, "Icons", {"Theme": primer_tema_de_iconos()})
-    # El estilo apuntaba a 'Darkly', que no esta instalado: cualquier app de KDE
-    # caia en el estilo por defecto y con el la paleta de fabrica.
+    # The style pointed to uninstalled 'Darkly': KDE apps fell back to the
+    # default style and its factory palette.
     texto = anadir_a_seccion(texto, "KDE", {"widgetStyle": "Fusion"})
 
     bloques = []
     for nombre, pares in nuevas.items():
         bloques.append(f"[{nombre}]\n" + "".join(f"{k}={v}\n" for k, v in pares.items()))
-    # Los efectos de KDE para ventanas inactivas/deshabilitadas: se dejan como
-    # estaban salvo el color base, que era el lila del esquema viejo.
+    # KDE effects for inactive/disabled windows retain their settings except
+    # for the base color, which was lilac from the old scheme.
     bloques.append(
         "[ColorEffects:Disabled]\n"
         "Color=" + p["window"] + "\n"
@@ -435,8 +428,8 @@ def actualizar_kdeglobals(p):
         "ColorAmount=0.025\nColorEffect=0\nContrastAmount=0.1\nContrastEffect=0\n"
         "Enable=true\nIntensityAmount=0\nIntensityEffect=0\n"
     )
-    # [WM] son los colores del marco de ventana; aqui las decora Hyprland, pero
-    # alguna app de KDE los usa para su barra de titulo propia.
+    # [WM] contains window-frame colors; Hyprland decorates them here, but some
+    # KDE apps use them for their own title bars.
     bloques.append(
         "[WM]\n"
         f"activeBackground={coma_rgb(p['window'])}\n"
@@ -448,15 +441,14 @@ def actualizar_kdeglobals(p):
     )
 
     texto = texto.rstrip("\n") + "\n\n" + "\n".join(bloques)
-    # En el mismo inodo, y por dos motivos. Uno, que las apps de KDE abiertas
-    # se enteren, igual que con los .conf de qt5ct/qt6ct. Y dos, el importante:
-    # con install.sh --link, ~/.config/kdeglobals ES un enlace al repo, y
-    # escribir con temporal + rename SUSTITUYE el enlace por un fichero suelto
-    # -- el dotfile se queda desconectado y en silencio.
+    # Keep the same inode for two reasons: already-open KDE apps notice it, as
+    # with qt5ct/qt6ct .conf files. Crucially, with install.sh --link,
+    # ~/.config/kdeglobals is a repository symlink; temp + rename replaces that
+    # link with a standalone file and silently disconnects the dotfile.
     escribir_en_sitio(ruta, texto)
 
 
-# --- fontaneria --------------------------------------------------------------
+# --- plumbing ----------------------------------------------------------------
 
 def respaldo(ruta):
     os.makedirs(BACKUPS, exist_ok=True)
@@ -466,15 +458,14 @@ def respaldo(ruta):
 
 
 def escribir_en_sitio(ruta, texto, modo=0o644):
-    """Escribe conservando el inodo, en vez de crear y renombrar.
+    """Writes while preserving the inode instead of creating and renaming.
 
-    Es lo que hace que las aplicaciones Qt ya abiertas cambien de color sin
-    reiniciarlas. El tema de plataforma de qt5ct/qt6ct vigila su fichero de
-    configuracion con QFileSystemWatcher, y un QFileSystemWatcher sigue al
-    INODO: en cuanto escribes con el truco habitual de fichero temporal +
-    os.replace, el watch se queda mirando un fichero que ya no existe y no
-    vuelve a avisar nunca. Medido con VLC delante: con escritura atomica el
-    color no se movia; escribiendo en el mismo inodo cambia en tres segundos.
+    This lets already-open Qt applications change color without restarting.
+    qt5ct/qt6ct platform themes watch their configuration with
+    QFileSystemWatcher, which follows the INODE: using the usual temporary file
+    plus os.replace leaves the watch looking at a nonexistent file forever.
+    Tested with VLC visible: atomic writes changed nothing; writing the same
+    inode updated its color within three seconds.
     """
     with open(ruta, "w", encoding="utf-8") as f:
         f.write(texto)
@@ -488,22 +479,22 @@ def main():
         with open(CACHE, encoding="utf-8") as f:
             wal = json.load(f)
     except (OSError, ValueError) as e:
-        print(f"qt-pywal: no se pudo leer {CACHE}: {e}", file=sys.stderr)
+        print(f"qt-pywal: could not read {CACHE}: {e}", file=sys.stderr)
         return 1
 
     p = construir(wal)
     c = wal["colors"]
     bg = wal["special"]["background"]
-    # Error en rojo, exito en verde, aviso en ambar: el tono se fija, la luz y
-    # la saturacion salen de la paleta del fondo.
+    # Error in red, success in green, warning in amber: hue is fixed while
+    # lightness and saturation come from the wallpaper palette.
     p["negative"] = semantico(c["color1"], bg, 0.00)
     p["positive"] = semantico(c["color2"], bg, 0.33)
     p["neutral"] = semantico(c["color3"], bg, 0.10)
 
     hechos = []
     for nombre in ("qt5ct", "qt6ct"):
-        # Solo se genera para los que esten instalados: si no lo estan, sus
-        # ficheros serian basura que nadie lee.
+        # Generate only for installed applications; otherwise their files would
+        # be unused.
         if shutil.which(nombre) is None:
             continue
         carpeta = os.path.join(CONFIG, nombre)

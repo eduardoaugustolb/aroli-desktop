@@ -1,13 +1,13 @@
-// PowerPanel.qml — menú de encendido desplegado DESDE el notch.
-// Sustituye a wlogout, que tomaba la pantalla completa. Aquí es una fila de
-// cinco botones dentro del notch: ←/→ o Tab para moverse, Enter confirma,
-// Esc cierra. El foco de teclado lo da TopShell.
+// PowerPanel.qml — power menu unfolded FROM the notch.
+// Replaces wlogout, which took the whole screen. Here it is a row of
+// five buttons inside the notch: ←/→ or Tab to move, Enter confirms,
+// Esc closes. TopShell provides keyboard focus.
 //
-// Salir, Reiniciar y Apagar piden DOS Enter: el primero arma el boton (se
-// pone rojo y su etiqueta pasa a "¿Seguro?"), el segundo ejecuta. Bloquear y
-// Suspender no lo piden: no pierdes nada y volver cuesta un tecleo.
-// Cualquier cosa que no sea repetir el Enter desarma: moverte a otro boton,
-// Esc, o dejarlo quieto unos segundos.
+// Log out, Restart, and Shut down ask for TWO Enters: the first arms the button
+// (it turns red and its label becomes "Sure?"), the second runs. Lock and
+// Suspend do not ask: you lose nothing and coming back costs one keystroke.
+// Anything other than repeating Enter disarms: moving to another button,
+// Esc, or leaving it idle a few seconds.
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
@@ -19,38 +19,38 @@ Item {
     property int current: 0
 
     readonly property var items: [
-        { icon: "󰌾", label: I18n.tr("Bloquear"),  cmd: "hyprlock",              danger: false },
-        { icon: "󰤄", label: I18n.tr("Suspender"), cmd: "systemctl suspend",     danger: false },
-        // `exit` a secas ya no vale: desde Hyprland 0.55 el argumento de
-        // `dispatch` es una expresion Lua, y un nombre suelto se queda en nil
-        // ("expected a dispatcher"). Las comillas simples son necesarias para
-        // que los parentesis lleguen enteros a hyprctl; el cmd se ejecuta con
-        // `bash -lc`, asi que no se las come nadie por el camino.
-        { icon: "󰗽", label: I18n.tr("Salir"),     cmd: "hyprctl dispatch 'hl.dsp.exit()'", danger: false, confirm: true  },
-        { icon: "󰜉", label: I18n.tr("Reiniciar"), cmd: "systemctl reboot",      danger: true,  confirm: true  },
-        { icon: "󰐥", label: I18n.tr("Apagar"),    cmd: "systemctl poweroff",    danger: true,  confirm: true  }
+        { icon: "󰌾", label: I18n.tr("Lock"),  cmd: "hyprlock",              danger: false },
+        { icon: "󰤄", label: I18n.tr("Suspend"), cmd: "systemctl suspend",     danger: false },
+        // Bare `exit` no longer works: since Hyprland 0.55 the
+        // `dispatch` argument is a Lua expression, and a bare name stays nil
+        // ("expected a dispatcher"). The single quotes are needed so the
+        // parentheses reach hyprctl intact; cmd runs under `bash -lc`, so
+        // nobody eats them along the way.
+        { icon: "󰗽", label: I18n.tr("Log out"),     cmd: "hyprctl dispatch 'hl.dsp.exit()'", danger: false, confirm: true  },
+        { icon: "󰜉", label: I18n.tr("Restart"), cmd: "systemctl reboot",      danger: true,  confirm: true  },
+        { icon: "󰐥", label: I18n.tr("Shut down"),    cmd: "systemctl poweroff",    danger: true,  confirm: true  }
     ]
 
-    // Indice del boton armado, o -1. Solo lo usan las acciones con
-    // confirm: true; el resto se ejecuta al primer Enter como siempre.
+    // Armed button index, or -1. Only used by actions with
+    // confirm: true; the rest run on the first Enter as always.
     property int armed: -1
 
-    // Un boton armado no se queda armado para siempre: si te distraes y
-    // vuelves, el siguiente Enter no te apaga el portatil. No es una
-    // duracion de movimiento, es una espera, por eso no sale de Appearance.
+    // An armed button does not stay armed forever: if you get distracted and
+    // come back, the next Enter will not shut down your laptop. Not a
+    // motion duration, a wait, which is why it does not come from Appearance.
     Timer { id: armTimer; interval: 4000; onTriggered: root.armed = -1 }
 
     function disarm() { root.armed = -1; armTimer.stop(); }
 
     function select(i) {
-        if (i === root.current) return;   // seguir en el mismo boton no desarma
+        if (i === root.current) return;   // staying on the same button does not disarm
         root.current = i;
         root.disarm();
     }
 
     function run(i) {
         if (i < 0 || i >= root.items.length) return;
-        // Primer Enter sobre una accion destructiva: armar y esperar al segundo.
+        // First Enter on a destructive action: arm and wait for the second.
         if (root.items[i].confirm && root.armed !== i) {
             root.armed = i;
             armTimer.restart();
@@ -68,8 +68,8 @@ Item {
         root.select(i);
     }
 
-    // Arranca siempre en "Bloquear": lo menos destructivo. Un Enter accidental
-    // no puede apagarte el portátil.
+    // Always starts on "Lock": the least destructive. A stray Enter
+    // cannot shut down your laptop.
     onActiveChanged: if (root.active) { root.current = 0; root.disarm(); keys.forceActiveFocus(); }
 
     MouseArea { anchors.fill: parent }
@@ -78,8 +78,8 @@ Item {
         id: keys
         anchors.fill: parent
         focus: true
-        // Esc con un boton armado solo cancela la confirmacion; el segundo Esc
-        // ya cierra el panel. Asi salir de un armado nunca te cierra el menu.
+        // Esc with an armed button only cancels the confirmation; the second Esc
+        // closes the panel. Leaving an armed state never closes the menu on you.
         Keys.onEscapePressed: if (root.armed >= 0) root.disarm(); else ShellState.closePanel()
         Keys.onLeftPressed: root.move(-1)
         Keys.onRightPressed: root.move(1)
@@ -127,7 +127,7 @@ Item {
                         }
                         Text {
                             Layout.alignment: Qt.AlignHCenter
-                            text: btn.isArmed ? I18n.tr("¿Seguro?") : btn.modelData.label
+                            text: btn.isArmed ? I18n.tr("Sure?") : btn.modelData.label
                             color: btn.sel ? "#ffffff" : "#8a8a8a"
                             font.family: Appearance.fontUI; font.pixelSize: 11
                             font.weight: btn.sel ? Font.Medium : Font.Normal

@@ -1,26 +1,23 @@
-# lang.sh — el idioma de los avisos de los scripts de Hyprland.
+# lang.sh - language for Hyprland script notifications.
 #
-# No se ejecuta: se carga con `source` desde los demas scripts.
+# Not executed directly: sourced by other scripts.
 #
 #   . "$HOME/.config/hypr/scripts/lang.sh" 2>/dev/null || tr_() { printf '%s' "$1"; }
 #   notify-send "$(tr_ 'Luz nocturna' 'Night light')" "$(tr_ 'Activada' 'On')"
 #
-# El português do Brasil es el original de este fork y va SIEMPRE como defecto;
-# si falta el fichero de idioma, si la linea no esta o si dice cualquier otra
-# cosa, sale pt-BR. Ese es el modo de fallo que interesa: texto de mas nunca,
-# texto en blanco jamas.
+# Brazilian Portuguese is this fork's original language and is always the
+# default. If the language file or its line is missing, or has any other value,
+# use pt-BR: extra text is preferable to blank text.
 #
-# La fuente de verdad es ~/.config/hypr/language.conf, la MISMA que carga
-# hyprlock, para que la pantalla de bloqueo y estos avisos no se separen.
-# $RICE_LANG en el entorno gana, que va bien para probar sin tocar nada:
+# ~/.config/hypr/language.conf is the source of truth, shared with hyprlock so
+# lock screen and notifications cannot diverge. Environment $RICE_LANG wins for testing:
 #   RICE_LANG=en ~/.config/hypr/scripts/hyprsunset-toggle.sh
 
 if [ -z "${RICE_LANG:-}" ]; then
     RICE_LANG=pt-BR
     _rice_lang_conf="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/language.conf"
     if [ -r "$_rice_lang_conf" ]; then
-        # Sin grep ni sed: son dos lineas de fichero y esto lo cargan scripts
-        # que se disparan con una tecla.
+        # No grep or sed: this is a two-line file sourced by hotkey scripts.
         while IFS= read -r _rice_lang_line || [ -n "$_rice_lang_line" ]; do
             case "$_rice_lang_line" in
                 '$uiLang'*=*)
@@ -35,7 +32,7 @@ if [ -z "${RICE_LANG:-}" ]; then
     unset _rice_lang_conf _rice_lang_line _rice_lang_value
 fi
 
-# tr_ ESPANHOL INGLES PORTUGUES-BRASIL
+# tr_ SPANISH ENGLISH BRAZILIAN-PORTUGUESE
 tr_() {
     case "$RICE_LANG" in
         en) printf '%s' "$2" ;;

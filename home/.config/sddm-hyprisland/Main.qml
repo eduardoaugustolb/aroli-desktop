@@ -1,12 +1,12 @@
-// hyprisland — tema SDDM que replica la isla de hyprlock.
+// hyprisland — SDDM theme replicating the hyprlock island.
 //
-// Objetivo: que la pantalla de login al arrancar sea INDISTINGUIBLE del bloqueo
-// que lanza el notch. Cada numero de aqui viene de ~/.config/hypr/hyprlock.conf;
-// si cambias uno alli, cambialo aqui. Las duraciones y curvas son las de
-// ~/.config/motion-language.md (PANEL 320, CONTENIDO 210, RESPUESTA 130).
+// Goal: the boot login screen is INDISTINGUISHABLE from the lock
+// the notch throws. Every number here comes from ~/.config/hypr/hyprlock.conf;
+// if you change one there, change it here. Durations and curves are the ones
+// in ~/.config/motion-language.md (PANEL 320, CONTENT 210, RESPONSE 130).
 //
-// Los glifos van escapados (\u{F033E}) a proposito: son Private Use Area de
-// Nerd Font y no sobreviven a todos los editores. No los pegues literales.
+// Glyphs go escaped (\u{F033E}) on purpose: they are Nerd Font Private Use
+// Area and do not survive every editor. Do not paste them literally.
 
 import QtQuick
 import QtQuick.Effects
@@ -14,27 +14,27 @@ import QtQuick.Effects
 Item {
     id: root
 
-    // El foco es critico: si el campo no lo recibe, no hay forma de entrar.
-    // forceActiveFocus() en Component.onCompleted NO basta — el item aun no
-    // cuelga de la ventana y la llamada se pierde en silencio. De ahi el
-    // focus: true aqui, el reintento con Timer y el reenvio de teclas.
+    // Focus is critical: if the field never gets it, there is no way in.
+    // forceActiveFocus() in Component.onCompleted is NOT enough — the item is
+    // not yet hung under the window and the call is silently lost. Hence
+    // focus: true here, the Timer retry, and key forwarding.
     focus: true
     Keys.forwardTo: [password]
 
-    // ---- Paleta: espejo de ~/.cache/wal/colors-hyprlock.conf -----------------
-    // El acento lo escribe login-sync.sh en /var/lib/sddm-hyprisland/accent
-    // cada vez que cambia el wallpaper. NO es readonly a proposito: se lee de
-    // disco al arrancar (ver Component.onCompleted) y se asigna. Lo que trae
-    // theme.conf es solo el punto de partida -lo siembra el instalador del
-    // tema con el acento del momento- para que no se vea saltar el color
-    // mientras entra la isla. El resto es fijo, igual que en el notch: la
-    // superficie es negra y pywal solo aporta el acento.
+    // ---- Palette: mirror of ~/.cache/wal/colors-hyprlock.conf -----------------
+    // login-sync.sh writes the accent to /var/lib/sddm-hyprisland/accent
+    // every time the wallpaper changes. NOT readonly on purpose: it is read
+    // off disk at boot (see Component.onCompleted) and assigned. What
+    // theme.conf carries is only the starting point -the theme installer seeds
+    // it with the current accent- so the color is not seen jumping as the
+    // island comes in. The rest is fixed, same as in the notch: the surface
+    // is black and pywal only provides the accent.
     property color accent:              config.accent || "#8cd8c2"
 
-    // Idioma del login. Sale de theme.conf porque aqui no hay sesion de
-    // usuario todavia y no se puede leer el JSON del rice: SDDM corre antes
-    // de que exista el $HOME de nadie. Lo escribe el instalador.
-    // Si la clave no esta, pt-BR, que es el defecto de este fork.
+    // Login language. Comes from theme.conf because there is no user session
+    // here yet and the rice JSON cannot be read: SDDM runs before anyone's
+    // $HOME exists. The installer writes it.
+    // If the key is missing, pt-BR, this fork's default.
     readonly property string uiLang:    config.language || "pt-BR"
     readonly property bool english:     uiLang === "en"
     readonly property bool portugueseBrazil: uiLang === "pt-BR"
@@ -48,18 +48,18 @@ Item {
     readonly property color warnColor:  "#e0a458"
     readonly property color failColor:  "#e05c5c"
 
-    // ---- Geometria de la isla (hyprlock: shape 520x340, rounding 32) ---------
+    // ---- Island geometry (hyprlock: shape 520x340, rounding 32) ---------
     readonly property int islandW: 520
     readonly property int islandH: 340
     readonly property int fieldW:  360
     readonly property int fieldH:  50
 
-    // ---- Estado del login ---------------------------------------------------
+    // ---- Login state ---------------------------------------------------
     property int  attempts: 0
     property bool checking: false
     property bool failed: false
-    // RememberLastUser=true en /etc/sddm.conf, asi que lastUser suele bastar;
-    // firstUser cubre el primer arranque y el modo test, donde viene vacio.
+    // RememberLastUser=true in /etc/sddm.conf, so lastUser usually suffices;
+    // firstUser covers first boot and test mode, where it comes empty.
     property string firstUser: ""
     property string userName: userModel.lastUser || firstUser
 
@@ -72,20 +72,20 @@ Item {
         }
     }
 
-    // ---- Sesiones -----------------------------------------------------------
-    // Antes se entraba SIEMPRE en sessionModel.lastIndex y no habia forma de
-    // elegir otra. El dia que Hyprland no arranco eso dejo la maquina cerrada
-    // por dentro: Plasma estaba instalado y no habia manera de llegar a el sin
-    // editar la linea del kernel desde el gestor de arranque.
+    // ---- Sessions -----------------------------------------------------------
+    // It used to ALWAYS enter sessionModel.lastIndex with no way to pick
+    // another. The day Hyprland failed to start that left the machine locked
+    // from the inside: Plasma was installed with no way to reach it without
+    // editing the kernel line from the boot manager.
     //
-    // El comportamiento por defecto NO cambia: sessionPick vale -1 mientras
-    // nadie toque el selector, y en ese caso se le pasa a sddm.login() el mismo
-    // sessionModel.lastIndex de siempre.
+    // The default behavior does NOT change: sessionPick stays -1 while nobody
+    // touches the selector, and in that case sddm.login() gets the same old
+    // sessionModel.lastIndex.
     //
-    // Este Repeater no dibuja nada: solo copia los nombres del modelo. Se leen
-    // por rol ("name", igual que en userModel) y no con
-    // sessionModel.data(idx, 260) como hace el tema `silent`, porque ese 260 es
-    // el numero crudo del enum de SDDM y se rompe en silencio si lo reordenan.
+    // This Repeater draws nothing: it only copies the model names. They read
+    // by role ("name", same as in userModel) and not with
+    // sessionModel.data(idx, 260) like the `silent` theme does, because that
+    // 260 is SDDM's raw enum number and silently breaks if they reorder it.
     property var sessionNames: []
     property int sessionPick: -1
     readonly property int sessionCurrent: sessionPick >= 0 ? sessionPick
@@ -104,8 +104,8 @@ Item {
         }
     }
 
-    // Se reasigna el array entero a proposito: mutar uno en sitio no notifica a
-    // los bindings y la etiqueta se quedaria vacia.
+    // The whole array is reassigned on purpose: mutating one in place does not
+    // notify bindings and the label would stay empty.
     function rememberSession(i, sessionTitle) {
         var a = sessionNames.slice();
         while (a.length <= i)
@@ -114,25 +114,25 @@ Item {
         sessionNames = a;
     }
 
-    // Ciclar, no desplegar. Un ComboBox de Qt mete su propio marco y su propio
-    // popup encima de la isla, y un popup abierto puede tapar el campo o robarle
-    // el foco, que es el fallo que mas caro costo montando este tema. Ciclando
-    // no hay nada que se pueda quedar abierto.
+    // Cycle, don't dropdown. A Qt ComboBox brings its own frame and its own
+    // popup over the island, and an open popup can cover the field or steal
+    // its focus, the most expensive failure while building this theme. Cycling
+    // leaves nothing that can stay open.
     function cycleSession(step) {
         var n = sessionProbe.count;
         if (n <= 1)
             return;
         var cur = (sessionCurrent >= 0 && sessionCurrent < n) ? sessionCurrent : 0;
         sessionPick = (cur + step + n) % n;
-        password.forceActiveFocus();      // el foco vuelve al campo, siempre
+        password.forceActiveFocus();      // focus returns to the field, always
     }
 
-    // La curva `softOut` de hyprlock.conf. Es la hermana de `forma` del lenguaje
-    // de movimiento: 90 % del recorrido en el primer tercio, aterrizaje largo.
+    // hyprlock.conf's `softOut` curve. Sibling of the motion language's `shape`:
+    // 90% of travel in the first third, long landing.
     readonly property var softOut: [0.16, 1.0, 0.3, 1.0, 1.0, 1.0]
 
     // =========================================================================
-    // Fondo: el wallpaper actual, desenfocado y bajado de luz igual que hyprlock
+    // Background: the current wallpaper, blurred and dimmed just like hyprlock
     // (blur_passes 2, blur_size 4, brightness 0.68, contrast 0.92, vibrancy).
     // =========================================================================
     Rectangle {
@@ -143,10 +143,10 @@ Item {
     Image {
         id: wallpaper
         anchors.fill: parent
-        // Ruta fija y absoluta: ahi deja el fondo login-sync.sh, que corre como
-        // tu usuario. Si el fichero no esta -tema recien instalado, o wallpaper
-        // sin cambiar todavia- Qt marca status Error y caemos al que viene
-        // dentro del tema, que es el ultimo que se publico con sudo.
+        // Fixed absolute path: login-sync.sh leaves the background there, running
+        // as your user. If the file is missing -freshly installed theme, or
+        // wallpaper not yet changed- Qt flags status Error and we fall to the one
+        // inside the theme, the last published with sudo.
         source: "file:///var/lib/sddm-hyprisland/current.jpg"
         onStatusChanged: if (status === Image.Error && source != fallback)
                              source = fallback
@@ -165,20 +165,20 @@ Item {
         blur: 1.0
         blurMax: 40
         blurMultiplier: 1.0
-        brightness: -0.32     // hyprlock brightness 0.68 (multiplicador)
+        brightness: -0.32     // hyprlock brightness 0.68 (multiplier)
         contrast: -0.08       // hyprlock contrast 0.92
         saturation: 0.14      // hyprlock vibrancy 0.14
     }
 
     // =========================================================================
-    // La isla
+    // The island
     // =========================================================================
 
-    // Sombra (hyprlock: shadow_passes 3, shadow_size 18, rgba(000000a6)).
-    // Se dibuja como un degradado de anillos y no con MultiEffect a proposito:
-    // un layer.effect recorta la sombra al borde del item, y alimentarlo con
-    // una fuente `visible: false` daba un halo GRIS CLARO en vez de sombra.
-    // Anillos de 1 px con alfa decreciente: predecible y sin efectos raros.
+    // Shadow (hyprlock: shadow_passes 3, shadow_size 18, rgba(000000a6)).
+    // Drawn as a gradient of rings, not with MultiEffect, on purpose:
+    // a layer.effect clips the shadow to the item edge, and feeding it from
+    // a `visible: false` source gave a LIGHT GRAY halo instead of a shadow.
+    // 1 px rings with decreasing alpha: predictable, no weird effects.
     Repeater {
         model: 18                                  // shadow_size
         delegate: Rectangle {
@@ -205,7 +205,7 @@ Item {
         border.width: 1
         border.color: root.outline
 
-        // PANEL entra: 320 ms.
+        // PANEL enters: 320 ms.
         opacity: 0
         Component.onCompleted: opacity = 1
         Behavior on opacity {
@@ -216,7 +216,7 @@ Item {
             }
         }
 
-        // ---- Medallon de bloqueo (42x42, +130 sobre el centro) --------------
+        // ---- Lock medallion (42x42, +130 above center) --------------
         Rectangle {
             width: 42
             height: 42
@@ -237,7 +237,7 @@ Item {
             }
         }
 
-        // ---- Reloj (68 px, cifras tabulares para que no bailen) -------------
+        // ---- Clock (68 px, tabular figures so they don't dance) -------------
         Text {
             id: clock
             anchors.horizontalCenter: parent.horizontalCenter
@@ -250,7 +250,7 @@ Item {
             text: Qt.formatDateTime(new Date(), "HH:mm")
         }
 
-        // ---- Fecha en espanol, independiente del locale del sistema ---------
+        // ---- Date in Spanish, independent of system locale ---------
         Text {
             id: dateLabel
             anchors.horizontalCenter: parent.horizontalCenter
@@ -262,7 +262,7 @@ Item {
             text: root.localDate()
         }
 
-        // ---- Campo-pildora --------------------------------------------------
+        // ---- Pill field --------------------------------------------------
         Rectangle {
             id: field
             width: root.fieldW
@@ -274,8 +274,8 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 58
 
-            // El color del borde ES el mensaje: acento en reposo, ambar con
-            // bloq-mayus, verde comprobando, rojo al fallar.
+            // The border color IS the message: accent at rest, amber on
+            // caps lock, green while checking, red on failure.
             border.color: root.checking ? root.okColor
                         : root.failed ? root.failColor
                         : keyboard.capsLock ? root.warnColor
@@ -283,14 +283,14 @@ Item {
 
             Behavior on border.color {
                 ColorAnimation {
-                    duration: 130                     // RESPUESTA
+                    duration: 130                     // RESPONSE
                     easing.type: Easing.Bezier
                     easing.bezierCurve: root.softOut
                 }
             }
 
-            // Captura las pulsaciones; los puntos se dibujan a mano debajo para
-            // clavar el tamano de hyprlock (dots_size 0.20, spacing 0.38).
+            // Captures keystrokes; dots are hand-drawn below to nail the
+            // hyprlock size (dots_size 0.20, spacing 0.38).
             TextInput {
                 id: password
                 anchors.fill: parent
@@ -310,10 +310,10 @@ Item {
                         root.doLogin();
                         event.accepted = true;
                     }
-                    // Ruta de teclado para el selector, por si el raton no
-                    // responde: F1 pasa a la siguiente sesion, Mayus+F1 a la
-                    // anterior. F1 no escribe nada, asi que no puede acabar
-                    // dentro de la contrasena.
+                    // Keyboard path for the selector, in case the mouse does
+                    // not respond: F1 goes to the next session, Shift+F1 to the
+                    // previous. F1 types nothing, so it cannot end up inside
+                    // the password.
                     if (event.key === Qt.Key_F1) {
                         root.cycleSession((event.modifiers & Qt.ShiftModifier) ? -1 : 1);
                         event.accepted = true;
@@ -321,7 +321,7 @@ Item {
                 }
             }
 
-            // Estado en texto, centrado, sustituye al placeholder.
+            // Text state, centered, stands in for the placeholder.
             Text {
                 anchors.centerIn: parent
                 font.family: "Adwaita Sans"
@@ -336,7 +336,7 @@ Item {
                     : ""
             }
 
-            // Los puntos. Diametro = 0.20 * alto, hueco = 0.38 * diametro.
+            // The dots. Diameter = 0.20 * height, gap = 0.38 * diameter.
             Row {
                 anchors.centerIn: parent
                 spacing: root.fieldH * 0.20 * 0.38
@@ -350,7 +350,7 @@ Item {
                         radius: width / 2
                         color: root.textColor
 
-                        // CONTENIDO entra: 210 ms.
+                        // CONTENT enters: 210 ms.
                         scale: 0
                         Component.onCompleted: scale = 1
                         Behavior on scale {
@@ -365,7 +365,7 @@ Item {
             }
         }
 
-        // ---- Pie: identidad a la izquierda, bateria a la derecha ------------
+        // ---- Footer: identity left, battery right ------------
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.horizontalCenterOffset: -154
@@ -389,36 +389,36 @@ Item {
             text: ""
         }
 
-        // ---- Selector de sesion: el tercer dato del pie ----------------------
-        // Va en la MISMA fila que el usuario y la bateria (offset 124), con la
-        // misma fuente, el mismo cuerpo y el mismo gris. Entre esos dos hay 248
-        // px libres, asi que no cuesta ni un pixel de alto ni una linea nueva:
-        // el pie pasa de dos datos descolgados a una fila de tres.
+        // ---- Session selector: the footer's third datum ----------------------
+        // Sits on the SAME row as user and battery (offset 124), with the same
+        // font, same size, same gray. 248 free px between those two, so it costs
+        // neither a pixel of height nor a new line: the footer goes from two
+        // stray data to a row of three.
         //
-        // Si el modelo no diera ningun nombre, esto no se dibuja y la isla queda
-        // EXACTAMENTE como estaba. Ese es el modo de fallo que interesa.
+        // If the model yielded no name, this never draws and the island stays
+        // EXACTLY as it was. That is the failure mode we want.
         Text {
             id: sessionLabel
             visible: root.sessionName !== ""
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 124
-            // Tope de ancho por si algun .desktop trae un nombre kilometrico:
-            // antes de rozar al usuario o a la bateria, se corta.
+            // Width cap in case some .desktop ships a marathon name:
+            // before touching user or battery, it clips.
             width: Math.min(implicitWidth, 232)
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 12
-            // El chevron aparece solo si hay a donde ir. Con una sola sesion
-            // esto es un dato, no un boton, y no debe insinuar lo contrario.
+            // The chevron only appears if there is somewhere to go. With a single
+            // session this is data, not a button, and must not hint otherwise.
             text: "\u{F0379}  " + root.sessionName          // nf-md-monitor
                 + (sessionProbe.count > 1 ? "  \u{F0140}" : "")   // nf-md-chevron_down
             color: sessionArea.containsMouse ? root.accent : root.dim
 
             Behavior on color {
                 ColorAnimation {
-                    duration: 130                 // RESPUESTA
+                    duration: 130                 // RESPONSE
                     easing.type: Easing.Bezier
                     easing.bezierCurve: root.softOut
                 }
@@ -427,7 +427,7 @@ Item {
             MouseArea {
                 id: sessionArea
                 anchors.fill: parent
-                anchors.margins: -8               // blanco de clic algo mayor
+                anchors.margins: -8               // slightly larger click target
                 enabled: sessionProbe.count > 1
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
@@ -440,7 +440,7 @@ Item {
     }
 
     // =========================================================================
-    // Relojes y datos
+    // Clocks and data
     // =========================================================================
     Timer {
         interval: 1000
@@ -460,13 +460,13 @@ Item {
         onTriggered: root.refreshBattery()
     }
 
-    // Mismo formato que ~/.config/hypr/scripts/lock-info.sh, y por el mismo
-    // motivo: la sesion corre con LC_TIME=C pero la interfaz habla espanol.
+    // Same format as ~/.config/hypr/scripts/lock-info.sh, for the same reason:
+    // the session runs with LC_TIME=C but the UI speaks Spanish.
     //
-    // En ingles NO se reusa esa tabla ni se confia en el locale de la sesion:
-    // se pide a Qt el locale en_GB explicito. Depender de LC_TIME=C daria el
-    // mismo resultado hoy, pero el dia que alguien toque el entorno de SDDM la
-    // fecha cambiaria de idioma sin que nadie hubiera tocado el tema.
+    // In English that table is NOT reused nor is the session locale trusted:
+    // an explicit en_GB Qt locale is requested. Depending on LC_TIME=C would
+    // give the same result today, but the day someone touches SDDM's environment
+    // the date would change language with nobody having touched the theme.
     function localDate() {
         var d = new Date();
         if (root.english)
@@ -484,9 +484,9 @@ Item {
                " de " + months[d.getMonth()];
     }
 
-    // OJO: el XMLHttpRequest de QML **no admite modo sincrono**. Con
-    // open(..., false) el send() lanza "Error: Invalid state" y te quedas sin
-    // dato y sin pista. Todo lector de ficheros de aqui va por callback.
+    // NOTE: QML's XMLHttpRequest **does not support sync mode**. With
+    // open(..., false) send() throws "Error: Invalid state" and you are left
+    // with no data and no clue. Every file reader here goes by callback.
     function readFile(path, done) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
@@ -501,7 +501,7 @@ Item {
         }
     }
 
-    // Se descubre una vez cual es la bateria y luego solo se releen sus datos.
+    // The battery is discovered once, then only its data is reread.
     property string batteryPath: ""
 
     function findBattery(i) {
@@ -543,9 +543,9 @@ Item {
             return;
         checking = true;
         failed = false;
-        // sessionCurrent ES sessionModel.lastIndex mientras nadie toque el
-        // selector del pie, asi que sin tocar nada esto se comporta igual que
-        // cuando aqui ponia lastIndex a pelo.
+        // sessionCurrent IS sessionModel.lastIndex while nobody touches the
+        // footer selector, so untouched this behaves just as when it said
+        // lastIndex outright.
         sddm.login(userName, password.text, sessionCurrent);
     }
 
@@ -566,11 +566,11 @@ Item {
         }
     }
 
-    // Foco auto-reparador. Medido: ni Component.onCompleted ni un unico
-    // reintento diferido agarran el foco — la ventana se activa despues y Qt no
-    // se lo da a nadie, asi que el campo se queda mudo hasta que haces clic.
-    // Este timer reinsiste mientras el campo NO tenga el foco y se apaga solo
-    // en cuanto lo consigue, asi que tambien lo recupera si se pierde.
+    // Self-healing focus. Measured: neither Component.onCompleted nor a single
+    // deferred retry grabs focus — the window activates later and Qt gives it
+    // to nobody, so the field stays mute until you click. This timer insists
+    // while the field does NOT have focus and switches itself off as soon as
+    // it gets it, so it also recovers it if lost.
     Timer {
         interval: 200
         running: !password.activeFocus
@@ -579,7 +579,7 @@ Item {
         onTriggered: password.forceActiveFocus()
     }
 
-    // Ultimo recurso: un clic en cualquier parte devuelve el foco al campo.
+    // Last resort: a click anywhere returns focus to the field.
     MouseArea {
         anchors.fill: parent
         z: -1
@@ -589,9 +589,9 @@ Item {
     Component.onCompleted: {
         password.forceActiveFocus();
         findBattery(0);
-        // El acento vivo. El fichero lo escribe tu usuario, no root, asi que se
-        // valida antes de usarlo: solo se acepta exactamente #rrggbb. Si no
-        // esta o no cuela, se queda el de theme.conf y no se nota nada.
+        // The live accent. Your user writes the file, not root, so it is
+        // validated before use: only exactly #rrggbb is accepted. If missing
+        // or failing, theme.conf's stays and nothing shows.
         readFile("/var/lib/sddm-hyprisland/accent", function (txt) {
             if (/^#[0-9a-fA-F]{6}$/.test(txt))
                 root.accent = txt;

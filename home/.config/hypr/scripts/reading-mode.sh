@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
-# Modo lectura reversible para Hyprland >= 0.55 (configuracion Lua).
+# Reversible reading mode for Hyprland >= 0.55 (Lua configuration).
 #
-# Solo toca cuatro valores de runtime: shader, animaciones, blur y sombras.
-# Antes de hacerlo guarda los valores REALES del compositor; al salir restaura
-# esos mismos valores, no unos defaults inventados. Wallpaper, pywal y brillo
-# quedan fuera deliberadamente.
+# Only changes four runtime values: shader, animations, blur, and shadows. It
+# saves the compositor's actual values and restores those exact values on exit,
+# not invented defaults. Wallpaper, pywal, and brightness are deliberately out.
 
 set -euo pipefail
 
 mode="${1:-toggle}"
-rice_home="${HOME:?HOME no esta definido}"
+rice_home="${HOME:?HOME is not set}"
 runtime_root="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 state_dir="$runtime_root/quickshell-rice"
 snapshot="$state_dir/reading-mode.json"
@@ -46,8 +45,8 @@ apply_state() {
 
 restore_snapshot() {
     if [[ ! -r "$snapshot" ]]; then
-        # Red de seguridad para un estado perdido: la recarga vuelve a la fuente
-        # de verdad del rice y no toca ventanas ni workspaces.
+        # Safety net for lost state: reload returns to the rice source of truth
+        # without affecting windows or workspaces.
         hyprctl reload >/dev/null
         return
     fi
@@ -60,25 +59,25 @@ restore_snapshot() {
         || [[ "$previous_animations" != true && "$previous_animations" != false ]] \
         || [[ "$previous_blur" != true && "$previous_blur" != false ]] \
         || [[ "$previous_shadow" != true && "$previous_shadow" != false ]]; then
-        # Snapshot truncado o manipulado: la fuente del rice es la salida segura.
+        # Truncated or altered snapshot: the rice source is the safe fallback.
         hyprctl reload >/dev/null
         unlink "$snapshot"
         return
     fi
     if ! apply_state "$previous_shader" "$previous_animations" "$previous_blur" "$previous_shadow"; then
-        # El shader anterior pudo borrarse mientras el modo estaba activo. Una
-        # recarga es más segura que dejar el modo a medias o bloquear el toggle.
+        # The previous shader may have been removed while mode was active. A
+        # reload is safer than leaving mode partial or blocking the toggle.
         hyprctl reload >/dev/null
     fi
     unlink "$snapshot"
 }
 
 activate() {
-    [[ -r "$shader" ]] || { printf 'No existe el shader: %s\n' "$shader" >&2; exit 1; }
+    [[ -r "$shader" ]] || { printf 'Shader does not exist: %s\n' "$shader" >&2; exit 1; }
     is_active && { printf 'on\n'; return; }
 
-    # Un snapshot sin shader activo es resto de una sesion interrumpida. Primero
-    # lo cerramos bien para no apilar estados sobre estados.
+    # A snapshot with no active shader is left from an interrupted session.
+    # Restore it first to avoid stacking state over state.
     [[ -e "$snapshot" ]] && restore_snapshot
 
     mkdir -p "$state_dir"
@@ -94,8 +93,8 @@ activate() {
     mv "$temp_snapshot" "$snapshot"
 
     if ! apply_state "$shader" false false false; then
-        # Incluso si Hyprland rechaza el shader, vuelve al estado capturado.
-        # Conservar el snapshot hasta restaurar evita dejar efectos a medias.
+        # Even if Hyprland rejects the shader, return to the captured state.
+        # Retaining the snapshot until restoration avoids partial effects.
         restore_snapshot || true
         exit 1
     fi
@@ -121,7 +120,7 @@ case "$mode" in
         if is_active; then printf 'on\n'; else printf 'off\n'; fi
         ;;
     *)
-        printf 'Uso: %s {on|off|toggle|status}\n' "${0##*/}" >&2
+        printf 'Usage: %s {on|off|toggle|status}\n' "${0##*/}" >&2
         exit 2
         ;;
 esac

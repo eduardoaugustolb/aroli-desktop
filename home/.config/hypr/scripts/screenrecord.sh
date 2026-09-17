@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Toggle de la grabación iniciada por este script. No interfiere con otros wf-recorder.
+# Toggle recording started by this script. Does not interfere with other wf-recorder instances.
 set -uo pipefail
 
 runtime_dir="${XDG_RUNTIME_DIR:-/tmp/runtime-$UID}/hypr-tools"
@@ -21,11 +21,11 @@ if [ -r "$state_file" ]; then
       sleep 0.1
     done
     if kill -0 "$pid" 2>/dev/null; then
-      notify-send -u critical "󰑊 Grabación" "wf-recorder no terminó todavía"
+      notify-send -u critical "󰑊 Recording" "wf-recorder has not finished yet"
       exit 1
     fi
     rm -f "$state_file"
-    notify-send -t 2500 "󰑊 Grabación" "Guardada en ${out/#$HOME/~}"
+    notify-send -t 2500 "󰑊 Recording" "Saved to ${out/#$HOME/~}"
     exit 0
   fi
 
@@ -41,9 +41,9 @@ sleep 0.2
 
 if ! kill -0 "$pid" 2>/dev/null; then
   wait "$pid" 2>/dev/null || true
-  notify-send -u critical "󰑊 Grabación" "No se pudo iniciar wf-recorder"
+  notify-send -u critical "󰑊 Recording" "Could not start wf-recorder"
   exit 1
 fi
 
 printf '%s\n%s\n' "$pid" "$out" > "$state_file"
-notify-send -t 2000 "󰑊 Grabación" "Grabando… (repite la tecla para parar)"
+notify-send -t 2000 "󰑊 Recording" "Recording... (press the key again to stop)"

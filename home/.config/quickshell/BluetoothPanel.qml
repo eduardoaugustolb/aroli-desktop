@@ -1,8 +1,8 @@
-// BluetoothPanel.qml — dispositivos bluetooth, desplegado DESDE el notch.
-// Hermano de NetworkPanel: mismo esqueleto (cabecera + interruptor + lista) y
-// mismo trato desde el centro de control. Habla con Bluez vía
-// Quickshell.Bluetooth, sin scripts. El descubrimiento solo corre mientras este
-// panel está abierto (ver ShellState.onPanelChanged).
+// BluetoothPanel.qml — bluetooth devices, unfolded FROM the notch.
+// Sibling of NetworkPanel: same skeleton (header + switch + list) and
+// same treatment from the control center. Talks to BlueZ via
+// Quickshell.Bluetooth, no scripts. Discovery only runs while this
+// panel is open (see ShellState.onPanelChanged).
 import Quickshell
 import Quickshell.Bluetooth
 import QtQuick
@@ -19,7 +19,7 @@ Item {
 
     MouseArea { anchors.fill: parent }
 
-    // Todo panel debe atender Escape (ver la nota en TopShell).
+    // Every panel must handle Escape (see the note in TopShell).
     Item {
         id: keys
         anchors.fill: parent
@@ -31,7 +31,7 @@ Item {
         anchors { fill: parent; leftMargin: 22; rightMargin: 20; topMargin: 20; bottomMargin: 18 }
         spacing: 12
 
-        // ─────────────── cabecera ───────────────
+        // ─────────────── header ───────────────
         RowLayout {
             Layout.fillWidth: true
             spacing: 10
@@ -49,12 +49,12 @@ Item {
                     font.family: Appearance.fontUI; font.pixelSize: 13; font.weight: Font.DemiBold
                 }
                 Text {
-                    text: !root.adapter ? I18n.tr("Sin adaptador")
-                        : ShellState.btBlocked ? I18n.tr("Bloqueado por rfkill")
-                        : !ShellState.btOn ? I18n.tr("Apagado")
+                    text: !root.adapter ? I18n.tr("No adapter")
+                        : ShellState.btBlocked ? I18n.tr("Blocked by rfkill")
+                        : !ShellState.btOn ? I18n.tr("Off")
                         : ShellState.btConnected > 0
                             ? ShellState.btLabel(ShellState.btPaired[0])
-                            : I18n.tr("Sin conexión")
+                            : I18n.tr("Not connected")
                     color: "#8a8a8a"; elide: Text.ElideRight
                     font.family: Appearance.fontUI; font.pixelSize: 11
                 }
@@ -85,7 +85,7 @@ Item {
 
         Rectangle { Layout.fillWidth: true; height: 1; color: "#1e1e1e" }
 
-        // ─────────────── listas ───────────────
+        // ─────────────── lists ───────────────
         Flickable {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -103,7 +103,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.topMargin: 4
                     visible: ShellState.btPaired.length > 0
-                    text: I18n.tr("MIS DISPOSITIVOS")
+                    text: I18n.tr("MY DEVICES")
                     color: Colors.accent
                     font.family: Appearance.fontUI; font.pixelSize: 10
                     font.weight: Font.DemiBold; font.letterSpacing: 0.6
@@ -114,7 +114,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.topMargin: 10
                     visible: ShellState.btOn && ShellState.btNearby.length > 0
-                    text: I18n.tr("DISPONIBLES")
+                    text: I18n.tr("AVAILABLE")
                     color: Colors.accent
                     font.family: Appearance.fontUI; font.pixelSize: 10
                     font.weight: Font.DemiBold; font.letterSpacing: 0.6
@@ -127,12 +127,12 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             visible: !ShellState.btOn || (ShellState.btPaired.length === 0 && ShellState.btNearby.length === 0)
-            text: !root.adapter ? I18n.tr("No hay adaptador bluetooth")
+            text: !root.adapter ? I18n.tr("No bluetooth adapter")
                 : ShellState.btBlocked
-                    ? I18n.tr("El adaptador está bloqueado por rfkill.")
-                        + "\n" + I18n.tr("Desbloquéalo con:  rfkill unblock bluetooth")
-                : !ShellState.btOn ? I18n.tr("Bluetooth apagado")
-                : I18n.tr("Buscando dispositivos…")
+                    ? I18n.tr("The adapter is blocked by rfkill.")
+                        + "\n" + I18n.tr("Unblock it with:  rfkill unblock bluetooth")
+                : !ShellState.btOn ? I18n.tr("Bluetooth off")
+                : I18n.tr("Looking for devices…")
             color: "#5e5e5e"
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -141,7 +141,7 @@ Item {
         }
     }
 
-    // ─────────── fila de dispositivo ───────────
+    // ─────────── device row ───────────
     component BtRow: Rectangle {
         id: dev
         required property var modelData
@@ -176,12 +176,12 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     visible: text.length > 0
-                    text: dev.modelData.pairing ? I18n.tr("Emparejando…")
+                    text: dev.modelData.pairing ? I18n.tr("Pairing…")
                         : dev.modelData.connected
                             ? (dev.modelData.batteryAvailable
-                                ? I18n.tr("Conectado · {0} %", Math.round(dev.modelData.battery * 100))
-                                : I18n.tr("Conectado"))
-                        : (dev.modelData.paired || dev.modelData.bonded) ? I18n.tr("Emparejado") : ""
+                                ? I18n.tr("Connected · {0} %", Math.round(dev.modelData.battery * 100))
+                                : I18n.tr("Connected"))
+                        : (dev.modelData.paired || dev.modelData.bonded) ? I18n.tr("Paired") : ""
                     color: dev.modelData.connected ? Colors.accent : "#7d7d7d"
                     elide: Text.ElideRight
                     font.family: Appearance.fontUI; font.pixelSize: 10

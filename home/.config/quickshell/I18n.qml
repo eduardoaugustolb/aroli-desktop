@@ -1,36 +1,39 @@
-// I18n.qml — la capa de idioma del shell.
+// I18n.qml — the shell language layer.
 //
-// EL CASTELLANO ES EL CÓDIGO. Las cadenas siguen escritas en español dentro de
-// cada .qml, envueltas en I18n.tr(...). En español tr() devuelve su argumento
-// tal cual: no hay diccionario que mantener, ni claves que inventar, ni forma
-// de que un texto se quede sin traducir y salga en blanco. Solo el inglés vive
-// en un diccionario (translations-en.js), y lo que le falte cae en español, que
-// es un fallo visible pero inofensivo.
+// ENGLISH (EN-US) IS THE CODE. Strings stay written in English inside each
+// .qml, wrapped in I18n.tr(...). In English tr() returns its argument as-is:
+// no dictionary to maintain, no keys to invent, and no way for a text to come
+// out untranslated and show up blank. Only Spanish and Brazilian Portuguese
+// live in dictionaries (translations-es.js, translations-pt-BR.js), and
+// whatever either one is missing falls back to English, which is a visible
+// but harmless failure.
 //
-// POR QUÉ NO qsTr() Y .qm: el flujo de Qt Linguist obliga a compilar los .ts y
-// a reiniciar la aplicación para cambiar de idioma. Aquí el idioma se cambia
-// desde Ajustes y la interfaz entera se repinta en el sitio, porque `lang` es
-// una propiedad y todas las asignaciones `text: I18n.tr(...)` son bindings que
-// dependen de ella.
+// WHY NOT qsTr() AND .qm: the Qt Linguist flow forces you to compile the .ts
+// files and to restart the application to change language. Here the language
+// switches from Settings and the whole interface repaints in place, because
+// `lang` is a property and every `text: I18n.tr(...)` assignment is a binding
+// that depends on it.
 pragma Singleton
 
 import Quickshell
 import QtQuick
-// El diccionario va en un .js importado, no en otro singleton QML: probado que
-// un `readonly property var` con las 402 entradas dentro llega como `undefined`
-// al leerlo desde aqui. El porque, entero, en la cabecera de translations-en.js.
-import "translations-en.js" as Dict
-import "translations-pt-br.js" as PtBR
+// The dictionaries go in imported .js files, not in another QML singleton:
+// proven that a `readonly property var` holding all 400+ entries arrives as
+// `undefined` when read from here. The full reason lives in the header of
+// translations-es.js.
+import "translations-es.js" as Es
+import "translations-pt-BR.js" as PtBR
 
 Singleton {
     id: root
 
     readonly property string lang: Config.language
-    readonly property bool english: lang === "en"
+    readonly property bool spanish: lang === "es"
     readonly property bool portugueseBrazil: lang === "pt-BR"
 
-    // El rótulo va en su propio idioma a propósito: quien tenga el shell en un
-    // idioma que no entiende tiene que poder encontrar el suyo en la lista.
+    // Each label goes in its own language on purpose: someone holding the
+    // shell in a language they do not understand still has to be able to find
+    // their own in the list.
     readonly property var languages: [
         { code: "pt-BR", label: "Português (Brasil)" },
         { code: "es", label: "Español" },
@@ -51,15 +54,16 @@ Singleton {
 
     readonly property var labels: root.languages.map(function (l) { return l.label; })
 
-    // tr("Apagar")                       -> "Shut down"
-    // tr("Quedan {0} minutos", 5)        -> "5 minutes left"
+    // tr("Shut down")                       -> "Apagar"
+    // tr("{0} minutes left", 5)              -> "Quedan 5 minutos"
     //
-    // Los huecos son {0}, {1}, {2} y NO se concatenan fuera: una frase partida
-    // en trozos ("Quedan " + n + " minutos") no se puede traducir, porque en
-    // otro idioma las piezas van en otro orden.
+    // The slots are {0}, {1}, {2} and are NEVER concatenated outside: a
+    // sentence split into chunks ("Quedan " + n + " minutos") cannot be
+    // translated, because in another language the pieces go in another
+    // order.
     function tr(s, a0, a1, a2) {
-        var out = root.portugueseBrazil && PtBR.ptBR[s] !== undefined ? PtBR.ptBR[s]
-                : root.english && Dict.en[s] !== undefined ? Dict.en[s] : s;
+        var out = root.spanish && Es.es[s] !== undefined ? Es.es[s]
+                : root.portugueseBrazil && PtBR.ptBR[s] !== undefined ? PtBR.ptBR[s] : s;
         if (a0 !== undefined) out = out.split("{0}").join(a0);
         if (a1 !== undefined) out = out.split("{1}").join(a1);
         if (a2 !== undefined) out = out.split("{2}").join(a2);

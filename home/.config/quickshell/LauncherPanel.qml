@@ -665,8 +665,8 @@ Item {
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: root.hasTimer ? I18n.tr("Enter arranca el temporizador")
-                                            : I18n.tr("Enter copia al portapapeles")
+                        text: root.hasTimer ? I18n.tr("Enter starts the timer")
+                                            : I18n.tr("Enter copies to the clipboard")
                         color: "#7d7d7d"; elide: Text.ElideRight
                         font.family: Appearance.fontUI; font.pixelSize: 10
                     }
@@ -720,11 +720,11 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: root.results.length === 0
-                text: root.waiting ? I18n.tr("Leyendo el portapapeles…")
-                    : field.text.length > 0 ? I18n.tr("Sin resultados")
-                    : root.mode === "clip" ? I18n.tr("El portapapeles está vacío")
-                    : root.mode === "win" ? I18n.tr("No hay ventanas abiertas")
-                    : I18n.tr("Sin resultados")
+                text: root.waiting ? I18n.tr("Reading the clipboard…")
+                    : field.text.length > 0 ? I18n.tr("No results")
+                    : root.mode === "clip" ? I18n.tr("The clipboard is empty")
+                    : root.mode === "win" ? I18n.tr("No windows open")
+                    : I18n.tr("No results")
                 color: "#5e5e5e"
                 font.family: Appearance.fontUI
                 font.pixelSize: 13

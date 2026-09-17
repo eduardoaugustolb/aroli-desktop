@@ -1,7 +1,7 @@
 pragma Singleton
 import Quickshell
 
-// Iconos Nerd Font (Material Design Icons) — codepoints validados contra la fuente.
+// Nerd Font icons (Material Design Icons) — codepoints validated against the font.
 Singleton {
     readonly property string volHigh: "󰕾"
     readonly property string volMed: "󰖀"
@@ -47,7 +47,7 @@ Singleton {
     readonly property string no: "󰅖"         // md-close U+F0156
     readonly property string edit: "󰲶"       // md-pencil-outline U+F0CB6
 
-    // ─── centro de comandos del lanzador (#, >, @) ───
+    // ─── launcher command center (#, >, @) ───
     readonly property string clipboard: "󰨸"  // md-clipboard_text_outline U+F0A38
     readonly property string bolt: "󱐌"       // md-lightning_bolt_outline U+F140C
     readonly property string windows: "󰖲"    // md-window_restore U+F05B2

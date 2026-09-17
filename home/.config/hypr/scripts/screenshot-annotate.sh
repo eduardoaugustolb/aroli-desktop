@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Captura de región y la abre en satty para anotar; guarda y copia al portapapeles.
-# Va sobre pantalla congelada (capture-region.sh), así que también puedes anotar
-# un menú abierto o el notch.
+# Captures a region and opens it in satty for annotation; saves and copies it.
+# It uses a frozen screen (capture-region.sh), so you can also annotate an open
+# menu or the notch.
 set -uo pipefail
 
 dir="$HOME/Pictures/screenshots"

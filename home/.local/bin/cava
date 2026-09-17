@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ejecuta cava con el config generado en cache para no mutar los dotfiles.
+# Runs cava with the cached generated config to avoid mutating dotfiles.
 set -u
 
 BASE="$HOME/.config/cava/config"

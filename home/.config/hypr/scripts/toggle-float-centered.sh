@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Super+V conserva el toggle original, pero al entrar en modo flotante usa una
-# geometria predecible: 60 % del area util del monitor y centrada. El calculo
-# se hace en coordenadas logicas para que tambien funcione con escalado HiDPI.
+# Super+V preserves the original toggle, but entering floating mode uses a
+# predictable geometry: 60% of usable monitor area, centered. Calculation uses
+# logical coordinates so it also works with HiDPI scaling.
 window_json=$(hyprctl activewindow -j)
 mapfile -t window_data < <(
     jq -r '.address, (.floating | tostring), (.monitor | tostring)' <<<"$window_json"
@@ -31,9 +31,9 @@ mapfile -t target_size < <(
     '
 )
 
-# Reserva por si el monitor desaparece justo entre las dos consultas (por
-# ejemplo, al desconectar un dock): usa el tamano actual y aun asi completa el
-# gesto en vez de dejar la ventana flotante con una geometria arbitraria.
+# Fallback if the monitor disappears between queries, such as after unplugging
+# a dock: use the current size and complete the gesture instead of leaving an
+# arbitrary floating geometry.
 if (( ${#target_size[@]} < 2 )); then
     mapfile -t target_size < <(jq -r '(.size[0] * 0.60 | floor), (.size[1] * 0.60 | floor)' <<<"$window_json")
 fi

@@ -1,22 +1,20 @@
 #!/usr/bin/env bash
-# Notificación de captura con acción "Editar": pulsar el aviso (en el notch o en
-# el centro de control) abre la foto en satty.
+# Screenshot notification with an "Edit" action: clicking the notification (in
+# the notch or control center) opens the image in satty.
 #
-# OJO al modo de funcionar: notify-send con -A implica --wait, o sea que se
-# queda vivo esperando a que pulses. Por eso quien captura lo lanza al fondo.
-# Y por eso lleva timeout: nuestro servidor de notificaciones (quickshell) NO
-# las caduca solo — se quedan en el historial hasta que las descartas —, así
-# que sin él quedaría un proceso esperando para siempre. Diez minutos de
-# margen: si vas a editar la captura, la editas en ese rato.
+# Note how this works: notify-send with -A implies --wait, so it remains alive
+# waiting for a click. The capture script therefore launches it in the background.
+# It also needs a timeout: our notification server (quickshell) does not expire
+# them automatically, so without one a process would wait forever. Ten minutes
+# is enough time to edit the screenshot.
 set -uo pipefail
 
 img="${1:-}"
 [ -s "$img" ] || exit 0
 
-# El cuerpo dice que se puede pulsar: si no, nadie descubre que la acción está
-# ahí. La ruta completa no cabe (parte el aviso en tres líneas), así que solo el
-# nombre del archivo.
-act=$(timeout 600 notify-send -a "Captura" -i "$img" -A "edit=Editar" \
-        "Captura de pantalla" "Copiada al portapapeles · pulsa para editar" 2>/dev/null) || exit 0
+# The body says it is clickable; otherwise no one discovers the action. The full
+# path does not fit, so only the file name is omitted.
+act=$(timeout 600 notify-send -a "Screenshot" -i "$img" -A "edit=Edit" \
+        "Screenshot" "Copied to clipboard · click to edit" 2>/dev/null) || exit 0
 
 [ "$act" = "edit" ] && exec "$HOME/.config/hypr/scripts/screenshot-edit.sh" "$img"

@@ -496,7 +496,7 @@ fi
 
 heading "Wallpaper"
 
-# The first boot on the tower came up with the right colours everywhere and a
+# The first boot on the tower came up with the right colors everywhere and a
 # BLACK desktop. The chain, all of it documented in awww-start.sh: install.sh
 # generates the palette with `wal -i -n`, and the -n means "palette yes,
 # wallpaper no"; then awww-start.sh called `awww restore`, which restores the
@@ -513,7 +513,7 @@ elif ! pgrep -x awww-daemon >/dev/null; then
     if [ "$SESSION_UP" = 0 ]; then
         note "awww-daemon is down, and there is no session for it to draw on"
     else
-        bad "awww-daemon is NOT running: the desktop is a flat colour"
+        bad "awww-daemon is NOT running: the desktop is a flat color"
         note "fix:  ~/.config/hypr/awww-start.sh"
     fi
 elif [ "$SESSION_UP" = 0 ]; then
@@ -532,7 +532,7 @@ else
             awww_shown="$(printf '%s\n' "$awww_q" | sed -n 's/.*image: //p' | head -2 | tr '\n' ' ')"
             note "${awww_shown% }"
         else
-            bad "$awww_img of $awww_outs outputs have a wallpaper; the rest are flat colour"
+            bad "$awww_img of $awww_outs outputs have a wallpaper; the rest are flat color"
             note 'awww restore exits 0 even when it restores nothing: nothing warned you'
             note "fix:  ~/.config/hypr/set-wallpaper.sh ~/Pictures/wallpapers/<image>"
         fi

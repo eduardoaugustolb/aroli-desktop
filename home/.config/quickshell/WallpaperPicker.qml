@@ -1,22 +1,21 @@
-// WallpaperPicker.qml — coverflow ilyamiro (cartas en paralelogramo / skew)
-// sobre un FONDO INMERSIVO: el wallpaper seleccionado, difuminado y oscurecido,
-// llena la pantalla y hace crossfade al navegar. Así el picker no se pelea con
-// el escritorio/terminal que haya detrás y las cartas destacan limpias.
+// WallpaperPicker.qml — ilyamiro coverflow (parallelogram / skew cards)
+// over an IMMERSIVE BACKGROUND: the selected wallpaper, blurred and dimmed,
+// fills the screen and crossfades while navigating. So the picker never fights
+// the desktop/terminal behind and cards stand out clean.
 //
-// Motor de máxima fluidez: cada RANURA es de ANCHO FIJO (cero relayout al
-// desplazar) y la carta, de TAMAÑO FIJO, solo se anima con `scale`+`opacity`
-// (función continua de su distancia al centro). Sin Behaviors que se
-// desincronicen, sin re-decodificar y SIN capas de sombra por carta (eso
-// mataba el rendimiento). La imagen interior es de tamaño fijo y siempre cubre
-// el paralelogramo -> jamás esquinas cortadas.
+// Top-fluency engine: each SLOT is FIXED-WIDTH (zero relayout on scroll) and
+// the FIXED-SIZE card only animates `scale`+`opacity` (a continuous function
+// of its distance to center). No desyncing Behaviors, no re-decoding, and NO
+// per-card shadow layers (those killed performance). The inner image is fixed
+// size and always covers the parallelogram -> never clipped corners.
 //
-// Las cartas NO leen los wallpapers originales, sino las miniaturas de 500 px
-// que mantiene scripts/wall-thumbs.sh en ~/.cache/wallpaper-thumbs: descomprimir
-// los originales (hasta 6 MB) para pintar una carta pequeña costaba ~12x más.
-// Cada miniatura conserva el nombre completo del original más ".jpg", así que
-// la ruta real se recupera quitando ese sufijo (ver originalOf).
+// Cards never read the original wallpapers, but the 500 px thumbnails
+// scripts/wall-thumbs.sh keeps in ~/.cache/wallpaper-thumbs: decompressing
+// the originals (up to 6 MB) to paint a small card cost ~12x more. Each
+// thumbnail keeps the original's full name plus ".jpg", so the real path is
+// recovered by stripping that suffix (see originalOf).
 //
-// Contrato conservado: GlobalShortcut "wallpaper" y el script set-wallpaper.sh.
+// Kept contract: "wallpaper" GlobalShortcut and the set-wallpaper.sh script.
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -39,14 +38,14 @@ Scope {
         root.open = false
     }
 
-    // Refresca la caché de miniaturas: al arrancar la shell y cada vez que se
-    // abre el picker. En caliente son ~30 ms (solo comprueba fechas).
+    // Refreshes the thumbnail cache: at shell boot and every time the
+    // picker opens. Warm it is ~30 ms (only checks dates).
     Process {
         id: thumbsProc
         command: ["bash", root.home + "/.config/quickshell/scripts/wall-thumbs.sh"]
         onExited: {
-            // Si la caché aún no existía, el watcher del modelo no llega a verla
-            // nacer y hay que reapuntarlo a mano una vez.
+            // If the cache never existed, the model watcher never sees it
+            // born and must be repointed by hand once.
             if (wallModel.count === 0) { wallModel.folder = ""; wallModel.folder = "file://" + root.thumbsDir }
         }
     }
@@ -66,22 +65,22 @@ Scope {
 
     PanelWindow {
         id: win
-        // Solo en la pantalla que estas mirando, no siempre en la primera.
+        // Only on the screen you are looking at, not always the first.
         screen: ShellState.focusedScreen
-        // Mapeada hasta que el fundido de salida termina: con visible ligado
-        // solo a open, la ventana se desmapeaba en el mismo frame y la
-        // animación de cierre no se veía nunca (el no_anim de hyprland.lua
-        // confía en que este stage se funde solo).
+        // Mapped until the exit fade ends: with visible tied
+        // only to open, the window unmapped on the same frame and the
+        // close animation never showed (hyprland.lua's no_anim trusts
+        // this stage to fade alone).
         visible: root.open || stage.opacity > 0
         anchors { top: true; bottom: true; left: true; right: true }
         exclusiveZone: 0
         color: "transparent"
         WlrLayershell.layer: WlrLayer.Overlay
-        // Exclusive solo mientras está abierto: durante los ~110 ms del
-        // fundido de salida la ventana sigue mapeada y no debe retener nada.
+        // Exclusive only while open: during the ~110 ms exit fade the window
+        // stays mapped and must retain nothing.
         WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-        // Sin namespace no hay layerrule posible: es el asa por la que
-        // Hyprland anima ESTA superficie y no todas por igual.
+        // Without a namespace no layerrule is possible: it is the handle by
+        // which Hyprland animates THIS surface and not all alike.
         WlrLayershell.namespace: "quickshell:wallpaper"
 
         Item {
@@ -89,9 +88,9 @@ Scope {
             anchors.fill: parent
             focus: true
             opacity: root.open ? 1 : 0
-            // Entrada 210/OutCubic; salida 110 ms (mOut) con InCubic, que es
-            // la curva `sale`: acelera y no frena. Ley 3: lo que sale se va
-            // en la mitad de tiempo.
+            // Entry 210/OutCubic; exit 110 ms (mOut) with InCubic, which is
+            // the `sale` curve: accelerates, never brakes. Law 3: what leaves
+            // goes in half the time.
             Behavior on opacity { NumberAnimation { duration: root.open ? Appearance.animMed : Appearance.mOut; easing.type: root.open ? Easing.OutCubic : Easing.InCubic } }
 
             Connections {
@@ -115,25 +114,25 @@ Scope {
                 }
             }
 
-            // SIN FONDO: el picker flota transparente sobre el escritorio (sin
-            // wallpaper difuminado ni velo). Las cartas son opacas y el cromo
-            // lleva halo de sombra para leerse sobre cualquier fondo.
-            // Clic en zona vacía cierra.
+            // NO BACKGROUND: the picker floats transparent over the desktop (no
+            // blurred wallpaper, no veil). Cards are opaque and chrome carries
+            // a shadow halo to read over any background. Click on empty area
+            // closes.
             MouseArea { anchors.fill: parent; z: -1; onClicked: root.open = false }
 
-            // ----- Coverflow ilyamiro (cartas en paralelogramo / skew) -----
+            // ----- ilyamiro coverflow (parallelogram / skew cards) -----
             ListView {
                 id: carousel
                 anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; verticalCenterOffset: 12 }
                 height: 560
                 orientation: ListView.Horizontal
                 model: wallModel
-                property real iw: 720                            // ancho base del hero (fijo)
-                property real ih: 406                            // alto base del hero (~16:9, fijo)
+                property real iw: 720                            // hero base width (fixed)
+                property real ih: 406                            // hero base height (~16:9, fixed)
                 property real skew: -0.35
                 property real bw: 3
-                property real slotW: 360                         // paso de scroll FIJO
-                property real sideBase: 0.56                     // escala del 1.er vecino
+                property real slotW: 360                         // FIXED scroll step
+                property real sideBase: 0.56                     // 1st neighbor scale
                 readonly property real imgW: iw + ih * Math.abs(skew) + 12
                 spacing: 0; clip: false; cacheBuffer: 2500
                 highlightRangeMode: ListView.StrictlyEnforceRange
@@ -154,11 +153,11 @@ Scope {
                     id: slot
                     width: carousel.slotW
                     height: carousel.height
-                    // distancia continua al centro del viewport, en ranuras.
+                    // continuous distance to the viewport center, in slots.
                     readonly property real d: (x + width / 2 - (carousel.contentX + carousel.width / 2)) / carousel.slotW
                     readonly property real ad: Math.abs(d)
-                    // Escala: 1.0 en el centro (hero nítido a tamaño real) y baja
-                    // suave hacia el fondo, simétrica a ambos lados.
+                    // Scale: 1.0 at center (sharp full-size hero) fading
+                    // gently to the back, symmetric both sides.
                     readonly property real sc: ad <= 1
                         ? carousel.sideBase + (1 - carousel.sideBase) * Math.pow(1 - ad, 1.35)
                         : carousel.sideBase * Math.pow(0.86, ad - 1)
@@ -170,21 +169,21 @@ Scope {
                         anchors.centerIn: parent
                         width: carousel.iw
                         height: carousel.ih
-                        scale: slot.sc                           // solo transform GPU
+                        scale: slot.sc                           // GPU transform only
                         transformOrigin: Item.Center
-                        // Cizalla referida al CENTRO vertical -> se centra sola.
+                        // Shear about the vertical CENTER -> self-centering.
                         transform: Matrix4x4 { matrix: Qt.matrix4x4(1, carousel.skew, 0, -carousel.skew * carousel.ih / 2,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1) }
 
-                        // Marco: base oscura + filo sutil.
+                        // Frame: dark base + subtle edge.
                         Rectangle {
                             anchors.fill: parent
                             color: Colors.bg
                             border.width: 1
                             border.color: Qt.rgba(1, 1, 1, 0.14)
                         }
-                        // Contenido recto (cizalla inversa) + PreserveAspectCrop.
-                        // Tamaño y sourceSize FIJOS -> cubre siempre el
-                        // paralelogramo (sin esquinas cortadas) y mismo encuadre.
+                        // Straight content (inverse shear) + PreserveAspectCrop.
+                        // FIXED size and sourceSize -> always covers the
+                        // parallelogram (no clipped corners) and same framing.
                         Item {
                             anchors.fill: parent; anchors.margins: carousel.bw; clip: true
                             Image {
@@ -207,11 +206,11 @@ Scope {
                 }
             }
 
-            // Estado vacío.
+            // Empty state.
             StyledText {
                 anchors.centerIn: parent
                 visible: wallModel.count === 0
-                text: I18n.tr("No hay wallpapers en {0}", "~/Pictures/wallpapers")
+                text: I18n.tr("No wallpapers in {0}", "~/Pictures/wallpapers")
                 color: "#fafafa"
                 font.pixelSize: Appearance.fsL
                 opacity: 0.85

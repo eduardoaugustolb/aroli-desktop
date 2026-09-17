@@ -1,10 +1,10 @@
-// CalendarPanel.qml — cara de calendario desplegada DESDE el notch.
+// CalendarPanel.qml — calendar face unfolded FROM the notch.
 //
-// Un mes y nada más: cabecera con mes/año y navegación, iniciales de los
-// días de la semana según el locale (ShellState.loc.firstDayOfWeek), y
-// rejilla fija de 6 filas × 7 columnas para que la altura del notch nunca
-// pegue saltos al cambiar de mes. Hoy va marcado con Colors.accent.
-// Es un calendario para mirarlo: ni notas, ni eventos, ni festivos.
+// One month and nothing more: header with month/year plus navigation, weekday
+// initials per locale (ShellState.loc.firstDayOfWeek), and a fixed 6-row × 7-
+// column grid so the notch height never jumps when the month changes. Today is
+// marked with Colors.accent. A calendar for looking at: no notes, no events,
+// no holidays.
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
@@ -14,11 +14,11 @@ Item {
 
     readonly property bool active: ShellState.panel === "calendar"
 
-    // SOLO la fecha, no la hora. El reloj del shell late cada segundo, y colgar
-    // de él la rejilla hacía que se reconstruyeran 42 objetos Date y sus 42
-    // delegados UNA VEZ POR SEGUNDO, para siempre, con el panel cerrado y por
-    // cada monitor. Una cadena "yyyy-MM-dd" solo emite cambio cuando cambia el
-    // día, que es exactamente cuando la rejilla tiene algo nuevo que decir.
+    // Date ONLY, not time. The shell clock ticks every second, and hanging
+    // the grid off it rebuilt 42 Date objects and their 42 delegates
+    // ONCE PER SECOND, forever, with the panel closed and per monitor. A
+    // "yyyy-MM-dd" string only emits a change when the day changes, which is
+    // exactly when the grid has something new to say.
     readonly property string todayKey: Qt.formatDate(ShellState.now, "yyyy-MM-dd")
 
     property int viewYear: parseInt(root.todayKey.slice(0, 4))
@@ -50,8 +50,8 @@ Item {
         }
     }
 
-    // Al abrir el panel volvemos siempre a hoy y tomamos el foco para
-    // poder cerrar con Escape o cambiar de mes con las flechas del teclado.
+    // Opening the panel always returns to today and grabs focus so it can
+    // close with Escape or change month with the keyboard arrows.
     onActiveChanged: {
         if (root.active) {
             root.goToToday();
@@ -59,7 +59,7 @@ Item {
         }
     }
 
-    // Absorbe clics en zonas vacías y añade navegación rápida de mes con la rueda
+    // Swallows clicks on empty areas and adds fast month navigation with the wheel
     MouseArea {
         anchors.fill: parent
         onWheel: function (w) {
@@ -79,10 +79,10 @@ Item {
         Keys.onEnterPressed: if (!root.isCurrentMonth) root.goToToday()
     }
 
-    // Rejilla fija de 42 celdas (6 semanas completas).
-    // La primera columna sigue siempre a ShellState.loc.firstDayOfWeek.
-    // Los días fuera del mes en curso se marcan como isCurrentMonth: false
-    // para pintarlos atenuados.
+    // Fixed 42-cell grid (6 full weeks).
+    // The first column always follows ShellState.loc.firstDayOfWeek.
+    // Days outside the current month are flagged isCurrentMonth: false
+    // to paint them dimmed.
     readonly property var gridCells: {
         const y = root.viewYear;
         const m = root.viewMonth;
@@ -91,12 +91,12 @@ Item {
         const todayM = parseInt(root.todayKey.slice(5, 7)) - 1;
         const todayD = parseInt(root.todayKey.slice(8, 10));
 
-        // Las 12:00 y no las 00:00, en TODAS las fechas que se construyen aquí.
-        // Donde el cambio de hora de primavera salta a medianoche -Santiago,
-        // Beirut, La Habana- las 00:00 de ese día NO EXISTEN, y el motor las
-        // resuelve como las 23:00 del día anterior: el día del cambio se cae de
-        // la rejilla y el anterior sale dos veces. En Madrid el salto es a las
-        // 02:00 y no se nota, pero este repo es público.
+        // Noon, not midnight, on EVERY date built here. Where the spring
+        // forward jumps at midnight -Santiago, Beirut, Havana- that day's 00:00
+        // does NOT EXIST, and the engine resolves it as 23:00 the day before:
+        // the changeover day drops off the grid and the previous one shows
+        // twice. In Madrid the jump is at 02:00 and never shows, but this repo
+        // is public.
         const firstOfMonth = new Date(y, m, 1, 12).getDay();
         const leadDays = (firstOfMonth - firstDow + 7) % 7;
 
@@ -125,13 +125,13 @@ Item {
         }
         spacing: 0
 
-        // ─────────────── cabecera: mes, año y controles ───────────────
+        // ─────────────── header: month, year, controls ───────────────
         RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: 32
             spacing: 8
 
-            // Al pinchar en el título cuando estás en otro mes, vuelve a hoy
+            // Clicking the title while on another month returns to today
             Text {
                 text: ShellState.capitalize(new Date(root.viewYear, root.viewMonth, 1, 12).toLocaleDateString(ShellState.loc, "MMMM yyyy"))
                 color: "#ffffff"
@@ -153,7 +153,7 @@ Item {
                 Layout.alignment: Qt.AlignVCenter
                 spacing: 6
 
-                // Botón "Hoy": aparece solo al salir del mes actual para no dejar un botón inútil
+                // "Today" button: only appears off the current month so no useless button sits around
                 Rectangle {
                     id: todayBtn
                     visible: !root.isCurrentMonth
@@ -172,7 +172,7 @@ Item {
                     Text {
                         id: todayLbl
                         anchors.centerIn: parent
-                        text: I18n.tr("Hoy")
+                        text: I18n.tr("Today")
                         color: Colors.accent
                         font.family: Appearance.fontUI
                         font.pixelSize: Appearance.fsXS
@@ -188,7 +188,7 @@ Item {
                     }
                 }
 
-                // Flecha mes anterior
+                // Previous month arrow
                 Rectangle {
                     id: prevBtn
                     width: 26
@@ -221,7 +221,7 @@ Item {
                     }
                 }
 
-                // Flecha mes siguiente
+                // Next month arrow
                 Rectangle {
                     id: nextBtn
                     width: 26
@@ -258,7 +258,7 @@ Item {
 
         Item { Layout.preferredHeight: 14 }
 
-        // ─────────────── fila de iniciales de los días ───────────────
+        // ─────────────── weekday initials row ───────────────
         Row {
             Layout.fillWidth: true
             Layout.preferredHeight: 18
@@ -282,7 +282,7 @@ Item {
 
         Item { Layout.preferredHeight: 8 }
 
-        // ─────────────── rejilla de 6 filas × 7 columnas ───────────────
+        // ─────────────── 6-row × 7-column grid ───────────────
         Grid {
             Layout.fillWidth: true
             columns: 7
@@ -299,7 +299,7 @@ Item {
                     width: 44
                     height: 32
 
-                    // Círculo de acento para el día de hoy
+                    // Accent circle for today
                     Rectangle {
                         anchors.centerIn: parent
                         width: 28

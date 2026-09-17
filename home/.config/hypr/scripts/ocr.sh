@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# OCR: selecciona zona -> extrae texto -> portapapeles.
-# Sobre pantalla congelada: también lee el texto de un menú o de un panel que
-# se cerraría al perder el foco.
+# OCR: select area -> extract text -> clipboard.
+# On a frozen screen, it can also read text from a menu or panel that would
+# close when it loses focus.
 set -uo pipefail
 
 img=$(mktemp --suffix=.png)
@@ -13,7 +13,7 @@ trap 'rm -f "$img"' EXIT
 txt=$(tesseract "$img" - -l spa+eng 2>/dev/null)
 if [ -n "${txt// /}" ]; then
     printf '%s' "$txt" | wl-copy
-    notify-send -t 2500 "OCR" "Texto copiado al portapapeles"
+    notify-send -t 2500 "OCR" "Text copied to clipboard"
 else
-    notify-send -t 2000 "OCR" "No se detectó texto"
+    notify-send -t 2000 "OCR" "No text detected"
 fi

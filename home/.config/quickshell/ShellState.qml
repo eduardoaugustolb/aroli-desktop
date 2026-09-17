@@ -778,13 +778,13 @@ Singleton {
     }
     function fmtWh(value) { return value > 0 ? I18n.tr("{0} Wh", value.toFixed(1)) : ""; }
     readonly property string battEstimateText: {
-        if (root.batt < 0) return I18n.tr("sin batería");
-        if (root.ac && root.batt >= 99 && root.battEstimateSeconds < 0) return I18n.tr("completa");
+        if (root.batt < 0) return I18n.tr("no battery");
+        if (root.ac && root.batt >= 99 && root.battEstimateSeconds < 0) return I18n.tr("full");
         const time = root.fmtBatteryTime(root.battEstimateSeconds);
-        if (time.length === 0) return I18n.tr("calculando…");
+        if (time.length === 0) return I18n.tr("calculating…");
         // Frase entera y no `time + sufijo`: en inglés el orden no tiene por qué
         // ser el mismo, y cada rama necesita su propia traducción.
-        return root.ac ? I18n.tr("{0} para completar", time) : I18n.tr("{0} restantes", time);
+        return root.ac ? I18n.tr("{0} to full", time) : I18n.tr("{0} left", time);
     }
 
     Process {
@@ -870,8 +870,8 @@ Singleton {
         ? (timerDone ? Icons.alarm : (timerRunning ? Icons.timer : Icons.pause))
         : Icons.sync
     readonly property string bubbleLabel: bubbleKind === "timer"
-        ? (timerDone ? I18n.tr("¡Tiempo!") : timerClock(timerLeft))
-        : I18n.tr("Sincronizando")
+        ? (timerDone ? I18n.tr("Time's up") : timerClock(timerLeft))
+        : I18n.tr("Syncing")
     readonly property bool bubbleAlert: timerDone
 
     // "Estoy haciendo algo y tarda." Solo la sincronización que pides tú con el
@@ -900,9 +900,9 @@ Singleton {
             // No hace falta inventar un aviso: se usa el que ya existe, y de
             // paso queda en el historial del centro de control.
             Quickshell.execDetached(["notify-send", "-u", "critical",
-                                     "-a", I18n.tr("Temporizador"),
-                                     I18n.tr("Temporizador"),
-                                     I18n.tr("{0} cumplidos", root.timerSpoken(root.timerTotal))]);
+                                     "-a", I18n.tr("Timer"),
+                                     I18n.tr("Timer"),
+                                     I18n.tr("{0} elapsed", root.timerSpoken(root.timerTotal))]);
         }
     }
 
@@ -1091,8 +1091,8 @@ Singleton {
             known ? "edit" : "create", String(net.name)
         ]);
         root.toast(Icons.wifiLock, known
-            ? I18n.tr("Abriendo credenciales de {0}", String(net.name))
-            : I18n.tr("Nueva red empresarial: {0}", String(net.name)));
+            ? I18n.tr("Opening credentials for {0}", String(net.name))
+            : I18n.tr("New enterprise network: {0}", String(net.name)));
     }
     function openNetworkProfiles() {
         root.settingsOpen = false;
@@ -1273,14 +1273,14 @@ Singleton {
                 root.readingMode = state === "on";
                 if (readingProc.announce) {
                     root.toast(Icons.reading, root.readingMode
-                        ? I18n.tr("Modo lectura activado") : I18n.tr("Modo lectura desactivado"));
+                        ? I18n.tr("Reading mode on") : I18n.tr("Reading mode off"));
                     readingProc.announce = false;
                 }
             }
         }
         onExited: function (exitCode) {
             if (exitCode !== 0 && announce)
-                root.toast(Icons.reading, I18n.tr("No se pudo cambiar el modo lectura"));
+                root.toast(Icons.reading, I18n.tr("Could not change reading mode"));
             announce = false;
             if (root.readingPending >= 0) {
                 const desired = root.readingPending === 1;
@@ -1464,16 +1464,16 @@ Singleton {
     property string launcherMode: "apps"     // "apps" | "clip" | "cmd" | "win"
 
     readonly property var launcherModes: [
-        { key: "clip", prefix: "#", icon: Icons.clipboard, name: I18n.tr("Portapapeles"),
-          hint: I18n.tr("Buscar en el portapapeles…") },
-        { key: "cmd",  prefix: ">", icon: Icons.bolt,      name: I18n.tr("Acciones"),
-          hint: I18n.tr("Buscar una acción del sistema…") },
-        { key: "win",  prefix: "@", icon: Icons.windows,   name: I18n.tr("Ventanas"),
-          hint: I18n.tr("Buscar una ventana abierta…") }
+        { key: "clip", prefix: "#", icon: Icons.clipboard, name: I18n.tr("Clipboard"),
+          hint: I18n.tr("Search the clipboard…") },
+        { key: "cmd",  prefix: ">", icon: Icons.bolt,      name: I18n.tr("Actions"),
+          hint: I18n.tr("Search system actions…") },
+        { key: "win",  prefix: "@", icon: Icons.windows,   name: I18n.tr("Windows"),
+          hint: I18n.tr("Search open windows…") }
     ]
 
     readonly property var launcherAppsMode: ({ key: "apps", prefix: "", icon: "󰍉",
-        name: I18n.tr("Aplicaciones"), hint: I18n.tr("Buscar aplicaciones…") })
+        name: I18n.tr("Apps"), hint: I18n.tr("Search applications…") })
 
     // "#" -> "clip". Devuelve "" si ese carácter no abre ningún modo.
     function launcherModeOf(ch) {
@@ -1585,8 +1585,8 @@ Singleton {
         Quickshell.execDetached([root.clipTool, "copy", String(item.id)]);
         root.closePanel();
         root.toast(item.image ? Icons.image : "󰆏",
-                   item.image ? I18n.tr("Imagen copiada")
-                              : I18n.tr("Copiado: {0}", root.clipShort(item.label)));
+                   item.image ? I18n.tr("Image copied")
+                              : I18n.tr("Copied: {0}", root.clipShort(item.label)));
     }
 
     function clipDelete(item) {
@@ -1620,63 +1620,63 @@ Singleton {
     // si las claves siguieran solo en castellano. Con las dos listas juntas, la
     // búsqueda funciona en los dos idiomas a la vez y sin duplicar la tabla.
     readonly property var sysActions: [
-        { kind: "cmd", id: "clip", icon: Icons.clipboard, name: I18n.tr("Portapapeles"),
-          desc: I18n.tr("Historial de copiado"),
+        { kind: "cmd", id: "clip", icon: Icons.clipboard, name: I18n.tr("Clipboard"),
+          desc: I18n.tr("Copy history"),
           keys: "clipboard cliphist copiar pegar historial copy paste history" },
-        { kind: "cmd", id: "lock", icon: Icons.lock, name: I18n.tr("Bloquear pantalla"),
+        { kind: "cmd", id: "lock", icon: Icons.lock, name: I18n.tr("Lock screen"),
           desc: "hyprlock",
           keys: "lock bloquear candado lock screen padlock" },
-        { kind: "cmd", id: "night", icon: Icons.moon, name: I18n.tr("Luz nocturna"),
-          desc: I18n.tr("Alternar hyprsunset"),
+        { kind: "cmd", id: "night", icon: Icons.moon, name: I18n.tr("Night light"),
+          desc: I18n.tr("Toggle hyprsunset"),
           keys: "night light nocturna calida azul hyprsunset warm blue filter" },
-        { kind: "cmd", id: "reading", icon: Icons.reading, name: I18n.tr("Modo lectura"),
-          desc: readingMode ? I18n.tr("Desactivar papel y tinta")
-                            : I18n.tr("Papel cálido, tinta y menos movimiento"),
+        { kind: "cmd", id: "reading", icon: Icons.reading, name: I18n.tr("Reading mode"),
+          desc: readingMode ? I18n.tr("Turn off paper and ink")
+                            : I18n.tr("Warm paper, ink and less motion"),
           keys: "lectura leer reading eink e-ink papel tinta concentracion read paper ink focus" },
-        { kind: "cmd", id: "shot", icon: Icons.screenshot, name: I18n.tr("Captura + anotar"),
-          desc: I18n.tr("Recorte y edición"),
+        { kind: "cmd", id: "shot", icon: Icons.screenshot, name: I18n.tr("Screenshot + annotate"),
+          desc: I18n.tr("Crop and edit"),
           keys: "screenshot captura pantallazo anotar recortar screen shot annotate crop snip" },
-        { kind: "cmd", id: "wall", icon: Icons.wallpaper, name: I18n.tr("Cambiar fondo"),
-          desc: I18n.tr("Selector de fondos de pantalla"),
+        { kind: "cmd", id: "wall", icon: Icons.wallpaper, name: I18n.tr("Change wallpaper"),
+          desc: I18n.tr("Wallpaper picker"),
           keys: "wallpaper fondo escritorio papel background desktop change" },
-        { kind: "cmd", id: "pick", icon: Icons.eyedropper, name: I18n.tr("Cuentagotas de color"),
-          desc: I18n.tr("Copia el color del píxel"),
+        { kind: "cmd", id: "pick", icon: Icons.eyedropper, name: I18n.tr("Colour picker"),
+          desc: I18n.tr("Copies the pixel colour"),
           keys: "color picker cuentagotas hex pipeta colour eyedropper dropper pixel" },
-        { kind: "cmd", id: "ocr", icon: Icons.ocr, name: I18n.tr("OCR: extraer texto"),
-          desc: I18n.tr("Texto de una zona de pantalla"),
+        { kind: "cmd", id: "ocr", icon: Icons.ocr, name: I18n.tr("OCR: extract text"),
+          desc: I18n.tr("Text from a screen area"),
           keys: "ocr texto reconocer leer imagen text recognise extract image" },
-        { kind: "cmd", id: "rec", icon: Icons.video, name: I18n.tr("Grabar pantalla"),
-          desc: I18n.tr("Iniciar o parar la grabación"),
+        { kind: "cmd", id: "rec", icon: Icons.video, name: I18n.tr("Record screen"),
+          desc: I18n.tr("Start or stop recording"),
           keys: "record grabar video captura recording screen capture" },
-        { kind: "cmd", id: "wifi", icon: Icons.wifi, name: I18n.tr("Wifi"),
-          desc: I18n.tr("Redes disponibles"),
+        { kind: "cmd", id: "wifi", icon: Icons.wifi, name: I18n.tr("Wi-Fi"),
+          desc: I18n.tr("Available networks"),
           keys: "wifi red network internet wi-fi wireless networks" },
         { kind: "cmd", id: "bt", icon: Icons.bluetooth, name: I18n.tr("Bluetooth"),
-          desc: I18n.tr("Dispositivos emparejados"),
+          desc: I18n.tr("Paired devices"),
           keys: "bluetooth bt auriculares mando headphones headset controller pair devices" },
-        { kind: "cmd", id: "overview", icon: Icons.grid, name: I18n.tr("Mapa de escritorios"),
-          desc: I18n.tr("Ver y mover ventanas"),
+        { kind: "cmd", id: "overview", icon: Icons.grid, name: I18n.tr("Workspace map"),
+          desc: I18n.tr("View and move windows"),
           keys: "overview escritorios workspaces mapa workspace map windows grid" },
-        { kind: "cmd", id: "system", icon: Icons.cpu, name: I18n.tr("Tu equipo"),
-          desc: I18n.tr("Actividad, temperatura y batería"),
+        { kind: "cmd", id: "system", icon: Icons.cpu, name: I18n.tr("Your computer"),
+          desc: I18n.tr("Activity, temperature and battery"),
           keys: "sistema monitor cpu ram memoria disco temperatura bateria rendimiento equipo system memory disk temperature battery performance machine" },
-        { kind: "cmd", id: "settings", icon: Icons.cog, name: I18n.tr("Ajustes"),
-          desc: I18n.tr("Apariencia, sonido, atajos…"),
+        { kind: "cmd", id: "settings", icon: Icons.cog, name: I18n.tr("Settings"),
+          desc: I18n.tr("Appearance, sound, shortcuts…"),
           keys: "settings ajustes preferencias config preferences configuration" },
-        { kind: "cmd", id: "keys", icon: Icons.keyboard, name: I18n.tr("Atajos de teclado"),
-          desc: I18n.tr("Mapa vivo de teclas de Hyprland"),
+        { kind: "cmd", id: "keys", icon: Icons.keyboard, name: I18n.tr("Keyboard shortcuts"),
+          desc: I18n.tr("Live map of Hyprland keys"),
           keys: "atajos teclas teclado keybinds shortcuts hotkeys mapa keyboard keys map" },
-        { kind: "cmd", id: "dnd", icon: Icons.bellOff, name: I18n.tr("No molestar"),
-          desc: I18n.tr("Silenciar notificaciones"),
+        { kind: "cmd", id: "dnd", icon: Icons.bellOff, name: I18n.tr("Do not disturb"),
+          desc: I18n.tr("Silence notifications"),
           keys: "dnd molestar silencio notificaciones do not disturb silence notifications mute" },
-        { kind: "cmd", id: "caffeine", icon: Icons.coffee, name: I18n.tr("Café"),
-          desc: I18n.tr("Impedir que se apague la pantalla"),
+        { kind: "cmd", id: "caffeine", icon: Icons.coffee, name: I18n.tr("Caffeine"),
+          desc: I18n.tr("Stops the screen going to sleep"),
           keys: "caffeine cafe insomnio despierto suspender coffee awake keep screen on sleep" },
-        { kind: "cmd", id: "saver", icon: Icons.monitor, name: I18n.tr("Salvapantallas"),
-          desc: I18n.tr("Arrancarlo ahora"),
+        { kind: "cmd", id: "saver", icon: Icons.monitor, name: I18n.tr("Screensaver"),
+          desc: I18n.tr("Start it now"),
           keys: "screensaver salvapantallas screen saver idle" },
-        { kind: "cmd", id: "power", icon: Icons.power, name: I18n.tr("Apagar / salir"),
-          desc: I18n.tr("Apagar, reiniciar, cerrar sesión"),
+        { kind: "cmd", id: "power", icon: Icons.power, name: I18n.tr("Shut down / log out"),
+          desc: I18n.tr("Shut down, restart, log out"),
           keys: "power apagar reiniciar salir logout suspender shutdown shut down restart reboot log out sign out suspend hibernate" }
     ]
 
@@ -1712,13 +1712,13 @@ Singleton {
             root.closePanel(); root.toggleReadingMode(); return;
         case "dnd":
             root.dnd = !root.dnd; root.closePanel();
-            root.toast(Icons.bell, root.dnd ? I18n.tr("No molestar activado")
-                                            : I18n.tr("No molestar desactivado"));
+            root.toast(Icons.bell, root.dnd ? I18n.tr("Do not disturb on")
+                                            : I18n.tr("Do not disturb off"));
             return;
         case "caffeine":
             root.caffeine = !root.caffeine; root.closePanel();
-            root.toast(Icons.coffee, root.caffeine ? I18n.tr("Café: la pantalla no se apaga")
-                                                   : I18n.tr("Café desactivado"));
+            root.toast(Icons.coffee, root.caffeine ? I18n.tr("Caffeine: the screen stays on")
+                                                   : I18n.tr("Caffeine off"));
             return;
         }
 
@@ -1887,7 +1887,7 @@ Singleton {
 
     function copyText(t) {
         Quickshell.clipboardText = String(t);
-        root.toast("󰆏", I18n.tr("Copiado: {0}", t));
+        root.toast("󰆏", I18n.tr("Copied: {0}", t));
     }
 
     // Aviso breve dentro del notch. Aquí SÍ hace falta: copiar al portapapeles

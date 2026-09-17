@@ -27,8 +27,8 @@ Use en-US spelling: `color` (not `colour`), `organize` (not `organise`),
 > but the project history must stay searchable in one language. A `git log`
 > mixed across languages is hard to grep, review, and automate.
 
-The desktop UI strings are the exception: they live in Spanish source plus
-the `translations-en.js` / `translations-pt-br.js` dictionaries (see
+The desktop UI strings are the exception: their en-US source lives in the QML
+files, with Spanish and Brazilian Portuguese dictionaries (see
 [Translations](#6-translations-i18n)).
 
 ## 2. Workflow
@@ -105,9 +105,9 @@ Fix stuff                                   # vague, capitalized
 
 ## 6. Translations (i18n)
 
-- Source strings stay in Spanish inside the `.qml` files.
-- English lives in `home/.config/quickshell/translations-en.js`,
-  Brazilian Portuguese in `home/.config/quickshell/translations-pt-br.js`.
+- Source strings stay in en-US inside the `.qml` files.
+- Spanish lives in `home/.config/quickshell/translations-es.js`, Brazilian
+  Portuguese in `home/.config/quickshell/translations-pt-BR.js`.
 - Keys must match 1:1 across dictionaries; never translate placeholders,
   commands (`rfkill unblock bluetooth`), or proper nouns
   (pywal, Hyprland, Quickshell, PipeWire).

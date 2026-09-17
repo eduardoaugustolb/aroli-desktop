@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Genera en cache un config de cava con degradado pywal y recarga cava si corre.
+# Generates a cached Cava config with a pywal gradient and reloads Cava if running.
 BASE="$HOME/.config/cava/config"
 OUT="$HOME/.cache/wal/cava.conf"
 J="$HOME/.cache/wal/colors.json"
@@ -10,7 +10,7 @@ BLOCK=$(mktemp) || exit 0
 TMP=$(mktemp "${OUT}.tmp.XXXXXX") || { rm -f "$BLOCK"; exit 0; }
 trap 'rm -f "$BLOCK" "$TMP"' EXIT
 {
-  echo "# >>> pywal (auto, no editar)"
+  echo "# >>> pywal (automatic; do not edit)"
   echo "gradient = 1"
   python3 -c "
 import json
