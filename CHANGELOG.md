@@ -10,6 +10,13 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [1.1.5] - 2026-09-17
+
+### Fixed
+
+- Plugin discovery now runs asynchronously with a loading state, cancellation
+  path, and a 45-second network timeout instead of blocking the TUI.
+
 ## [1.1.4] - 2026-09-17
 
 ### Fixed

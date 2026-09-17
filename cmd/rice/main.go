@@ -7,6 +7,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
@@ -223,7 +224,9 @@ var cloneRepository = func(target string) error {
 }
 
 func cloneRepositoryQuiet(target string) error {
-	cmd := exec.Command("git", "clone", "--depth", "1", repositoryURL, target)
+	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "git", "clone", "--depth", "1", repositoryURL, target)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
@@ -731,6 +734,7 @@ const (
 	tuiLanguage
 	tuiPlugins
 	tuiConfirm
+	tuiLoading
 	tuiRunning
 	tuiDone
 )
@@ -741,6 +745,11 @@ type tuiAction struct {
 }
 
 type tuiResult struct{ err error }
+
+type tuiPluginsResult struct {
+	items []plugin
+	err   error
+}
 
 type tuiModel struct {
 	screen       tuiScreen
@@ -807,6 +816,14 @@ func (m tuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			m.message = "Ação concluída com sucesso."
 		}
+	case tuiPluginsResult:
+		if msg.err != nil {
+			m.message = "Não foi possível carregar os plugins: " + msg.err.Error()
+			m.screen = tuiDone
+		} else {
+			m.plugins, m.selected, m.pluginCursor = msg.items, map[int]bool{}, 0
+			m.screen = tuiPlugins
+		}
 	case tea.KeyPressMsg:
 		key := msg.String()
 		if key == "ctrl+c" || key == "q" || key == "esc" {
@@ -856,24 +873,25 @@ func (m tuiModel) updateHome(key string) (tea.Model, tea.Cmd) {
 			m.dryRun = m.cursor == 1
 			m.screen = tuiLanguage
 		} else if m.cursor == 2 {
-			var items []plugin
-			err := silenceTerminal(func() error {
-				var err error
-				items, err = pluginCatalog()
-				return err
-			})
-			if err != nil {
-				m.message = "Erro: " + err.Error()
-				m.screen = tuiDone
-			} else {
-				m.plugins, m.selected, m.pluginCursor = items, map[int]bool{}, 0
-				m.screen = tuiPlugins
-			}
+			m.screen = tuiLoading
+			return m, m.loadPlugins()
 		} else {
 			m.screen = tuiConfirm
 		}
 	}
 	return m, nil
+}
+
+func (m tuiModel) loadPlugins() tea.Cmd {
+	return func() tea.Msg {
+		var items []plugin
+		err := silenceTerminal(func() error {
+			var err error
+			items, err = pluginCatalog()
+			return err
+		})
+		return tuiPluginsResult{items: items, err: err}
+	}
 }
 
 func (m tuiModel) updateLanguage(key string) (tea.Model, tea.Cmd) {
@@ -968,12 +986,15 @@ func (m tuiModel) View() tea.View {
 		body = m.viewPlugins()
 	case tuiConfirm:
 		body = m.viewConfirm()
+	case tuiLoading:
+		body = "\n  Carregando plugins…\n\n  A conexão pode levar alguns segundos.\n  Pressione q ou Esc para voltar.\n"
 	case tuiRunning:
 		body = "\n  Executando…\n"
 	case tuiDone:
 		body = tuiTitle.Render("\n  "+m.message+"\n\n") + tuiMuted.Render("  Enter/r: voltar   q: sair")
 	}
-	view := tea.NewView(tuiPanel.Render(tuiTitle.Render("Umbra Noctis") + "\n" + tuiMuted.Render("rice · assistente") + "\n" + tuiAccent.Render(m.breadcrumb()) + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
+	var view tea.View
+	view.SetContent(tuiPanel.Render(tuiTitle.Render("Umbra Noctis") + "\n" + tuiMuted.Render("rice · assistente") + "\n" + tuiAccent.Render(m.breadcrumb()) + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
 	view.AltScreen = true
 	return view
 }
