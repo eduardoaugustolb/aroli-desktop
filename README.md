@@ -1,16 +1,15 @@
-<p align="center">
-  <img src="home/Pictures/wallpapers/umbra-ink-mountains.png" alt="Ink mountains — Umbra Noctis wallpaper" width="100%">
-</p>
-
-<p align="center">
-  <sub>U M B R A &nbsp; / &nbsp; L I M I N A L</sub>
-</p>
-
 <h1 align="center">Umbra Noctis</h1>
 
 <p align="center">
-  A rice for <strong>Omarchy</strong>, Arch Linux, Hyprland, and Quickshell.<br>
+  A premium visual layer for <strong>Omarchy</strong>, Arch Linux, Hyprland, and Quickshell.<br>
   Dark by nature. Personal by wallpaper. Yours by choice.
+</p>
+
+<p align="center">
+  <a href="https://github.com/eduardoaugustolb/umbra-noctis/stargazers"><img src="https://img.shields.io/github/stars/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff&label=stars" alt="GitHub stars"></a>
+  <a href="https://github.com/eduardoaugustolb/umbra-noctis/releases"><img src="https://img.shields.io/github/v/release/eduardoaugustolb/umbra-noctis?display_name=tag&style=flat-square&color=8b7cff&label=release" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff" alt="GPL-3.0 license"></a>
+  <a href="https://github.com/eduardoaugustolb/umbra-noctis/actions"><img src="https://img.shields.io/github/actions/workflow/status/eduardoaugustolb/umbra-noctis/release.yml?style=flat-square&label=build" alt="Build status"></a>
 </p>
 
 <p align="center">
@@ -26,18 +25,23 @@
 ## The threshold
 
 **Umbra Noctis** is the visual layer of the Umbra workspace on top of the
-stable Omarchy base. "Noctis" evokes the project's nocturnal, premium visual language between system and
-person: the rice keeps the structure — notch, dark surfaces, cutouts, and
-luminance bands — and lets each wallpaper set the mood of the environment
-with Pywal.
+stable Omarchy base. “Noctis” evokes its nocturnal, premium visual language:
+the rice keeps the structure — notch, dark surfaces, cutouts, and luminance
+bands — while each wallpaper sets the mood with Pywal.
 
-There is no fixed palette decorating the desktop. There is a language:
-depth, negative space, and contrast. The result changes when your image
-changes, but it is still recognizable as Umbra.
+The dark foundation is fixed: depth, negative space, and contrast remain
+Umbra. Your wallpaper supplies the accent palette, so the result changes with
+your image without turning every application surface into its dominant colour.
 
 | Base | Umbra surface | Your choice |
 | --- | --- | --- |
 | Omarchy · Arch · Hyprland | Quickshell, notch, and dynamic palette | Wallpaper, language, and optionals |
+
+<p align="center">
+  <a href="https://github.com/eduardoaugustolb/umbra-noctis/commits/main"><img src="https://img.shields.io/github/commit-activity/m/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff&label=community%20activity" alt="Monthly commit activity"></a>
+  <a href="https://github.com/eduardoaugustolb/umbra-noctis/issues"><img src="https://img.shields.io/github/issues/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff&label=issues" alt="Open issues"></a>
+  <a href="https://github.com/eduardoaugustolb/umbra-noctis/network/members"><img src="https://img.shields.io/github/forks/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff&label=forks" alt="GitHub forks"></a>
+</p>
 
 <p align="center">
   <img src="home/Pictures/wallpapers/umbra-ember-coast.png" alt="Ember Coast — bundled wallpaper" width="49%">
@@ -50,8 +54,9 @@ changes, but it is still recognizable as Umbra.
 - Interface translation in **Brazilian Portuguese** and ABNT2 keyboard layout.
 - **Umbra** cursor and visual identification of the active platform: Omarchy on
   Omarchy, Arch on Arch.
-- Pywal palette extracted from the current wallpaper, applied to the shell and
-  compatible surfaces.
+- Pywal accents extracted from the current wallpaper, applied over stable dark
+  Umbra surfaces. Settings › Appearance › Colour system can restore the legacy
+  mode where the wallpaper also tints application backgrounds.
 - Four Umbra wallpapers installed with the rice: Ember Coast, Silent
   Threshold, Obsidian Dunes, and Ink Mountains.
 - Assisted migration for installs coming from the previous fork.
