@@ -62,9 +62,12 @@ Singleton {
     // ───────── janelas ─────────
     // Raio dos cantos e espessura da borda (Hyprland: decoration:rounding e
     // general:border_size). A borda já vem tematizada via pywal; com 0, o foco
-    // continua marcado só com luz/sombra.
+    // continua marcado só com luz/sombra. Espaçamentos: gaps_in entre janelas,
+    // gaps_out até a borda da tela (Hyprland: general:gaps_in/gaps_out).
     property alias windowRounding: opts.windowRounding
     property alias windowBorderSize: opts.windowBorderSize
+    property alias windowGapsIn: opts.windowGapsIn
+    property alias windowGapsOut: opts.windowGapsOut
 
     // ───────── tipografía ─────────
     property alias fontUI: opts.fontUI
@@ -100,7 +103,8 @@ Singleton {
         id: debounce
         interval: 180
         onTriggered: {
-            const lua = "hl.config({ general = { border_size = " + opts.windowBorderSize + " }, "
+            const lua = "hl.config({ general = { border_size = " + opts.windowBorderSize
+                      + ", gaps_in = " + opts.windowGapsIn + ", gaps_out = " + opts.windowGapsOut + " }, "
                       + "decoration = { rounding = " + opts.windowRounding + ", "
                       + "motion_blur = { enabled = "
                       + (opts.motionBlur ? "true" : "false")
@@ -136,6 +140,7 @@ Singleton {
         opts.fontUI = "Adwaita Sans"; opts.clockSize = 17;
         opts.motionBlur = true; opts.motionBlurSamples = 7;
         opts.windowRounding = 12; opts.windowBorderSize = 0;
+        opts.windowGapsIn = 3; opts.windowGapsOut = 6;
         root.applyEffects();   // este no se entera solo: hay que empujarlo a Hyprland
         // favApps y language NO se tocan a propósito: "restaurar valores" es
         // para la apariencia, y ni los favoritos ni el idioma en el que lees la
@@ -186,8 +191,12 @@ Singleton {
 
             // Cantos arredondados das janelas (0 = retas). 12 é o padrão: lê-se
             // como "flutua" sem virar pílula. Borda 0 = foco só com luz/sombra.
+            // Gaps 3/6: entre duas janelas ficam 6 px (3 + 3) e até a borda da
+            // tela, outros 6 — o mesmo vão.
             property int windowRounding: 12
             property int windowBorderSize: 0
+            property int windowGapsIn: 3
+            property int windowGapsOut: 6
 
             property string fontUI: "Adwaita Sans"
             property int clockSize: 17

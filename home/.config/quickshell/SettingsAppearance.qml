@@ -298,6 +298,24 @@ Flickable {
                     onMoved: function (v) { Config.windowBorderSize = Math.round(v); Config.applyEffects(); }
                 }
             }
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Espacio entre ventanas")
+                hint: I18n.tr("Hueco entre dos ventanas. El hueco visible es el doble: 3 y 3 se juntan en 6.")
+                SettingsControls.Slider_ {
+                    value: Config.windowGapsIn; from: 0; to: 20; suffix: " px"
+                    onMoved: function (v) { Config.windowGapsIn = Math.round(v); Config.applyEffects(); }
+                }
+            }
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Espacio al borde")
+                hint: I18n.tr("Hueco entre las ventanas y el borde de la pantalla. Igualarlo al doble del anterior deja el mismo vano por todas partes.")
+                SettingsControls.Slider_ {
+                    value: Config.windowGapsOut; from: 0; to: 30; suffix: " px"
+                    onMoved: function (v) { Config.windowGapsOut = Math.round(v); Config.applyEffects(); }
+                }
+            }
         }
 
         // ─────────────────── fondo de pantalla ───────────────────

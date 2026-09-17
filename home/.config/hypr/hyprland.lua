@@ -123,10 +123,10 @@ end
 
 hl.config({
     general = {
-        -- Ley 8 -- un solo hueco en la capa de contenido. Entre dos ventanas
-        -- quedan 6 px (3 + 3) y hasta el borde de la pantalla, otros 6: EL
-        -- MISMO hueco. Antes eran 6 y 5. Un pixel de desajuste no se ve, pero
-        -- se siente.
+        -- Ley 8 -- um só vão na camada de conteúdo. Padrão 3/6: entre duas
+        -- janelas ficam 6 px (3 + 3) e até a borda da tela, outros 6 — O MESMO
+        -- vão. Ajustes > Aparência > Janelas muda em quente (efeitos.lua, que
+        -- ganha deste bloco por ser carregado por último).
         gaps_in  = 3,
         gaps_out = 6,
 
