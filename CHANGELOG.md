@@ -10,6 +10,13 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [1.1.2] - 2026-09-17
+
+### Fixed
+
+- Prevented installer and diagnostic output from corrupting the Bubble Tea
+  alternate screen while actions run inside the TUI.
+
 ## [1.1.1] - 2026-09-17
 
 ### Fixed

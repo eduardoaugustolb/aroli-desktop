@@ -916,13 +916,32 @@ func (m tuiModel) selectedPlugins() []plugin {
 func (m tuiModel) runAction() tea.Cmd {
 	return func() tea.Msg {
 		var err error
-		if m.action == 2 {
-			err = installPlugins(m.selectedPlugins(), false)
-		} else {
-			err = m.actions()[m.action].command(&m)
-		}
+		err = silenceTerminal(func() error {
+			if m.action == 2 {
+				return installPlugins(m.selectedPlugins(), false)
+			}
+			return m.actions()[m.action].command(&m)
+		})
 		return tuiResult{err: err}
 	}
+}
+
+// Bubble Tea owns the terminal while the TUI is active. The installer and its
+// shell backend are intentionally verbose, so keep their output from writing
+// over Bubble Tea's alternate screen and report only the final result in the
+// interface. Direct CLI commands remain verbose as before.
+func silenceTerminal(run func() error) error {
+	stdout, stderr := os.Stdout, os.Stderr
+	devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
+	if err != nil {
+		return run()
+	}
+	os.Stdout, os.Stderr = devNull, devNull
+	defer func() {
+		os.Stdout, os.Stderr = stdout, stderr
+		_ = devNull.Close()
+	}()
+	return run()
 }
 
 func (m tuiModel) View() tea.View {
