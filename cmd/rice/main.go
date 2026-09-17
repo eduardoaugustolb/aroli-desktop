@@ -139,6 +139,9 @@ func install(args []string) error {
 	if err != nil {
 		return err
 	}
+	if opts.dryRun {
+		defer cleanupDryRunRepository(path)
+	}
 	backend := []string{"--lang", opts.lang}
 	if opts.dryRun {
 		backend = append(backend, "--dry-run")
@@ -182,7 +185,16 @@ func ensureRepository(explicit string, dryRun bool) (string, error) {
 		return path, nil
 	}
 	if dryRun {
-		return target, nil
+		parent, err := os.MkdirTemp("", "rice-dry-run-")
+		if err != nil {
+			return "", err
+		}
+		dryRunTarget := filepath.Join(parent, "checkout")
+		if err := cloneRepository(dryRunTarget); err != nil {
+			_ = os.RemoveAll(parent)
+			return "", fmt.Errorf("não foi possível preparar o rice para o dry-run: %w", err)
+		}
+		return dryRunTarget, nil
 	}
 	if _, err := exec.LookPath("git"); err != nil {
 		return "", errors.New("git é necessário para baixar o rice")
@@ -191,10 +203,21 @@ func ensureRepository(explicit string, dryRun bool) (string, error) {
 		return "", err
 	}
 	fmt.Println("Baixando o rice pela primeira vez…")
-	if err := command("", "git", "clone", "--depth", "1", repositoryURL, target).Run(); err != nil {
+	if err := cloneRepository(target); err != nil {
 		return "", fmt.Errorf("não foi possível baixar o rice: %w", err)
 	}
 	return validRepo(target)
+}
+
+var cloneRepository = func(target string) error {
+	return command("", "git", "clone", "--depth", "1", repositoryURL, target).Run()
+}
+
+func cleanupDryRunRepository(path string) {
+	parent := filepath.Dir(path)
+	if strings.HasPrefix(filepath.Base(parent), "rice-dry-run-") {
+		_ = os.RemoveAll(parent)
+	}
 }
 
 func validRepo(path string) (string, error) {

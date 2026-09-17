@@ -57,6 +57,42 @@ func TestValidRepo(t *testing.T) {
 	}
 }
 
+func TestEnsureRepositoryDryRunBootstrapsTemporaryCheckout(t *testing.T) {
+	originalClone := cloneRepository
+	t.Cleanup(func() { cloneRepository = originalClone })
+	cloneRepository = func(target string) error {
+		if err := os.MkdirAll(target, 0o755); err != nil {
+			return err
+		}
+		return os.WriteFile(filepath.Join(target, "install.sh"), []byte("#!/bin/sh\n"), 0o755)
+	}
+
+	workingDirectory := t.TempDir()
+	originalDirectory, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(workingDirectory); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(originalDirectory) })
+
+	path, err := ensureRepository("", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := validRepo(path); err != nil {
+		t.Fatalf("dry-run checkout is invalid: %v", err)
+	}
+	if !strings.HasPrefix(filepath.Base(filepath.Dir(path)), "rice-dry-run-") {
+		t.Fatalf("dry-run checkout was not temporary: %q", path)
+	}
+	cleanupDryRunRepository(path)
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		t.Fatalf("temporary checkout still exists: %v", err)
+	}
+}
+
 func TestRunRejectsUnknownCommand(t *testing.T) {
 	err := run([]string{"not-a-command"})
 	if err == nil || !strings.Contains(err.Error(), "comando desconhecido") {
