@@ -1,0 +1,181 @@
+[General]
+ColorScheme=Pywal
+TerminalApplication=kitty -1
+XftHintStyle=hintslight
+XftSubPixel=none
+fixed=JetBrainsMono Nerd Font,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+font=Google Sans Flex,11,-1,5,500,0,0,0,0,0,0,0,0,0,0,1,Medium
+menuFont=Google Sans Flex,10,-1,5,500,0,0,0,0,0,0,0,0,0,0,1,Medium
+smallestReadableFont=Google Sans Flex,9,-1,5,500,0,0,0,0,0,0,0,0,0,0,1,Medium
+toolBarFont=Google Sans Flex,10,-1,5,500,0,0,0,0,0,0,0,0,0,0,1,Medium
+
+[Icons]
+Theme=Adwaita
+
+[KDE]
+widgetStyle=Fusion
+contrast=4
+frameContrast=0.2
+
+[KFileDialog Settings]
+Allow Expansion=false
+Automatically select filename extension=true
+Breadcrumb Navigation=true
+Decoration position=2
+LocationCombo Completionmode=5
+PathCombo Completionmode=5
+Show Bookmarks=false
+Show Full Path=false
+Show Inline Previews=true
+Show Preview=false
+Show Speedbar=true
+Show hidden files=false
+Sort by=Name
+Sort directories first=true
+Sort hidden files last=false
+Sort reversed=false
+Speedbar Width=168
+View Style=Simple
+
+[Sounds]
+Theme=freedesktop
+
+[Colors:Button]
+BackgroundAlternate=#2d0a02
+BackgroundNormal=#370c02
+DecorationFocus=#3978cb
+DecorationHover=#3978cb
+ForegroundActive=#c4c2c1
+ForegroundInactive=#5c4d4a
+ForegroundLink=#f5d78c
+ForegroundNegative=#d92121
+ForegroundNeutral=#feb548
+ForegroundNormal=#c4c2c1
+ForegroundPositive=#38dd35
+ForegroundVisited=#d4a06d
+
+[Colors:Complementary]
+BackgroundAlternate=#2d0a02
+BackgroundNormal=#0d0300
+DecorationFocus=#3978cb
+DecorationHover=#3978cb
+ForegroundActive=#c4c2c1
+ForegroundInactive=#5c4d4a
+ForegroundLink=#f5d78c
+ForegroundNegative=#d92121
+ForegroundNeutral=#feb548
+ForegroundNormal=#c4c2c1
+ForegroundPositive=#38dd35
+ForegroundVisited=#d4a06d
+
+[Colors:Header]
+BackgroundAlternate=#2d0a02
+BackgroundNormal=#1c0601
+DecorationFocus=#3978cb
+DecorationHover=#3978cb
+ForegroundActive=#c4c2c1
+ForegroundInactive=#5c4d4a
+ForegroundLink=#f5d78c
+ForegroundNegative=#d92121
+ForegroundNeutral=#feb548
+ForegroundNormal=#c4c2c1
+ForegroundPositive=#38dd35
+ForegroundVisited=#d4a06d
+
+[Colors:Header][Inactive]
+BackgroundAlternate=#2d0a02
+BackgroundNormal=#0d0300
+DecorationFocus=#3978cb
+DecorationHover=#3978cb
+ForegroundActive=#c4c2c1
+ForegroundInactive=#5c4d4a
+ForegroundLink=#f5d78c
+ForegroundNegative=#d92121
+ForegroundNeutral=#feb548
+ForegroundNormal=#c4c2c1
+ForegroundPositive=#38dd35
+ForegroundVisited=#d4a06d
+
+[Colors:Selection]
+BackgroundAlternate=#3978cb
+BackgroundNormal=#3978cb
+DecorationFocus=#3978cb
+DecorationHover=#3978cb
+ForegroundActive=#000000
+ForegroundInactive=#000000
+ForegroundLink=#000000
+ForegroundNegative=#d92121
+ForegroundNeutral=#feb548
+ForegroundNormal=#000000
+ForegroundPositive=#38dd35
+ForegroundVisited=#000000
+
+[Colors:Tooltip]
+BackgroundAlternate=#2d0a02
+BackgroundNormal=#430e02
+DecorationFocus=#3978cb
+DecorationHover=#3978cb
+ForegroundActive=#c4c2c1
+ForegroundInactive=#5c4d4a
+ForegroundLink=#f5d78c
+ForegroundNegative=#d92121
+ForegroundNeutral=#feb548
+ForegroundNormal=#c4c2c1
+ForegroundPositive=#38dd35
+ForegroundVisited=#d4a06d
+
+[Colors:View]
+BackgroundAlternate=#2d0a02
+BackgroundNormal=#0d0300
+DecorationFocus=#3978cb
+DecorationHover=#3978cb
+ForegroundActive=#c4c2c1
+ForegroundInactive=#5c4d4a
+ForegroundLink=#f5d78c
+ForegroundNegative=#d92121
+ForegroundNeutral=#feb548
+ForegroundNormal=#c4c2c1
+ForegroundPositive=#38dd35
+ForegroundVisited=#d4a06d
+
+[Colors:Window]
+BackgroundAlternate=#2d0a02
+BackgroundNormal=#1c0601
+DecorationFocus=#3978cb
+DecorationHover=#3978cb
+ForegroundActive=#c4c2c1
+ForegroundInactive=#5c4d4a
+ForegroundLink=#f5d78c
+ForegroundNegative=#d92121
+ForegroundNeutral=#feb548
+ForegroundNormal=#c4c2c1
+ForegroundPositive=#38dd35
+ForegroundVisited=#d4a06d
+
+[ColorEffects:Disabled]
+Color=#1c0601
+ColorAmount=0.5
+ColorEffect=3
+ContrastAmount=0
+ContrastEffect=0
+IntensityAmount=0
+IntensityEffect=0
+
+[ColorEffects:Inactive]
+ChangeSelectionColor=true
+Color=#0d0300
+ColorAmount=0.025
+ColorEffect=0
+ContrastAmount=0.1
+ContrastEffect=0
+Enable=true
+IntensityAmount=0
+IntensityEffect=0
+
+[WM]
+activeBackground=28,6,1
+activeBlend=57,120,203
+activeForeground=196,194,193
+inactiveBackground=13,3,0
+inactiveBlend=97,21,3
+inactiveForeground=92,77,74

@@ -1,0 +1,8 @@
+adw-gtk-theme-git
+otf-space-grotesk
+qt6-avif-image-plugin
+ttf-readex-pro
+ttf-rubik-vf
+ttf-twemoji
+yay
+python-pywal16

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" fill="none" stroke="currentColor" stroke-width="80" aria-hidden="true">
+  <defs>
+    <linearGradient id="mark-bands" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1200">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="26.316%" stop-color="#ffffff"/>
+      <stop offset="26.316%" stop-color="#d4d4d4"/><stop offset="36.842%" stop-color="#d4d4d4"/>
+      <stop offset="36.842%" stop-color="#a8a8a8"/><stop offset="57.895%" stop-color="#a8a8a8"/>
+      <stop offset="57.895%" stop-color="#737373"/><stop offset="73.684%" stop-color="#737373"/>
+      <stop offset="73.684%" stop-color="#454545"/><stop offset="100%" stop-color="#454545"/>
+    </linearGradient>
+  </defs>
+  <g stroke="url(#mark-bands)">
+    <path d="M640 1160H40V40H1160V1160H720"/>
+    <path d="M600 40V200"/><path d="M640 200H200V1000H1000V200H880"/>
+    <path d="M600 1160V1040"/><path d="M40 600H200"/>
+  </g>
+</svg>

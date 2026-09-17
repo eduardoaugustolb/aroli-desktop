@@ -1,0 +1,18 @@
+# Pacotes opcionais: cada um requer confirmação individual no instalador.
+# Formato: pacote<TAB>motivo
+bibata-cursor-theme	tema de cursor Bibata alternativo
+auto-cpufreq	ajuste automático de energia e CPU (não habilita o serviço)
+cbonsai	animação de bonsai no terminal
+google-chrome	navegador Google Chrome
+pipes.sh	animação de terminal
+pokeshell	animações Pokémon no terminal
+sddm-silent-theme	tema SDDM alternativo
+spicetify-cli	personalização do Spotify
+spotify	cliente Spotify
+timg	visualizador de imagens no terminal
+tty-clock	relógio no terminal
+ufw-docker	integração Docker e UFW
+unimatrix-git	animação Matrix no terminal
+vesktop	cliente Discord alternativo
+visual-studio-code-bin	Visual Studio Code binário
+xdg-desktop-portal-luminous	portal alternativo para captura remota
