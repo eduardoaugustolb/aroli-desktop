@@ -10,6 +10,13 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [1.1.7] - 2026-09-17
+
+### Fixed
+
+- Release asset uploads now remove stale assets before re-uploading, avoiding
+  GitHub's duplicate asset name validation errors.
+
 ## [1.1.6] - 2026-09-17
 
 ### Fixed
