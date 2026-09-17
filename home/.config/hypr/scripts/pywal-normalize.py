@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# pywal-normalize.py — reassigns pywal's chromatic slots by hue.
+# pywal-normalize.py — reassigns pywal's chromatic slots by hue and applies
+# the selected Umbra surface policy.
 #
 # pywal clusters the wallpaper and fills the ANSI slots by lightness/order,
 # with no hue semantics: a small green detail can land in color1 (the red
@@ -30,6 +31,53 @@ import sys
 # Canonical ANSI hue anchors (HLS fractions) for slots color1..color6.
 ANCHORS = (0.0, 1 / 3, 1 / 6, 2 / 3, 5 / 6, 0.5)
 GRAY_SAT = 0.12
+
+# Umbra's stable dark foundation. Wallpaper colour belongs in the accents, not
+# in the surface below every application. These four ANSI slots are the neutral
+# tiers pywal normally derives from the dominant image area.
+UMBRA_SPECIAL = {"background": "#0d0f12", "foreground": "#e7eaf0"}
+UMBRA_SURFACE_SLOTS = {
+    "color0": "#16191f", "color7": "#cbd1dc",
+    "color8": "#68707d", "color15": "#f5f7fb",
+}
+
+
+def surface_mode():
+    """Read the user's persistent setting; missing means Umbra by design."""
+    config = os.path.join(os.path.expanduser("~"), ".config", "quickshell-rice.json")
+    try:
+        with open(config) as f:
+            mode = json.load(f).get("paletteMode", "umbra")
+        return mode if mode in ("umbra", "wallpaper") else "umbra"
+    except Exception:
+        return "umbra"
+
+
+def apply_surface(data, mode):
+    """Keep a raw pywal snapshot, then choose stable or wallpaper surfaces.
+
+    The snapshot makes switching modes reversible without extracting the image
+    again. Accent slots (color1..6 and color9..14) deliberately stay dynamic.
+    """
+    meta = data.setdefault("umbra", {})
+    colors, special = data["colors"], data["special"]
+    if "wallpaper_special" not in meta:
+        meta["wallpaper_special"] = {
+            "background": special.get("background"),
+            "foreground": special.get("foreground"),
+        }
+    if "wallpaper_surface_slots" not in meta:
+        meta["wallpaper_surface_slots"] = {
+            slot: colors.get(slot) for slot in UMBRA_SURFACE_SLOTS
+        }
+
+    if mode == "umbra":
+        special.update(UMBRA_SPECIAL)
+        colors.update(UMBRA_SURFACE_SLOTS)
+    else:
+        special.update({k: v for k, v in meta["wallpaper_special"].items() if v})
+        colors.update({k: v for k, v in meta["wallpaper_surface_slots"].items() if v})
+    meta["surface_mode"] = mode
 
 
 def hls(hex_color):
@@ -81,12 +129,11 @@ def main(argv):
         sys.stderr.write("pywal-normalize: palette missing slot %s\n" % e)
         return 1
     perm, changed = normalize(group)
-    if not changed:
-        print("pywal-normalize: slots already hue-aligned, nothing to do")
-        return 0
-    for slot, idx in enumerate(perm):
-        data["colors"]["color%d" % (slot + 1)] = group[idx]
-        data["colors"]["color%d" % (slot + 9)] = brights[idx]
+    if changed:
+        for slot, idx in enumerate(perm):
+            data["colors"]["color%d" % (slot + 1)] = group[idx]
+            data["colors"]["color%d" % (slot + 9)] = brights[idx]
+    apply_surface(data, surface_mode())
     tmp = src + ".tmp"
     with open(tmp, "w") as f:
         json.dump(data, f, indent="\t")
@@ -94,7 +141,8 @@ def main(argv):
     names = ("red", "green", "yellow", "blue", "magenta", "cyan")
     moves = ["color%d->%s" % (idx + 1, names[slot])
              for slot, idx in enumerate(perm) if slot != idx]
-    print("pywal-normalize: reassigned %s" % ", ".join(moves))
+    detail = ", ".join(moves) if moves else "slots already hue-aligned"
+    print("pywal-normalize: %s; surface=%s" % (detail, data["umbra"]["surface_mode"]))
     return 0
 
 

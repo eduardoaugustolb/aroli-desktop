@@ -3,15 +3,15 @@
 ## Concept
 
 **Threshold** is the crossing between the stable Omarchy base and the
-personal Umbra surface. That is why Noctis does not use a fixed palette as
-its signature: the wallpaper provides the color, while the system provides
-the shape.
+personal Umbra surface. The system provides the dark surface and shape; the
+wallpaper provides the accent colour. This keeps the workspace recognisably
+Umbra even with a bright or strongly coloured image.
 
 ## Visual assets
 
 1. Dark surfaces and negative space to hold the content.
 2. Luminance bands and notch cutouts as recurring structure.
-3. Palette derived from the wallpaper, not from a proprietary hex code.
+3. Accent palette derived from the wallpaper over a stable dark foundation.
 4. Correct branding for the current platform: Omarchy on Omarchy, Arch on
    Arch, and a neutral symbol on other distributions.
 

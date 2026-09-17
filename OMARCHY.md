@@ -18,7 +18,7 @@ Quickshell that runs on top of the stack already provided by Omarchy.
 | Area | Behavior |
 | --- | --- |
 | Shell | Noctis Quickshell notch and panels. |
-| Palette | Pywal extracts colors from the selected wallpaper. |
+| Palette | Pywal extracts wallpaper accents over stable Umbra dark surfaces; Settings › Appearance can restore wallpaper-tinted surfaces. |
 | Language | Shell, Hyprlock, and SDDM in pt-BR. |
 | Cursor | Umbra XCursor, without setting `HYPRCURSOR_THEME`. |
 | Keyboard | ABNT2 (`br`) in Hyprland. |

@@ -46,6 +46,10 @@ Singleton {
     property alias showAppName: opts.showAppName
     property alias showTray: opts.showTray
 
+    // "umbra" keeps dark, neutral application surfaces; "wallpaper" restores
+    // the original pywal behaviour where dominant wallpaper colours tint them.
+    property alias paletteMode: opts.paletteMode
+
     // ───────── launcher ─────────
     // Favorites, by .desktop entry `id` and IN ORDER: position is what
     // the user arranges by dragging, so the list is the data, not a set.
@@ -78,6 +82,13 @@ Singleton {
     ]
 
     function save() { file.writeAdapter(); }
+
+    function applyPalette() {
+        root.save()
+        palette.command = [Quickshell.env("HOME") + "/.config/hypr/scripts/pywal-reapply.sh"]
+        palette.running = true
+    }
+    Process { id: palette }
 
     // Hyprland does not read quickshell-rice.json, so the setting must travel
     // two ways, and BOTH are needed:
@@ -140,11 +151,12 @@ Singleton {
         opts.motionBlur = true; opts.motionBlurSamples = 7;
         opts.windowRounding = 12; opts.windowBorderSize = 0;
         opts.windowGapsIn = 3; opts.windowGapsOut = 6;
+        opts.paletteMode = "umbra";
         root.applyEffects();   // this one does not catch on by itself: it must be pushed to Hyprland
         // favApps and language are NOT touched on purpose: "restore defaults"
         // is about appearance, and neither your favorites nor the language you
         // read the screen in is a default worth resetting.
-        root.save();
+        root.applyPalette();
     }
 
     FileView {
@@ -181,6 +193,7 @@ Singleton {
             property bool showWorkspaces: true
             property bool showAppName: true
             property bool showTray: true
+            property string paletteMode: "umbra"
 
             // Factory-on: one of the few rice things visible
             // without touching anything. The switch is there for the day

@@ -22,7 +22,7 @@ Flickable {
     property string note: I18n.tr("Saved on its own to ~/.config/quickshell-rice.json")
     readonly property int matchCount: cLang.visibleRows + cNotch.visibleRows
         + cBehav.visibleRows + cBar.visibleRows + cFont.visibleRows + cFx.visibleRows
-        + cWin.visibleRows + cWall.visibleRows
+        + cWin.visibleRows + cWall.visibleRows + cPalette.visibleRows
     signal actionRun
     onActionRun: Config.reset()
 
@@ -321,6 +321,24 @@ Flickable {
 
         // ─────────────────── wallpaper ───────────────────
         SettingsControls.Card_ {
+            id: cPalette
+            title: I18n.tr("COLOUR SYSTEM")
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Surface source")
+                hint: I18n.tr("Umbra keeps application backgrounds dark and neutral while the wallpaper supplies accents. Wallpaper also tints backgrounds, matching the original pywal behaviour.")
+                SettingsControls.Choice_ {
+                    options: [I18n.tr("Umbra dark"), I18n.tr("Wallpaper")]
+                    current: Config.paletteMode === "wallpaper" ? I18n.tr("Wallpaper") : I18n.tr("Umbra dark")
+                    onPicked: function (v) {
+                        Config.paletteMode = (v === I18n.tr("Wallpaper")) ? "wallpaper" : "umbra";
+                        Config.applyPalette();
+                    }
+                }
+            }
+        }
+
+        SettingsControls.Card_ {
             id: cWall
             title: I18n.tr("WALLPAPER")
 
@@ -358,6 +376,7 @@ Flickable {
             visible: ShellState.settingsQuery.length > 0
                      && !cLang.visible && !cNotch.visible && !cBehav.visible && !cBar.visible
                      && !cFont.visible && !cFx.visible && !cWin.visible && !cWall.visible
+                     && !cPalette.visible
             text: I18n.tr("No Appearance setting matches “{0}”.", ShellState.settingsQuery)
         }
     }
