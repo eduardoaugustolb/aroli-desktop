@@ -59,6 +59,13 @@ Singleton {
     property alias motionBlur: opts.motionBlur
     property alias motionBlurSamples: opts.motionBlurSamples
 
+    // ───────── janelas ─────────
+    // Raio dos cantos e espessura da borda (Hyprland: decoration:rounding e
+    // general:border_size). A borda já vem tematizada via pywal; com 0, o foco
+    // continua marcado só com luz/sombra.
+    property alias windowRounding: opts.windowRounding
+    property alias windowBorderSize: opts.windowBorderSize
+
     // ───────── tipografía ─────────
     property alias fontUI: opts.fontUI
     property alias clockSize: opts.clockSize
@@ -93,12 +100,14 @@ Singleton {
         id: debounce
         interval: 180
         onTriggered: {
-            const lua = "hl.config({ decoration = { motion_blur = { enabled = "
+            const lua = "hl.config({ general = { border_size = " + opts.windowBorderSize + " }, "
+                      + "decoration = { rounding = " + opts.windowRounding + ", "
+                      + "motion_blur = { enabled = "
                       + (opts.motionBlur ? "true" : "false")
                       + ", samples = " + opts.motionBlurSamples + " } } })";
-            // Los dos valores son un bool y un int del JsonAdapter, nunca texto
-            // libre del usuario, así que estas comillas simples no las puede
-            // romper nadie escribiendo.
+            // Os valores são bool/int do JsonAdapter, nunca texto livre do
+            // usuário, então estas aspas simples ninguém consegue romper
+            // escrevendo.
             fx.command = ["sh", "-c",
                 "hyprctl eval '" + lua + "' >/dev/null 2>&1; "
                 + "printf '%s\\n' "
@@ -126,6 +135,7 @@ Singleton {
         opts.showAppName = true; opts.showTray = true;
         opts.fontUI = "Adwaita Sans"; opts.clockSize = 17;
         opts.motionBlur = true; opts.motionBlurSamples = 7;
+        opts.windowRounding = 12; opts.windowBorderSize = 0;
         root.applyEffects();   // este no se entera solo: hay que empujarlo a Hyprland
         // favApps y language NO se tocan a propósito: "restaurar valores" es
         // para la apariencia, y ni los favoritos ni el idioma en el que lees la
@@ -173,6 +183,11 @@ Singleton {
             // importe más que la estela.
             property bool motionBlur: true
             property int motionBlurSamples: 7
+
+            // Cantos arredondados das janelas (0 = retas). 12 é o padrão: lê-se
+            // como "flutua" sem virar pílula. Borda 0 = foco só com luz/sombra.
+            property int windowRounding: 12
+            property int windowBorderSize: 0
 
             property string fontUI: "Adwaita Sans"
             property int clockSize: 17

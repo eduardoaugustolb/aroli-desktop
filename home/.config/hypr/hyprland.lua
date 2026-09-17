@@ -130,9 +130,10 @@ hl.config({
         gaps_in  = 3,
         gaps_out = 6,
 
-        -- Ley 2 -- sin borde, a proposito: el foco se marca con luz, no con
-        -- contorno. Si algun dia quieres bordes: sube esto a 2 y ya vienen
-        -- tematizados desde pywal (arriba).
+        -- Ley 2 -- sem borda por padrão, a proposito: o foco se marca com luz,
+        -- não com contorno. Ajustes > Aparência > Janelas muda isso em quente
+        -- (efeitos.lua) e a borda já vem tematizada desde pywal (acima).
+        -- 0 = só luz/sombra; 2 = contorno tematizado.
         border_size = 0,
 
         col = {
@@ -146,12 +147,14 @@ hl.config({
     },
 
     decoration = {
-        -- Ley 1 -- la geometria dice de quien es la capa. Las ventanas van
-        -- RECTAS (esto es tuyo y esta anclado a la rejilla); lo redondo es del
-        -- shell y flota por encima. No redondear esto "por coherencia": la
-        -- coherencia la da el movimiento, no la forma.
-        rounding       = 0,
-        rounding_power = 0,  -- irrelevante con rounding = 0, pero se respeta el valor que tenias
+        -- Cantos arredondados das janelas. Padrão 12; Ajustes > Aparência >
+        -- Janelas muda em quente (efeitos.lua, que ganha deste bloco por ser
+        -- carregado por último) e sobrevive a reload/reinício. 0 = retas.
+        -- NOTA motion-blur: com rounding > 0 os dois shaders se excluem dentro
+        -- do Hyprland (USE_ROUNDING && !USE_MOTION_BLUR), então os cantos saem
+        -- retos justo enquanto a janela viaja. É limite do compositor, não bug.
+        rounding       = 12,
+        rounding_power = 2.0,
 
         -- Ley 2 -- el foco se marca con luz. La enfocada esta PLENAMENTE
         -- presente; las demas se hunden. dim_inactive oscurece en vez de
@@ -195,10 +198,9 @@ hl.config({
         -- mientras dura la animacion. Es la misma idea que las curvas de abajo,
         -- pero aplicada al pixel en vez de al tiempo.
         --
-        -- No pelea con el redondeo porque aqui rounding = 0 (ley 1). En un rice
-        -- con esquinas redondas si: los dos shaders se excluyen dentro de
-        -- Hyprland (USE_ROUNDING && !USE_MOTION_BLUR), asi que las esquinas
-        -- saldrian rectas justo mientras la ventana viaja.
+        -- Com rounding > 0 (padrão 12) os dois shaders se excluem dentro do
+        -- Hyprland (USE_ROUNDING && !USE_MOTION_BLUR): os cantos saem retos
+        -- justo enquanto a janela viaja, e voltam ao raio ao pousar.
         --
         -- Tampoco se paga al arrastrar con el raton: animate_mouse_windowdragging
         -- ya esta en false, y sin animacion no hay rastro que calcular. El coste

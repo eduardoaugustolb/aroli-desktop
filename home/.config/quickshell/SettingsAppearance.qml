@@ -22,7 +22,7 @@ Flickable {
     property string note: I18n.tr("Se guarda solo en ~/.config/quickshell-rice.json")
     readonly property int matchCount: cLang.visibleRows + cNotch.visibleRows
         + cBehav.visibleRows + cBar.visibleRows + cFont.visibleRows + cFx.visibleRows
-        + cWall.visibleRows
+        + cWin.visibleRows + cWall.visibleRows
     signal actionRun
     onActionRun: Config.reset()
 
@@ -274,6 +274,32 @@ Flickable {
             }
         }
 
+        // ─────────────────── janelas ───────────────────
+        // Como EFECTOS: isto é do Hyprland, não do shell. Sai também para
+        // ~/.config/hypr/efectos.lua via Config.applyEffects() — ver Config.
+        SettingsControls.Card_ {
+            id: cWin
+            title: I18n.tr("VENTANAS")
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Esquinas redondeadas")
+                hint: I18n.tr("Cuánto se redondean las esquinas de las ventanas. A 0 van rectas. Con redondeo, las esquinas salen rectas mientras la ventana viaja: es un límite de Hyprland, no un fallo.")
+                SettingsControls.Slider_ {
+                    value: Config.windowRounding; from: 0; to: 20; suffix: " px"
+                    onMoved: function (v) { Config.windowRounding = Math.round(v); Config.applyEffects(); }
+                }
+            }
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Borde de la ventana")
+                hint: I18n.tr("Grosor del borde, tematizado con pywal. A 0 el foco se marca solo con luz y sombra.")
+                SettingsControls.Slider_ {
+                    value: Config.windowBorderSize; from: 0; to: 4; suffix: " px"
+                    onMoved: function (v) { Config.windowBorderSize = Math.round(v); Config.applyEffects(); }
+                }
+            }
+        }
+
         // ─────────────────── fondo de pantalla ───────────────────
         SettingsControls.Card_ {
             id: cWall
@@ -311,7 +337,7 @@ Flickable {
             Layout.topMargin: 10
             visible: ShellState.settingsQuery.length > 0
                      && !cLang.visible && !cNotch.visible && !cBehav.visible && !cBar.visible
-                     && !cFont.visible && !cFx.visible && !cWall.visible
+                     && !cFont.visible && !cFx.visible && !cWin.visible && !cWall.visible
             text: I18n.tr("Ningún ajuste de Apariencia coincide con «{0}».", ShellState.settingsQuery)
         }
     }
