@@ -18,8 +18,8 @@ Singleton {
     id: root
 
     // ───────── idioma ─────────
-    // "es" | "en". Lo lee I18n y de ahí cuelga toda la interfaz. El instalador
-    // lo deja escrito según lo que elijas al instalar (./install.sh --lang en).
+    // "pt-BR" | "es" | "en". Lo lee I18n y de ahí cuelga toda la interfaz. El instalador
+    // lo deja escrito según lo que elijas al instalar (./install.sh --lang pt-BR).
     property alias language: opts.language
 
     // ───────── notch ─────────

@@ -76,7 +76,8 @@ ask() {
 
 # The language question. It is not a yes/no, so it cannot go through ask(), but
 # it plays by the same rules: --lang settles it, -y and --dry-run do not ask,
-# and what nobody chooses is the Spanish the desktop has always come up in.
+# and what nobody chooses is what the desktop already speaks (or pt-BR on a
+# fresh install).
 # What the desktop speaks right now. Without this, re-running the installer
 # without --lang silently undid a language picked in Settings: the default was
 # hard-wired to 'es' and set_language_quickshell dutifully wrote it back.
@@ -134,7 +135,7 @@ Options:
   -y, --yes         never ask (for unattended runs)
       --copy        copy the configs instead of symlinking them
       --link        symlink the configs into the repo (default)
-      --lang es|en|pt-BR  what the desktop speaks (default es; it asks if you do not
+      --lang es|en|pt-BR  what the desktop speaks (default pt-BR; it asks if you do not
                     say, and Settings changes it later anyway)
   -h, --help        this
 

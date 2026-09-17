@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Datos pequenos para hyprlock. No dependen del locale global: la sesion usa
-# LC_TIME=C, mientras que el resto de la interfaz presenta las fechas en espanol.
+# LC_TIME=C, mientras que el resto de la interfaz presenta las fechas en el
+# idioma del rice (pt-BR por defecto).
 set -uo pipefail
 
 # El idioma sale del mismo language.conf que carga hyprlock, para que la isla
 # y esta linea no puedan acabar hablando idiomas distintos.
-. "${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/lang.sh" 2>/dev/null || RICE_LANG="${RICE_LANG:-es}"
+. "${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/lang.sh" 2>/dev/null || RICE_LANG="${RICE_LANG:-pt-BR}"
 
 case "${1:-}" in
   date)

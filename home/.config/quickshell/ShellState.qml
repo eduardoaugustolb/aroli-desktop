@@ -21,16 +21,15 @@ Singleton {
     id: root
 
     readonly property string home: Quickshell.env("HOME")
-    // El locale con el que TODO el shell da formato a fechas y números. Tiene
-    // que seguir al idioma: con el shell en inglés, un "miércoles" en el notch
-    // canta tanto como una etiqueta sin traducir.
+    // O locale com o qual TODO o shell formata datas e números. Segue o idioma:
+    // pt-BR -> pt_BR, inglês -> en_GB, resto -> es_ES.
     //
-    // en_GB y no en_US porque el inglés de este repo es el británico del README
-    // ("recoloured", "licence", "centre"), y porque el formato acompaña: en_GB
-    // pone el día antes que el mes (3/9/2026) y la hora en 24 h, igual que el
-    // castellano. Con en_US la fecha se daría la vuelta (9/3/2026) y saldría el
-    // "PM", que aquí no lo usa nadie.
-    readonly property var loc: Qt.locale(I18n.english ? "en_GB" : "es_ES")
+    // en_GB e não en_US porque o inglês deste repo é o britânico do README
+    // ("recoloured", "licence", "centre"), e porque o formato acompanha: en_GB
+    // põe o dia antes do mês (3/9/2026) e a hora em 24 h, igual ao português
+    // e ao castelhano. Com en_US a data viraria (9/3/2026) e apareceria o
+    // "PM", que aqui ninguém usa.
+    readonly property var loc: Qt.locale(I18n.english ? "en_GB" : I18n.portugueseBrazil ? "pt_BR" : "es_ES")
 
     // ═══════════════════════ estado del notch ═══════════════════════
     // El notch es el punto de entrada del escritorio: de él se despliegan

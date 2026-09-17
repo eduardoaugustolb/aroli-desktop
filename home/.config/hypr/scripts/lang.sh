@@ -5,10 +5,10 @@
 #   . "$HOME/.config/hypr/scripts/lang.sh" 2>/dev/null || tr_() { printf '%s' "$1"; }
 #   notify-send "$(tr_ 'Luz nocturna' 'Night light')" "$(tr_ 'Activada' 'On')"
 #
-# El castellano es el original y va SIEMPRE primero; si falta el fichero de
-# idioma, si la linea no esta o si dice cualquier otra cosa, sale el castellano.
-# Ese es el modo de fallo que interesa: texto de mas nunca, texto en blanco
-# jamas.
+# El português do Brasil es el original de este fork y va SIEMPRE como defecto;
+# si falta el fichero de idioma, si la linea no esta o si dice cualquier otra
+# cosa, sale pt-BR. Ese es el modo de fallo que interesa: texto de mas nunca,
+# texto en blanco jamas.
 #
 # La fuente de verdad es ~/.config/hypr/language.conf, la MISMA que carga
 # hyprlock, para que la pantalla de bloqueo y estos avisos no se separen.
@@ -16,7 +16,7 @@
 #   RICE_LANG=en ~/.config/hypr/scripts/hyprsunset-toggle.sh
 
 if [ -z "${RICE_LANG:-}" ]; then
-    RICE_LANG=es
+    RICE_LANG=pt-BR
     _rice_lang_conf="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/language.conf"
     if [ -r "$_rice_lang_conf" ]; then
         # Sin grep ni sed: son dos lineas de fichero y esto lo cargan scripts

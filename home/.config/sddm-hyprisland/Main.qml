@@ -34,8 +34,8 @@ Item {
     // Idioma del login. Sale de theme.conf porque aqui no hay sesion de
     // usuario todavia y no se puede leer el JSON del rice: SDDM corre antes
     // de que exista el $HOME de nadie. Lo escribe el instalador.
-    // Si la clave no esta, castellano, que es lo que habia siempre.
-    readonly property string uiLang:    config.language || "es"
+    // Si la clave no esta, pt-BR, que es el defecto de este fork.
+    readonly property string uiLang:    config.language || "pt-BR"
     readonly property bool english:     uiLang === "en"
     readonly property bool portugueseBrazil: uiLang === "pt-BR"
     readonly property color surface:    Qt.rgba(0, 0, 0, 0.941)   // rgba(000000f0)
