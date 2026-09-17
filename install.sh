@@ -497,7 +497,7 @@ apply_language() {
 # ----------------------------------------------------------------- phase: base
 
 phase_base() {
-    heading "Preflight checks"
+    heading "Preflight checks (Umbra Liminal $(cat "$REPO/VERSION" 2>/dev/null || echo "unversioned"))"
 
     [ "$(id -u)" -ne 0 ] || die "do not run this as root. Run it as your user; it will ask for sudo when it needs to."
     ok "regular user ($USER)"

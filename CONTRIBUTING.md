@@ -120,8 +120,21 @@ Fix stuff                                   # vague, capitalized
 | Path | What lives there |
 | --- | --- |
 | `home/` | Deployed configs, mirrored into `$HOME` by `install.sh` |
+| `home/.local/bin/rice` | Version/update/rollback/prune CLI |
+| `home/.config/systemd/user/rice-update-check.{service,timer}` | Daily release check (idle, oneshot) |
+| `VERSION` / `CHANGELOG.md` | Single source of truth for the version + release history |
 | `install.sh` | Installer (symlink mode by default, `--copy` available) |
 | `diagnose` | Read-only system diagnostics |
 | `packages/` | Package lists (`pacman`, `aur`, `optional-*`) |
 | `docs/` | Migration and identity notes |
 | `LLMS.md` | Operating contract for automations and AI agents |
+
+## 8. Releases
+
+- Bump `VERSION`, add a `CHANGELOG.md` entry, commit, then tag:
+  `git tag -s vX.Y.Z -m "Umbra Liminal vX.Y.Z"` and push the tag.
+  CI checks that the tag matches `VERSION` and that `rice --help`,
+  `diagnose` and the i18n dictionaries still pass.
+- GitHub Releases are cut from the tag with auto-generated notes plus the
+  `CHANGELOG.md` entry. Clients only follow `vX.Y.Z` tags (`rice update`
+  refuses anything else); `main` is never auto-applied.

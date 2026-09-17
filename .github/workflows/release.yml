@@ -1,0 +1,62 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag matches VERSION
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          ver="$(tr -d ' \t\r\n' < VERSION)"
+          [ "$tag" = "$ver" ] || { echo "tag v$tag != VERSION $ver"; exit 1; }
+      - name: Shell syntax
+        run: |
+          bash -n install.sh
+          bash -n diagnose
+          bash -n home/.local/bin/rice
+          bash -n scripts/migrate-from-legacy-rice.sh
+      - name: Installer dry-run plan
+        run: |
+          # install.sh targets Arch; outside Arch only the arg parsing and
+          # preflight are exercised. This still catches quoting/syntax slips.
+          bash install.sh --help >/dev/null
+      - name: i18n dictionaries
+        run: python3 home/.config/quickshell/tools/i18n-check.py
+
+  release:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checksums
+        run: |
+          git archive --format=tar.gz --prefix="umbra-liminal-${GITHUB_REF_NAME}/" \
+            -o "umbra-liminal-${GITHUB_REF_NAME}.tar.gz" "$GITHUB_REF_NAME"
+          sha256sum "umbra-liminal-${GITHUB_REF_NAME}.tar.gz" > SHA256SUMS.txt
+      - name: Extract CHANGELOG entry
+        run: |
+          awk -v tag="[${GITHUB_REF_NAME#v}]" '
+            $0 ~ "^## \\[" { capture = ($0 ~ "^## \\[" tag "\\]") }
+            capture { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          [ -s RELEASE_NOTES.md ] || echo "See CHANGELOG.md for details." > RELEASE_NOTES.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            umbra-liminal-*.tar.gz
+            SHA256SUMS.txt
+          body_path: RELEASE_NOTES.md
+          generate_release_notes: true

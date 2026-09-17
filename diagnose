@@ -653,6 +653,38 @@ else
     systemctl --user --failed --no-legend --no-pager 2>/dev/null | sed 's/^/      /'
 fi
 
+# --------------------------------------------------------------- updates
+
+heading "Rice version and updates"
+
+if [ -f "$REPO/VERSION" ]; then
+    good "Umbra Liminal $(tr -d ' \t\r\n' < "$REPO/VERSION")"
+else
+    eye "no VERSION file in the repo"
+fi
+
+rice_cache="${XDG_CACHE_HOME:-$HOME/.cache}/umbra-liminal/update.json"
+if [ -f "$rice_cache" ]; then
+    rice_remote="$(sed -n 's/^[[:space:]]*"remote"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$rice_cache" | head -1)"
+    rice_avail="$(sed -n 's/^[[:space:]]*"update_available"[[:space:]]*:[[:space:]]*\(true\|false\).*/\1/p' "$rice_cache" | head -1)"
+    if [ "$rice_avail" = true ]; then
+        eye "release $rice_remote is available: rice update --dry-run"
+    elif [ -n "$rice_remote" ]; then
+        good "no newer release known (latest seen: $rice_remote)"
+    fi
+else
+    note "never checked for releases yet: rice check --force"
+fi
+
+if systemctl --user list-unit-files --no-legend rice-update-check.timer 2>/dev/null | grep -q .; then
+    if systemctl --user is-enabled --quiet rice-update-check.timer 2>/dev/null; then
+        good "rice-update-check.timer enabled (daily, idle priority)"
+    else
+        eye "rice-update-check.timer is disabled: release notices stop"
+        note "re-enable:  systemctl --user enable rice-update-check.timer"
+    fi
+fi
+
 # --------------------------------------------------------------- the repo
 
 heading "Repo status"

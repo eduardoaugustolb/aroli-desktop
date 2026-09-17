@@ -1186,6 +1186,30 @@ Singleton {
         pacmanProc.running = true;
     }
 
+    // ═══════════════════════ rice releases ═══════════════════════
+    // Zero-cost by design: this is a FileView (inotify) on the cache file the
+    // systemd timer writes once a day. No Timer, no Process, no network in
+    // QML — the file changes at most once per day, so this wakes up at most
+    // once per day. Opening Settings > About re-reads it explicitly.
+    property string riceLocal: ""
+    property string riceRemote: ""
+    property bool riceUpdate: false
+    FileView {
+        id: riceUpdateFile
+        path: Quickshell.env("HOME") + "/.cache/umbra-liminal/update.json"
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: {
+            try {
+                const d = JSON.parse(text());
+                root.riceLocal = String(d.local || "");
+                root.riceRemote = String(d.remote || "");
+                root.riceUpdate = d.update_available === true;
+            } catch (e) {}
+        }
+    }
+    function riceRefresh() { riceUpdateFile.reload(); }
+
     // ═══════════════════════ notificaciones (servidor propio) ═══════════════════════
     // Sustituye a swaync: su "centro de control" es una ventana GTK suya, no se
     // puede meter dentro del notch. Aquí somos el servidor D-Bus y pintamos
