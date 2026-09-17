@@ -399,7 +399,7 @@ hl.config({
 -- Cursor: hyprcursor APAGADO a proposito (2026-09-06). Al instalar el tema
 -- SVG de Bibata (~/.local/share/icons/Bibata-Modern-Ice, para el nitido del
 -- shake-to-find) Hyprland empezo a usarlo tambien para el cursor NORMAL y
--- Diego lo noto distinto al XCursor bitmap de siempre. Con esto el cursor
+-- Eduardo Augusto lo noto distinto al XCursor bitmap de siempre. Con esto el cursor
 -- normal es el de toda la vida; el agrandado del shake escala ese bitmap con
 -- filtrado suave (hyprcursor:nearest 0, abajo). El plugin usa el mismo
 -- interruptor y tema que el compositor, asi que SVG-en-el-zoom +

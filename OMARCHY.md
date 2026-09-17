@@ -42,8 +42,8 @@ hyprctl configerrors
 Para converter symlinks de uma instalação legada, rode primeiro sem efeitos:
 
 ```sh
-./scripts/migrate-from-diego-rice.sh
-./scripts/migrate-from-diego-rice.sh --apply
+./scripts/migrate-from-legacy-rice.sh
+./scripts/migrate-from-legacy-rice.sh --apply
 ```
 
 Veja [docs/MIGRACAO.md](docs/MIGRACAO.md) e [LLMS.md](LLMS.md).

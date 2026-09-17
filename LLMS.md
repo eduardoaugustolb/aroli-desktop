@@ -33,7 +33,7 @@ precedência sobre conveniência.
 | `packages/optional-*.txt` | Itens opt-in, nunca padrão. |
 | `home/` | Arquivos que serão ligados ou copiados para `$HOME`. |
 | `home/Pictures/wallpapers/` | Wallpapers padrão distribuídos pelo rice. |
-| `scripts/migrate-from-diego-rice.sh` | Migração segura do fork legado. |
+| `scripts/migrate-from-legacy-rice.sh` | Migração segura do fork legado. |
 | `OMARCHY.md` | Contrato de compatibilidade com Omarchy. |
 
 ## Fluxo seguro para instalação
@@ -55,10 +55,10 @@ oficial ou AUR), dependências relevantes e espaço estimado antes de instalar.
 
 ```sh
 # Não altera nada.
-./scripts/migrate-from-diego-rice.sh
+./scripts/migrate-from-legacy-rice.sh
 
 # Só após o usuário aprovar a lista de symlinks.
-./scripts/migrate-from-diego-rice.sh --apply
+./scripts/migrate-from-legacy-rice.sh --apply
 ```
 
 O script mantém o clone legado intacto. Não remova o diretório antigo nem

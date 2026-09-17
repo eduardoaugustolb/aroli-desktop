@@ -1,4 +1,4 @@
-# Quickshell system (diego's rice)
+# Quickshell system (Eduardo Augusto's rice)
 
 > 🇪🇸 [En castellano](README.md)
 
@@ -663,7 +663,7 @@ desktop in a language you cannot read.
 `~/.config/hypr/hyprland.conf` and **puts the comment of each line through
 `I18n.tr(comment)`**. So the Spanish comment in the `.conf` is the dictionary
 key, the list of shortcuts comes out in English and **the Hyprland
-configuration does not have to be touched**: it is diego's, and it stays in
+configuration does not have to be touched**: it is Eduardo Augusto's, and it stays in
 Spanish on purpose.
 
 Those keys never appear as `I18n.tr("literal")` in any `.qml`, so

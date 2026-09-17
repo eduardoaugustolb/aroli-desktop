@@ -1,4 +1,4 @@
-# Sistema Quickshell (rice de diego)
+# Sistema Quickshell (rice de Eduardo Augusto)
 
 > 🇬🇧 [In English](README.en.md)
 
@@ -651,7 +651,7 @@ dejarte el escritorio en un idioma que no lees.
 `~/.config/hypr/hyprland.conf` y **pasa el comentario de cada una por
 `I18n.tr(comment)`**. O sea que el comentario castellano del `.conf` es la clave
 del diccionario, la lista de atajos sale en inglés y **la configuración de
-Hyprland no hay que tocarla**: es de diego y sigue en castellano a propósito.
+Hyprland no hay que tocarla**: es de Eduardo Augusto y sigue en castellano a propósito.
 
 Esas claves no aparecen nunca como `I18n.tr("literal")` en ningún `.qml`, así
 que `tools/i18n-check.py` las recoge aparte leyendo el propio `hyprland.conf`;

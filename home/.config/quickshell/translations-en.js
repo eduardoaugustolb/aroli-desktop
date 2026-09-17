@@ -324,7 +324,7 @@ var en = {
     "Procesador": "Processor",
     "Proporcional, solo para el texto de dentro del notch. Los iconos van siempre en la Nerd Font.": "Proportional, only for the text inside the notch. The icons always use the Nerd Font.",
     "Prueba otra palabra o pulsa Esc para limpiar la búsqueda.": "Try another word, or press Esc to clear the search.",
-    "Quickshell · rice de diego": "Quickshell · diego's rice",
+    "Quickshell · rice de Eduardo Augusto": "Quickshell · Eduardo Augusto's rice",
     "Quiere emparejarse con este equipo": "Wants to pair with this computer",
     "Radio, equipos guardados y descubrimiento": "Radio, saved devices and discovery",
     "recarga Quickshell (barra + notch)": "reloads Quickshell (bar + notch)",

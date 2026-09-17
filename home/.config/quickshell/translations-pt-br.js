@@ -319,7 +319,7 @@ var ptBR = {
     "Procesador": "Processador",
     "Proporcional, solo para el texto de dentro del notch. Los iconos van siempre en la Nerd Font.": "Proporcional, só para o texto dentro do notch. Os ícones usam sempre a Nerd Font.",
     "Prueba otra palabra o pulsa Esc para limpiar la búsqueda.": "Tente outra palavra ou pressione Esc para limpar a busca.",
-    "Quickshell · rice de diego": "Quickshell · rice do diego",
+    "Quickshell · rice de Eduardo Augusto": "Quickshell · rice do Eduardo Augusto",
     "Quiere emparejarse con este equipo": "Quer emparelhar com este computador",
     "Radio, equipos guardados y descubrimiento": "Rádio, redes salvas e descoberta",
     "recarga Quickshell (barra + notch)": "recarrega o Quickshell (barra + notch)",

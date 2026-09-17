@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Migra symlinks do fork Diego para Umbra Liminal.
+# Migra symlinks do fork legado para Umbra Liminal.
 # Sem --apply, apenas mostra o plano.
 set -euo pipefail
 
@@ -8,7 +8,7 @@ source_dir="$HOME/.local/share/diegoMalagrida-dotfiles"
 target_dir="$HOME/.local/share/umbra-liminal"
 
 usage() {
-    printf '%s\n' 'Uso: migrate-from-diego-rice.sh [--apply] [--source CAMINHO] [--target CAMINHO]'
+    printf '%s\n' 'Uso: migrate-from-legacy-rice.sh [--apply] [--source CAMINHO] [--target CAMINHO]'
 }
 
 while [ "$#" -gt 0 ]; do
