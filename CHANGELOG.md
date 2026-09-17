@@ -10,7 +10,7 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
-## [Unreleased]
+## [1.1.0] - 2026-09-17
 
 ### Added
 
@@ -21,6 +21,15 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   background check via systemd user timer (24 h, idle priority, zero
   resident processes), and update badge in the shell (reads a local cache
   file only, no extra polling).
+
+### Changed
+
+- Replaced the numeric first-run menu with a keyboard-driven Bubble Tea v2
+  interface using Charm styling, plugin selection, confirmations, and action
+  feedback.
+- Added Linux amd64 and arm64 CLI release binaries with SHA-256 verification.
+
+## [Unreleased]
 
 ## [1.0.0] - 2026-09-17
 
