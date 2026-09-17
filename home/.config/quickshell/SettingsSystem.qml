@@ -15,7 +15,7 @@ import QtQuick.Layouts
 Flickable {
     id: root
 
-    property string note: I18n.tr("Ajustes del sistema en vivo: no se guardan en el JSON del rice.")
+    property string note: I18n.tr("Live system settings: they are not saved in the rice JSON.")
     readonly property int matchCount: cScreen.visibleRows + cPower.visibleRows
         + cNet.visibleRows + cNotif.visibleRows + cTerm.visibleRows
 
@@ -35,12 +35,12 @@ Flickable {
         // ─────────────────── pantalla ───────────────────
         SettingsControls.Card_ {
             id: cScreen
-            title: I18n.tr("PANTALLA")
+            title: I18n.tr("SCREEN")
 
             SettingsControls.Row_ {
                 shown: ShellState.bright >= 0
-                label: I18n.tr("Brillo")
-                hint: I18n.tr("El mismo brillo que las teclas de función, y con el mismo OSD en el notch.")
+                label: I18n.tr("Brightness")
+                hint: I18n.tr("The same brightness as the function keys, with the same OSD in the notch.")
                 SettingsControls.Slider_ {
                     value: Math.max(0, ShellState.bright); from: 0; to: 100; suffix: " %"
                     onMoved: function (v) { ShellState.setBrightness(v); }
@@ -48,8 +48,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Luz nocturna")
-                hint: I18n.tr("Baja la temperatura de color a 4000 K con hyprsunset. Súper+Shift+N hace lo mismo.")
+                label: I18n.tr("Night light")
+                hint: I18n.tr("Drops the colour temperature to 4000 K with hyprsunset. Super+Shift+N does the same.")
                 SettingsControls.Switch_ {
                     checked: ShellState.nightLight
                     onToggled: ShellState.toggleNightLight()
@@ -57,8 +57,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Modo lectura")
-                hint: I18n.tr("Convierte la pantalla en papel cálido y tinta, añade un grano e-ink estático y pausa animaciones, desenfoque y sombras. Al salir restaura exactamente lo que había antes; no cambia el fondo, pywal ni el brillo.")
+                label: I18n.tr("Reading mode")
+                hint: I18n.tr("Turns the screen into warm paper and ink, adds a static e-ink grain and pauses animations, blur and shadows. On leaving it restores exactly what was there before; it does not change the wallpaper, pywal or the brightness.")
                 SettingsControls.Switch_ {
                     checked: ShellState.readingMode
                     onToggled: function (v) { ShellState.setReadingMode(v); }
@@ -69,7 +69,7 @@ Flickable {
         // ─────────────────── energía ───────────────────
         SettingsControls.Card_ {
             id: cPower
-            title: I18n.tr("ENERGÍA")
+            title: I18n.tr("POWER")
 
             // En una torre no hay /sys/class/power_supply/BAT*, así que `batt`
             // vale -1 y esta fila decía "sin batería" para siempre. Contar algo
@@ -79,25 +79,25 @@ Flickable {
             // vacía porque Cafeína y el resto siguen ahí.
             SettingsControls.Row_ {
                 shown: ShellState.batt >= 0
-                label: I18n.tr("Batería")
-                hint: I18n.tr("Carga actual según el kernel, la misma que enseña el notch.")
+                label: I18n.tr("Battery")
+                hint: I18n.tr("Current charge according to the kernel, the same one the notch shows.")
                 SettingsControls.Val_ {
                     text: I18n.tr("{0} % · {1}", ShellState.batt,
-                                  ShellState.ac ? I18n.tr("cargando") : I18n.tr("con batería"))
+                                  ShellState.ac ? I18n.tr("charging") : I18n.tr("on battery"))
                     color: ShellState.batt < 15 && !ShellState.ac ? Colors.crit : "#b9b9b9"
                 }
             }
 
             SettingsControls.Row_ {
                 shown: ShellState.battHealth >= 0 || ShellState.battCycles >= 0
-                label: I18n.tr("Salud")
-                hint: I18n.tr("Capacidad máxima actual frente a la capacidad de fábrica, según UPower. Los ciclos vienen directamente del contador de la batería.")
+                label: I18n.tr("Health")
+                hint: I18n.tr("Current maximum capacity against the factory capacity, according to UPower. The cycles come straight from the battery's own counter.")
                 SettingsControls.Val_ {
                     text: {
                         const salud = ShellState.battHealth >= 0
-                                    ? ShellState.battHealth.toFixed(0) + " %" : I18n.tr("sin dato");
+                                    ? ShellState.battHealth.toFixed(0) + " %" : I18n.tr("no data");
                         return ShellState.battCycles >= 0
-                             ? I18n.tr("{0} · {1} ciclos", salud, ShellState.battCycles) : salud;
+                             ? I18n.tr("{0} · {1} cycles", salud, ShellState.battCycles) : salud;
                     }
                     color: ShellState.battHealth >= 0 && ShellState.battHealth < 60 ? Colors.crit
                         : ShellState.battHealth >= 0 && ShellState.battHealth < 80 ? Colors.warn : "#b9b9b9"
@@ -106,11 +106,11 @@ Flickable {
 
             SettingsControls.Row_ {
                 shown: ShellState.battFullWh > 0
-                label: I18n.tr("Capacidad")
-                hint: I18n.tr("Energía que admite cargada al máximo frente al diseño original. Se muestra en vatios-hora, no es el porcentaje de carga de ahora.")
+                label: I18n.tr("Capacity")
+                hint: I18n.tr("Energy it holds when fully charged against the original design. Shown in watt-hours; it is not the charge percentage right now.")
                 SettingsControls.Val_ {
                     text: ShellState.battDesignWh > 0
-                        ? I18n.tr("{0} de {1}", ShellState.fmtWh(ShellState.battFullWh),
+                        ? I18n.tr("{0} of {1}", ShellState.fmtWh(ShellState.battFullWh),
                                   ShellState.fmtWh(ShellState.battDesignWh))
                         : ShellState.fmtWh(ShellState.battFullWh)
                 }
@@ -118,8 +118,8 @@ Flickable {
 
             SettingsControls.Row_ {
                 shown: ShellState.batt >= 0
-                label: I18n.tr("Autonomía")
-                hint: I18n.tr("Estimación de UPower según el consumo reciente. Puede tardar unos minutos en estabilizarse después de enchufar, desenchufar o despertar el equipo.")
+                label: I18n.tr("Time left")
+                hint: I18n.tr("UPower's estimate from recent consumption. It can take a few minutes to settle after plugging in, unplugging or waking the machine.")
                 SettingsControls.Val_ {
                     text: ShellState.battEstimateText
                         + (ShellState.battRateW > 0.05 ? " · " + ShellState.battRateW.toFixed(1) + " W" : "")
@@ -127,8 +127,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Cafeína")
-                hint: I18n.tr("Impide que la pantalla se apague y que el equipo se suspenda. Se activa sola al iniciar; apágala desde el notch cuando quieras permitir el reposo.")
+                label: I18n.tr("Caffeine")
+                hint: I18n.tr("Stops the screen going to sleep and the machine suspending. It turns itself on at start-up; switch it off from the notch when you want to allow sleep.")
                 SettingsControls.Switch_ {
                     checked: ShellState.caffeine
                     onToggled: function (v) { ShellState.caffeine = v; }
@@ -136,8 +136,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Modo remoto")
-                hint: I18n.tr("Para conectarte por RustDesk desde fuera: deja el bloqueo de sesión pero quita el apagado de pantalla y la suspensión, que es lo que cortaba la conexión.")
+                label: I18n.tr("Remote mode")
+                hint: I18n.tr("For connecting over RustDesk from outside: it keeps the session lock but drops the screen blanking and the suspend, which is what used to cut the connection.")
                 SettingsControls.Switch_ {
                     checked: ShellState.remoteMode
                     onToggled: ShellState.toggleRemoteMode()
@@ -148,12 +148,12 @@ Flickable {
         // ─────────────────── red ───────────────────
         SettingsControls.Card_ {
             id: cNet
-            title: I18n.tr("RED")
+            title: I18n.tr("NETWORK")
 
             SettingsControls.Row_ {
                 shown: ShellState.hasWifi
                 label: I18n.tr("Wi-Fi")
-                hint: I18n.tr("Enciende o apaga la radio wifi (NetworkManager).")
+                hint: I18n.tr("Turns the wifi radio on or off (NetworkManager).")
                 SettingsControls.Switch_ {
                     checked: ShellState.wifiOn
                     onToggled: function (v) { ShellState.setWifi(v); }
@@ -161,12 +161,12 @@ Flickable {
             }
 
             SettingsControls.Action_ {
-                label: I18n.tr("Redes disponibles")
-                hint: I18n.tr("Abre el selector de redes en el notch. Ajustes se cierra para no taparlo.")
+                label: I18n.tr("Available networks")
+                hint: I18n.tr("Opens the network picker in the notch. Settings closes so it does not cover it.")
                 icon: Icons.wifi
-                value: ShellState.wiredDev ? I18n.tr("cable")
+                value: ShellState.wiredDev ? I18n.tr("wired")
                      : ShellState.wifiNet ? ShellState.wifiNet.name
-                     : (ShellState.wifiOn || !ShellState.hasWifi) ? I18n.tr("sin conexión") : I18n.tr("apagado")
+                     : (ShellState.wifiOn || !ShellState.hasWifi) ? I18n.tr("not connected") : I18n.tr("off")
                 onTriggered: {
                     ShellState.settingsOpen = false;
                     ShellState.togglePanel("network");
@@ -174,10 +174,10 @@ Flickable {
             }
 
             SettingsControls.Action_ {
-                label: I18n.tr("Perfiles de red")
-                hint: I18n.tr("Gestiona perfiles WPA-Enterprise sin enseñar contraseñas en comandos: identidad, método EAP y certificados se guardan mediante NetworkManager.")
+                label: I18n.tr("Network profiles")
+                hint: I18n.tr("Manages WPA-Enterprise profiles without exposing passwords in commands: identity, EAP method and certificates are stored through NetworkManager.")
                 icon: Icons.wifiLock
-                value: I18n.tr("EAP y certificados")
+                value: I18n.tr("EAP and certificates")
                 onTriggered: ShellState.openNetworkProfiles()
             }
         }
@@ -185,11 +185,11 @@ Flickable {
         // ─────────────────── notificaciones ───────────────────
         SettingsControls.Card_ {
             id: cNotif
-            title: I18n.tr("NOTIFICACIONES")
+            title: I18n.tr("NOTIFICATIONS")
 
             SettingsControls.Row_ {
-                label: I18n.tr("No molestar")
-                hint: I18n.tr("Las notificaciones siguen llegando y quedan en el centro de control, pero el notch no las anuncia.")
+                label: I18n.tr("Do not disturb")
+                hint: I18n.tr("Notifications still arrive and stay in the Control Centre, but the notch does not announce them.")
                 SettingsControls.Switch_ {
                     checked: ShellState.dnd
                     onToggled: function (v) { ShellState.dnd = v; }
@@ -197,11 +197,11 @@ Flickable {
             }
 
             SettingsControls.Action_ {
-                label: I18n.tr("Vaciar la bandeja")
-                hint: I18n.tr("Descarta todas las notificaciones guardadas.")
+                label: I18n.tr("Clear all")
+                hint: I18n.tr("Discards every saved notification.")
                 icon: Icons.bell
-                value: ShellState.notifCount === 0 ? I18n.tr("vacía")
-                     : I18n.tr("{0} sin leer", ShellState.notifCount)
+                value: ShellState.notifCount === 0 ? I18n.tr("empty")
+                     : I18n.tr("{0} unread", ShellState.notifCount)
                 onTriggered: ShellState.clearNotifs()
             }
         }
@@ -212,8 +212,8 @@ Flickable {
             title: I18n.tr("TERMINAL")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Pokémon del tema")
-                hint: I18n.tr("El pokémon que sale al abrir la primera terminal se elige entre los que mejor pegan con la paleta del fondo (tema azul → pokémon azules). Apagado sale uno al azar, como antes.")
+                label: I18n.tr("Themed Pokémon")
+                hint: I18n.tr("The pokémon you get when you open the first terminal is picked from the ones that suit the wallpaper's palette best (blue theme → blue pokémon). Off, you get a random one, as before.")
                 SettingsControls.Switch_ {
                     checked: ShellState.pokeTheme
                     onToggled: ShellState.togglePokeTheme()
@@ -226,7 +226,7 @@ Flickable {
             visible: ShellState.settingsQuery.length > 0
                      && !cScreen.visible && !cPower.visible && !cNet.visible
                      && !cNotif.visible && !cTerm.visible
-            text: I18n.tr("Ningún ajuste de Sistema coincide con «{0}».", ShellState.settingsQuery)
+            text: I18n.tr("No System setting matches “{0}”.", ShellState.settingsQuery)
         }
     }
 }

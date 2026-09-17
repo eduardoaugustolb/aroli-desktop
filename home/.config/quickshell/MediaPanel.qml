@@ -1,9 +1,9 @@
-// MediaPanel.qml — reproductor vertical dentro del centro de control (Super+D).
+// MediaPanel.qml — vertical player inside the control center (Super+D).
 //
-// La composición sigue una sola columna: carátula protagonista, título y
-// artista, progreso, controles y el espectro. Así el reproductor no se lee como
-// una tarjeta horizontal encajada en el centro de control, sino como una cara
-// propia dentro del panel expandido.
+// The layout follows a single column: hero cover art, title and
+// artist, progress, controls, and the spectrum. That way the player reads not
+// as a horizontal card wedged into the control center, but as its own face
+// inside the expanded panel.
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
@@ -12,8 +12,8 @@ Item {
     id: root
     readonly property color accent: ShellState.mediaAccent
 
-    // El fondo entero absorbe el clic para que un hueco entre controles no
-    // llegue a ninguna acción que haya detrás del panel.
+    // The whole background swallows clicks so a gap between controls never
+    // reaches any action behind the panel.
     MouseArea { anchors.fill: parent }
 
     ColumnLayout {
@@ -26,15 +26,15 @@ Item {
         }
         spacing: 10
 
-        // ── carátula circular ──────────────────────────────────────────────
+        // ── circular cover art ──────────────────────────────────────────────
         Item {
             id: artStage
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 166
             Layout.preferredHeight: 166
 
-            // Halo muy tenue: da profundidad sin convertir la carátula en una
-            // rueda que gira ni competir con el visualizador de abajo.
+            // Very faint halo: gives depth without turning the cover into a
+            // spinning wheel or competing with the visualizer below.
             Rectangle {
                 anchors.centerIn: parent
                 width: 166; height: 166; radius: 83
@@ -70,9 +70,9 @@ Item {
                 visible: false
             }
 
-            // clip:true recorta a un rectángulo, aunque el padre tenga radius.
-            // MultiEffect usa esta máscara real para que la portada sea un
-            // círculo de verdad como en la referencia.
+            // clip:true crops to a rectangle even when the parent has radius.
+            // MultiEffect uses this real mask so the cover is a true
+            // circle like in the reference.
             Item {
                 id: coverMask
                 width: coverImage.width
@@ -105,7 +105,7 @@ Item {
             }
         }
 
-        // ── tema y artista ────────────────────────────────────────────────
+        // ── title and artist ────────────────────────────────────────────────
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 2
@@ -113,8 +113,8 @@ Item {
             Text {
                 Layout.fillWidth: true
                 text: ShellState.player
-                    ? (ShellState.player.trackTitle || I18n.tr("Sin reproducción"))
-                    : I18n.tr("Sin reproducción")
+                    ? (ShellState.player.trackTitle || I18n.tr("Nothing playing"))
+                    : I18n.tr("Nothing playing")
                 color: "#ffffff"
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.Wrap
@@ -135,7 +135,7 @@ Item {
             }
         }
 
-        // ── progreso: discreto, pero se puede pulsar para buscar ──────────
+        // ── progress: quiet, but clickable to seek ──────────
         Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 25
@@ -185,7 +185,7 @@ Item {
             }
         }
 
-        // ── anterior / pausa / siguiente ─────────────────────────────────
+        // ── previous / pause / next ─────────────────────────────────
         Row {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredHeight: 52
@@ -240,7 +240,7 @@ Item {
             }
         }
 
-        // ── espectro: la "ilustración" viva al pie de la columna ─────────
+        // ── spectrum: the living "illustration" at the column foot ─────────
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true

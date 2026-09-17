@@ -1,9 +1,10 @@
-// NetworkPanel.qml — selector de red, desplegado DESDE el notch.
+// NetworkPanel.qml — network picker, unfolded FROM the notch.
 //
-// Sustituye al menú de rofi (~/.config/rofi/scripts/network-menu.sh). Habla
-// directamente con NetworkManager vía Quickshell.Networking. Solo los perfiles
-// WPA-Enterprise saltan al editor oficial: Quickshell aún no expone identidad,
-// método EAP ni certificados. El escáner solo corre con este panel abierto.
+// Replaces the rofi menu (~/.config/rofi/scripts/network-menu.sh). Talks
+// directly to NetworkManager via Quickshell.Networking. Only WPA-Enterprise
+// profiles jump to the official editor: Quickshell does not yet expose
+// identity, EAP method, or certificates. The scanner only runs with this panel
+// open.
 import Quickshell
 import Quickshell.Networking
 import QtQuick
@@ -14,7 +15,7 @@ Item {
     id: root
 
     readonly property bool active: ShellState.panel === "network"
-    // SSID cuya fila está desplegada pidiendo contraseña
+    // SSID whose row is unfolded asking for a password
     property string askingFor: ""
     property string errorFor: ""
 
@@ -25,10 +26,9 @@ Item {
 
     MouseArea { anchors.fill: parent }
 
-    // Sin esto el panel era una ratonera: la capa coge el teclado en exclusiva
-    // (lo necesita el campo de contraseña) pero no había nada que atendiera las
-    // teclas, así que Escape no cerraba y no se podía escribir en ninguna otra
-    // ventana.
+    // Without this the panel was a mousetrap: the layer grabs the keyboard
+    // exclusively (the password field needs it) but nothing handled keys, so
+    // Escape never closed and nothing could be typed in any other window.
     Item {
         id: keys
         anchors.fill: parent
@@ -48,7 +48,7 @@ Item {
         anchors { fill: parent; leftMargin: 22; rightMargin: 20; topMargin: 20; bottomMargin: 18 }
         spacing: 12
 
-        // ─────────────── cabecera ───────────────
+        // ─────────────── header ───────────────
         RowLayout {
             Layout.fillWidth: true
             spacing: 10
@@ -61,24 +61,24 @@ Item {
             ColumnLayout {
                 spacing: 0
                 Text {
-                    text: I18n.tr("Red")
+                    text: I18n.tr("Network")
                     color: "#ffffff"
                     font.family: Appearance.fontUI; font.pixelSize: 13; font.weight: Font.DemiBold
                 }
                 Text {
-                    // "Wi-Fi apagado" solo cuando hay una radio que ENCENDER.
-                    // En un equipo sin adaptador esa frase invita a buscar el
-                    // interruptor que la arregle, y no existe.
-                    text: ShellState.wiredDev ? I18n.tr("Cable conectado")
+                    // "Wi-Fi off" only when there is a radio to TURN ON.
+                    // On a box with no adapter that sentence invites hunting for
+                    // the switch that fixes it, and none exists.
+                    text: ShellState.wiredDev ? I18n.tr("Cable connected")
                         : ShellState.wifiNet ? ShellState.wifiNet.name
-                        : (ShellState.wifiOn || !ShellState.hasWifi) ? I18n.tr("Sin conexión") : I18n.tr("Wi-Fi apagado")
+                        : (ShellState.wifiOn || !ShellState.hasWifi) ? I18n.tr("Not connected") : I18n.tr("Wi-Fi off")
                     color: "#8a8a8a"
                     font.family: Appearance.fontUI; font.pixelSize: 11
                 }
             }
             Item { Layout.fillWidth: true }
 
-            // interruptor de wifi — solo si hay radio que encender
+            // wifi switch — only with a radio to turn on
             Rectangle {
                 visible: ShellState.hasWifi
                 implicitWidth: 42; implicitHeight: 23
@@ -102,7 +102,7 @@ Item {
 
         Rectangle { Layout.fillWidth: true; height: 1; color: "#1e1e1e" }
 
-        // ─────────────── lista de redes ───────────────
+        // ─────────────── network list ───────────────
         ListView {
             id: list
             Layout.fillWidth: true
@@ -114,7 +114,7 @@ Item {
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded; width: 4 }
 
-            // Enter sobre la red marcada con el teclado
+            // Enter on the keyboard-marked network
             function activateCurrent() {
                 const n = list.model[list.currentIndex];
                 if (!n || n.connected) return;
@@ -185,11 +185,11 @@ Item {
                                 Layout.fillWidth: true
                                 visible: text.length > 0
                                 text: root.errorFor === netRow.ssid
-                                    ? (netRow.enterprise ? I18n.tr("Revisa el perfil empresarial") : I18n.tr("Contraseña incorrecta"))
-                                    : netRow.modelData.stateChanging ? I18n.tr("Conectando…")
-                                    : netRow.modelData.connected ? (netRow.enterprise ? I18n.tr("Conectado · Empresa") : I18n.tr("Conectado"))
-                                    : netRow.modelData.known ? (netRow.enterprise ? I18n.tr("Empresa · Guardada") : I18n.tr("Guardada"))
-                                    : netRow.enterprise ? I18n.tr("Empresa · EAP") : ""
+                                    ? (netRow.enterprise ? I18n.tr("Check the enterprise profile") : I18n.tr("Wrong password"))
+                                    : netRow.modelData.stateChanging ? I18n.tr("Connecting…")
+                                    : netRow.modelData.connected ? (netRow.enterprise ? I18n.tr("Connected · Enterprise") : I18n.tr("Connected"))
+                                    : netRow.modelData.known ? (netRow.enterprise ? I18n.tr("Enterprise · Saved") : I18n.tr("Saved"))
+                                    : netRow.enterprise ? I18n.tr("Enterprise · EAP") : ""
                                 color: root.errorFor === netRow.ssid ? Colors.crit
                                      : netRow.modelData.connected ? Colors.accent : "#7d7d7d"
                                 elide: Text.ElideRight
@@ -204,8 +204,8 @@ Item {
                             font.family: Appearance.font; font.pixelSize: 11
                         }
 
-                        // EAP no cabe de forma segura en un campo de contraseña:
-                        // abre el perfil exacto para identidad, método y CA.
+                        // EAP never fits safely in a password field:
+                        // opens the exact profile for identity, method, and CA.
                         Text {
                             visible: netRow.enterprise
                             text: Icons.edit
@@ -219,7 +219,7 @@ Item {
                             }
                         }
 
-                        // desconectar / olvidar
+                        // disconnect / forget
                         Text {
                             visible: netMa.containsMouse && netRow.modelData.connected
                             text: "󰅖"
@@ -234,7 +234,7 @@ Item {
                         }
                     }
 
-                    // ---- contraseña, desplegada en la propia fila ----
+                    // ---- password, unfolded in the row itself ----
                     RowLayout {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 30
@@ -254,7 +254,7 @@ Item {
                                 id: pskField
                                 anchors { fill: parent; leftMargin: 11; rightMargin: 11 }
                                 echoMode: TextInput.Password
-                                placeholderText: I18n.tr("Contraseña")
+                                placeholderText: I18n.tr("Password")
                                 color: "#ffffff"
                                 placeholderTextColor: "#5e5e5e"
                                 selectionColor: Colors.accent
@@ -277,7 +277,7 @@ Item {
                             Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                             Text {
                                 anchors.centerIn: parent
-                                text: I18n.tr("Conectar")
+                                text: I18n.tr("Connect")
                                 color: okMa.containsMouse ? "#000000" : "#ffffff"
                                 font.family: Appearance.fontUI; font.pixelSize: 11; font.weight: Font.Medium
                             }
@@ -309,8 +309,8 @@ Item {
                     onClicked: {
                         if (netRow.modelData.connected) return;
                         root.errorFor = "";
-                        // Guardada u abierta -> directo; EAP -> editor seguro;
-                        // solo una red PSK nueva despliega un campo de clave.
+                        // Saved or open -> straight in; EAP -> safe editor;
+                        // only a new PSK network unfolds a key field.
                         if (netRow.modelData.known || !netRow.secured) netRow.modelData.connect();
                         else if (netRow.enterprise) ShellState.editEnterprise(netRow.modelData);
                         else root.askingFor = netRow.asking ? "" : netRow.ssid;
@@ -323,10 +323,10 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             visible: !ShellState.wifiOn || ShellState.wifiNetworks.length === 0
-            // Sin adaptador la lista está vacía PARA SIEMPRE, así que decir
-            // "Buscando redes…" sería una espera que no termina nunca.
-            text: !ShellState.hasWifi ? (ShellState.wiredDev ? I18n.tr("Este equipo va por cable") : I18n.tr("Este equipo no tiene Wi-Fi"))
-                : !ShellState.wifiOn ? I18n.tr("Wi-Fi apagado") : I18n.tr("Buscando redes…")
+            // With no adapter the list is empty FOREVER, so saying
+            // "Scanning for networks…" would be a wait that never ends.
+            text: !ShellState.hasWifi ? (ShellState.wiredDev ? I18n.tr("This computer uses a cable") : I18n.tr("This computer has no Wi-Fi"))
+                : !ShellState.wifiOn ? I18n.tr("Wi-Fi off") : I18n.tr("Looking for networks…")
             color: "#5e5e5e"
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter

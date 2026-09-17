@@ -7,7 +7,7 @@ readonly stamp_file="$state_dir/pacman-updates.last-sync"
 readonly lock_file="$state_dir/pacman-updates.lock"
 readonly error_log="$state_dir/pacman-updates.error.log"
 readonly check_db="${CHECKUPDATES_DB:-${TMPDIR:-/tmp}/checkup-db-${UID}}"
-readonly sync_interval=3600  # 1 h: el dato cambia pocas veces al dia; 600 s era ~6x mas agresivo de lo necesario
+readonly sync_interval=3600  # 1 h: data changes rarely; 600 s was about 6x more aggressive than needed
 
 mkdir -p "$state_dir"
 
@@ -22,9 +22,9 @@ sync_description() {
         read -r last_sync < "$stamp_file"
     fi
     if [[ "$last_sync" =~ ^[0-9]+$ ]] && (( last_sync > 0 )); then
-        printf 'repos sincronizados a las %s' "$(date --date="@$last_sync" '+%H:%M')"
+        printf 'repositories synchronized at %s' "$(date --date="@$last_sync" '+%H:%M')"
     else
-        printf 'repos aun no sincronizados'
+        printf 'repositories not synchronized yet'
     fi
 }
 
@@ -59,7 +59,7 @@ run_check() {
 
 exec 9> "$lock_file"
 if ! flock -w 65 9; then
-    emit_json "?" "Otra consulta de actualizaciones sigue en curso" "error"
+    emit_json "?" "Another update check is still in progress" "error"
     exit 0
 fi
 
@@ -69,18 +69,14 @@ case "${1:-}" in
         run_check
         case $check_status in
             0) printf '%s\n' "$updates" ;;
-            2) printf 'Sin actualizaciones\n' ;;
-            *) printf 'No se pudieron consultar las actualizaciones\n' ;;
+            2) printf 'No updates\n' ;;
+            *) printf 'Could not check for updates\n' ;;
         esac
         exit 0
         ;;
     --refresh)
-        # Esto hacia `pkill -RTMIN+8 waybar` para que waybar releyera el modulo.
-        # Ya no hay waybar -- la barra es quickshell -- asi que la senal se la
-        # llevaba el viento y el clic derecho no hacia NADA. Ahora solo
-        # invalidamos la marca de tiempo y NO salimos: seguimos hasta la consulta
-        # de abajo, que al no encontrar marca hara sincronizacion completa y
-        # emitira el JSON nuevo por stdout, que es justo lo que la barra lee.
+        # This used to signal Waybar to reload its module. Quickshell now owns
+        # the bar, so invalidate the timestamp and continue to emit fresh JSON.
         rm -f "$stamp_file"
         ;;
 esac
@@ -89,12 +85,12 @@ run_check
 case $check_status in
     0)
         count=$(awk 'NF { count++ } END { print count + 0 }' <<< "$updates")
-        emit_json "$count" "$count actualizaciones disponibles · $(sync_description)" "updates"
+        emit_json "$count" "$count updates available · $(sync_description)" "updates"
         ;;
     2)
-        emit_json "0" "Sistema actualizado · $(sync_description)" "none"
+        emit_json "0" "System is up to date · $(sync_description)" "none"
         ;;
     *)
-        emit_json "?" "Fallo al consultar · detalles en $error_log" "error"
+        emit_json "?" "Check failed · details in $error_log" "error"
         ;;
 esac

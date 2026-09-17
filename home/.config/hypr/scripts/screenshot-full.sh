@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Captura de pantalla COMPLETA e instantánea con grim.
-# grim no roba el foco → captura también overlays y menús abiertos.
-# Guarda, copia al portapapeles y avisa (el aviso se puede pulsar para editar).
+# Full, instant screenshot with grim.
+# grim does not steal focus, so it also captures overlays and open menus.
+# Saves, copies to the clipboard, and notifies (click the notification to edit).
 set -uo pipefail
 
 dir="$HOME/Pictures/screenshots"
@@ -13,5 +13,5 @@ if grim "$file"; then
     "$HOME/.config/hypr/scripts/notify-shot.sh" "$file" &
 else
     rm -f "$file"
-    notify-send -u critical -a "Captura" "Captura de pantalla" "Error al capturar"
+    notify-send -u critical -a "Screenshot" "Screenshot" "Capture error"
 fi

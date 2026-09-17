@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
-# remote-mode — prepara el portátil para acceso remoto con RustDesk.
+# remote-mode — prepares the laptop for remote access with RustDesk.
 #
-# El problema que resuelve: hypridle apaga la pantalla a los 7 min y suspende
-# el equipo a los 20. Con la pantalla apagada la captura se va a negro, y a un
-# equipo suspendido no te puedes conectar de ninguna manera. Este script cambia
-# la config de hypridle para que ninguna de las dos cosas pase, sin renunciar
-# al bloqueo de sesión.
+# Problem solved: hypridle turns the screen off after 7 minutes and suspends
+# the machine after 20. With the screen off, capture turns black, and it is
+# impossible to connect to a suspended machine. This script changes hypridle's
+# config so neither happens, without giving up session locking.
 #
-#   remote-mode on      antes de irte de casa
-#   remote-mode off     al volver
-#   remote-mode status  para ver cómo está
+#   remote-mode on      before leaving home
+#   remote-mode off     upon returning
+#   remote-mode status  to check its state
 
 set -uo pipefail
 
@@ -18,11 +17,10 @@ CONF="$HYPR_DIR/hypridle.conf"
 NORMAL="$HYPR_DIR/hypridle.d/normal.conf"
 REMOTE="$HYPR_DIR/hypridle.d/remote.conf"
 
-# No hay fichero de marca a proposito: el estado se deduce de QUE config esta
-# puesta en hypridle.conf. Una marca aparte se desincroniza en cuanto un paso
-# falla a medias (paso: apply copiaba la config, el restart fallaba, y el
-# touch de la marca nunca se ejecutaba -> config remota puesta pero estado
-# diciendo "apagado").
+# There is intentionally no marker file: the state is derived from WHICH config
+# is in hypridle.conf. A separate marker gets out of sync as soon as a step
+# partially fails (for example: apply copied the config, restart failed, and
+# the marker touch never ran -> remote config active but state says "off").
 die() { echo "error: $*" >&2; exit 1; }
 
 is_on() { cmp -s "$CONF" "$REMOTE"; }
@@ -37,76 +35,76 @@ on_battery() {
     return 1
 }
 
-apply() {  # $1 = fichero de config a poner en marcha
-    cp -f "$1" "$CONF" || die "no se pudo escribir $CONF"
-    # reset-failed limpia el contador de arranques de systemd. Sin esto, pulsar
-    # el boton varias veces seguidas agota el limite (5 arranques en 10 s),
-    # systemd marca la unidad como failed y hypridle se queda MUERTO: ni bloqueo
-    # de sesion ni gestion de inactividad. Paso de verdad el 2026-08-04.
+apply() {  # $1 = config file to activate
+    cp -f "$1" "$CONF" || die "could not write $CONF"
+    # reset-failed clears systemd's startup counter. Without this, pressing the
+    # button several times reaches the limit (5 starts in 10 s), systemd marks
+    # the unit as failed, and hypridle is left DEAD: no session locking or idle
+    # management. This actually happened on 2026-08-04.
     systemctl --user reset-failed hypridle.service 2>/dev/null
     systemctl --user restart hypridle.service 2>/dev/null
     sleep 1
     if ! systemctl --user is-active --quiet hypridle.service; then
-        # Segundo intento tras limpiar de nuevo, por si se acumularon reinicios.
+        # Try again after clearing it once more in case restarts accumulated.
         systemctl --user reset-failed hypridle.service 2>/dev/null
         sleep 2
         systemctl --user restart hypridle.service 2>/dev/null
         sleep 1
     fi
     systemctl --user is-active --quiet hypridle.service \
-        || die "hypridle NO arranco (config aplicada, pero sin gestion de inactividad): systemctl --user status hypridle"
+        || die "hypridle did NOT start (config applied, but no idle management): systemctl --user status hypridle"
 }
 
 case "${1:-status}" in
 on)
-    [ -f "$REMOTE" ] || die "falta $REMOTE"
+    [ -f "$REMOTE" ] || die "missing $REMOTE"
     apply "$REMOTE"
-    # Sintaxis Lua (Hyprland 0.55+): `dpms on` a secas es error de sintaxis y
-    # hyprctl sale con 7 sin encender nada. Aqui importa mas que en otros
-    # sitios: si entras en modo remoto con la pantalla apagada, DPMS off deja
-    # de componer y la captura de RustDesk se va a negro.
+    # Lua syntax (Hyprland 0.55+): bare `dpms on` is a syntax error and hyprctl
+    # exits with 7 without turning anything on. This matters more here: entering
+    # remote mode with the screen off causes DPMS off to stop compositing and
+    # RustDesk capture to turn black.
     hyprctl dispatch 'hl.dsp.dpms("on")' >/dev/null 2>&1
 
-    # RustDesk tiene que estar corriendo para que haya algo a lo que conectarse.
+    # RustDesk must be running for there to be something to connect to.
     if ! pgrep -x rustdesk >/dev/null 2>&1; then
-        echo "RustDesk no estaba corriendo, lo arranco..."
+        echo "RustDesk was not running, starting it..."
         setsid rustdesk --tray >/dev/null 2>&1 &
         sleep 5
     fi
 
-    echo "MODO REMOTO ACTIVADO"
-    echo "  · no se suspende, no se apaga la pantalla"
-    echo "  · sigue bloqueando a los 6 min (se desbloquea en remoto)"
-    echo "  · RustDesk: $(pgrep -x rustdesk >/dev/null && echo corriendo || echo 'NO CORRE - revisar')"
+    echo "REMOTE MODE ENABLED"
+    echo "  · no suspend, screen stays on"
+    echo "  · still locks after 6 min (unlock remotely)"
+    echo "  · RustDesk: $(pgrep -x rustdesk >/dev/null && echo running || echo 'NOT RUNNING - check it')"
     echo "  · ID: $(timeout 15 rustdesk --get-id 2>/dev/null | tail -1)"
     if on_battery; then
         echo
-        echo "  AVISO: estás con BATERÍA. Sin suspensión se va a gastar y"
-        echo "  cuando se agote perderás el acceso. Déjalo enchufado."
+        echo "  WARNING: running on BATTERY. Without suspend, it will drain and"
+        echo "  you will lose access when it runs out. Keep it plugged in."
     fi
-    notify "Modo remoto ACTIVADO" "Sin suspensión. RustDesk accesible desde fuera."
+    notify "Remote mode ENABLED" "No suspend. RustDesk is accessible remotely."
     ;;
 off)
-    [ -f "$NORMAL" ] || die "falta $NORMAL"
+    [ -f "$NORMAL" ] || die "missing $NORMAL"
     apply "$NORMAL"
-    echo "Modo remoto desactivado: hypridle vuelve a lo de siempre"
-    echo "  (bloqueo 6 min · pantalla 7 min · suspensión 20 min)"
-    notify "Modo remoto desactivado" "Ahorro de energía normal restaurado."
+    echo "Remote mode disabled: hypridle has returned to normal"
+    echo "  (lock 6 min · screen 7 min · suspend 20 min)"
+    notify "Remote mode disabled" "Normal power saving restored."
     ;;
 is-on)
-    # Para el boton de Quickshell: imprime on|off y sale 0 siempre.
+    # For the Quickshell button: prints on|off and always exits 0.
     is_on && echo on || echo off
     ;;
 status)
-    is_on && echo "modo remoto: ACTIVADO" || echo "modo remoto: apagado"
+    is_on && echo "remote mode: ENABLED" || echo "remote mode: disabled"
     echo "hypridle:  $(systemctl --user is-active hypridle.service 2>&1)"
-    echo "rustdesk:  $(pgrep -x rustdesk >/dev/null && echo corriendo || echo parado)"
-    echo "corriente: $(on_battery && echo BATERIA || echo enchufado)"
-    echo "config en uso:"
-    if cmp -s "$CONF" "$REMOTE"; then echo "  remote.conf (sin suspensión)"
-    elif cmp -s "$CONF" "$NORMAL"; then echo "  normal.conf (suspende a los 20 min)"
-    else echo "  ninguna de las dos: $CONF ha sido modificada a mano"; fi
+    echo "rustdesk:  $(pgrep -x rustdesk >/dev/null && echo running || echo stopped)"
+    echo "power: $(on_battery && echo BATTERY || echo plugged in)"
+    echo "active config:"
+    if cmp -s "$CONF" "$REMOTE"; then echo "  remote.conf (no suspend)"
+    elif cmp -s "$CONF" "$NORMAL"; then echo "  normal.conf (suspends after 20 min)"
+    else echo "  neither: $CONF was modified manually"; fi
     ;;
 *)
-    echo "uso: remote-mode {on|off|status|is-on}" >&2; exit 2 ;;
+    echo "usage: remote-mode {on|off|status|is-on}" >&2; exit 2 ;;
 esac

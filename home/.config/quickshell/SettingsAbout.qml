@@ -1,10 +1,10 @@
-// SettingsAbout.qml — información del sistema. Una sola pasada de shell, no un
-// poll: esto no cambia mientras miras la ventana (salvo el uptime, que se
-// refresca al volver a entrar en la sección).
+// SettingsAbout.qml — system information. A single shell pass, not a
+// poll: this does not change while you look at the window (except uptime,
+// which refreshes when you re-enter the section).
 //
-// Cada dato lleva su valor también como `hint`, así que si el texto no cabe en
-// la fila (el nombre del procesador, por ejemplo) sale entero en la franja del
-// pie al pasar por encima.
+// Each datum also carries its value as a `hint`, so if the text does not fit
+// the row (the processor name, say) it shows whole in the footer strip on
+// hover.
 import Quickshell
 import Quickshell.Io
 import QtQuick
@@ -14,7 +14,7 @@ import QtQuick.Layouts
 Flickable {
     id: root
 
-    property string note: I18n.tr("Una sola pasada al entrar en la sección; nada de sondeos en bucle.")
+    property string note: I18n.tr("One single pass when you open the section; no polling loop.")
     readonly property int matchCount: cSw.visibleRows + cHw.visibleRows + cRice.visibleRows
 
     contentHeight: col.implicitHeight + 34
@@ -38,13 +38,13 @@ Flickable {
             printf 'wm\\t%s\\n'     "Hyprland $(hyprctl version 2>/dev/null | head -1 | grep -oP '\\d+\\.\\d+\\.\\d+' | head -1)"
             printf 'shell\\t%s\\n'  "Quickshell $(quickshell --version 2>/dev/null | grep -oP '\\d+\\.\\d+\\.\\d+' | head -1)"
             printf 'cpu\\t%s\\n'    "$(awk -F': ' '/model name/{print $2; exit}' /proc/cpuinfo)"
-            printf 'ram\\t%s\\n'    "$(free -h --si | awk '/^Mem:/{print $3" ${I18n.tr("de")} "$2}')"
-            printf 'disk\\t%s\\n'   "$(df -h --output=used,size,pcent / | tail -1 | awk '{print $1" ${I18n.tr("de")} "$2" ("$3")"}')"
+            printf 'ram\\t%s\\n'    "$(free -h --si | awk '/^Mem:/{print $3" ${I18n.tr("of")} "$2}')"
+            printf 'disk\\t%s\\n'   "$(df -h --output=used,size,pcent / | tail -1 | awk '{print $1" ${I18n.tr("of")} "$2" ("$3")"}')"
             printf 'up\\t%s\\n'     "$(awk '{s=int($1); d=int(s/86400); h=int(s%86400/3600); m=int(s%3600/60);
                                           if(d>0) printf "%d d %d h %d min", d, h, m;
                                           else if(h>0) printf "%d h %d min", h, m;
                                           else printf "%d min", m}' /proc/uptime)"
-            printf 'pkgs\\t%s\\n'   "$(pacman -Qq 2>/dev/null | wc -l) ${I18n.tr("paquetes")}"
+            printf 'pkgs\\t%s\\n'   "$(pacman -Qq 2>/dev/null | wc -l) ${I18n.tr("packages")}"
             printf 'rice\\t%s\\n'   "$("$HOME/.local/bin/rice" version 2>/dev/null || rice version 2>/dev/null || echo "?")"
             printf 'rel\\t%s\\n'    "$(jq -r 'if .update_available then ((.remote // \"?\") + \" (!)\") else (.remote // \"?\") end' ~/.cache/umbra-liminal/update.json 2>/dev/null || echo "?")"
         `]
@@ -62,15 +62,15 @@ Flickable {
 
     readonly property var hw: [
         { k: "kernel", label: I18n.tr("Kernel") },
-        { k: "cpu",    label: I18n.tr("Procesador") },
-        { k: "ram",    label: I18n.tr("Memoria") },
-        { k: "disk",   label: I18n.tr("Disco raíz") },
-        { k: "up",     label: I18n.tr("Encendido desde hace") },
-        { k: "pkgs",   label: I18n.tr("Paquetes instalados") }
+        { k: "cpu",    label: I18n.tr("Processor") },
+        { k: "ram",    label: I18n.tr("Memory") },
+        { k: "disk",   label: I18n.tr("Root disk") },
+        { k: "up",     label: I18n.tr("Uptime") },
+        { k: "pkgs",   label: I18n.tr("Installed packages") }
     ]
 
     readonly property var sw: [
-        { k: "distro", label: I18n.tr("Sistema") },
+        { k: "distro", label: I18n.tr("System") },
         { k: "wm",     label: I18n.tr("Compositor") },
         { k: "shell",  label: I18n.tr("Shell") }
     ]
@@ -82,7 +82,7 @@ Flickable {
         y: 16
         spacing: 10
 
-        // ─────────────────── cabecera con el logo ───────────────────
+        // ─────────────────── header with logo ───────────────────
         RowLayout {
             Layout.fillWidth: true
             Layout.bottomMargin: 4
@@ -138,7 +138,7 @@ Flickable {
 
         SettingsControls.Card_ {
             id: cHw
-            title: I18n.tr("EQUIPO")
+            title: I18n.tr("HARDWARE")
             Repeater {
                 model: root.hw
                 onItemAdded: cHw.recount()
@@ -153,32 +153,32 @@ Flickable {
 
         SettingsControls.Card_ {
             id: cRice
-            title: I18n.tr("ESTE RICE")
+            title: I18n.tr("THIS RICE")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Versión del rice")
+                label: I18n.tr("Rice version")
                 hint: root.info["rice"] || ""
                 SettingsControls.Val_ { text: root.info["rice"] || "…" }
             }
             SettingsControls.Row_ {
-                label: I18n.tr("Última versión vista")
-                hint: I18n.tr("Lo escribe el temporizador diario en ~/.cache/umbra-liminal/update.json. «(!)» = hay actualización: ejecuta «rice update --dry-run» en una terminal.")
+                label: I18n.tr("Latest release seen")
+                hint: I18n.tr("Written by the daily timer in ~/.cache/umbra-liminal/update.json. “(!)” means an update is available: run “rice update --dry-run” in a terminal.")
                 SettingsControls.Val_ { text: root.info["rel"] || "…" }
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Ajustes guardados en")
-                hint: I18n.tr("El JSON que escribe la sección Apariencia. Bórralo y todo vuelve a los valores de fábrica.")
+                label: I18n.tr("Settings saved in")
+                hint: I18n.tr("The JSON the Appearance section writes. Delete it and everything goes back to factory settings.")
                 SettingsControls.Val_ { text: "~/.config/quickshell-rice.json" }
             }
             SettingsControls.Row_ {
-                label: I18n.tr("Código del shell")
-                hint: I18n.tr("Barra, notch, paneles, lanzador, selector de fondos y esta misma ventana.")
+                label: I18n.tr("Shell code")
+                hint: I18n.tr("Bar, notch, panels, launcher, wallpaper picker and this very window.")
                 SettingsControls.Val_ { text: "~/.config/quickshell/" }
             }
             SettingsControls.Row_ {
-                label: I18n.tr("Lenguaje de movimiento")
-                hint: I18n.tr("La spec de duraciones, curvas y forma que siguen Hyprland y Quickshell.")
+                label: I18n.tr("Motion language")
+                hint: I18n.tr("The spec for durations, curves and shape that Hyprland and Quickshell follow.")
                 SettingsControls.Val_ { text: "~/.config/motion-language.md" }
             }
         }
@@ -186,7 +186,7 @@ Flickable {
         SettingsControls.Note_ {
             Layout.topMargin: 10
             visible: ShellState.settingsQuery.length > 0 && !cSw.visible && !cHw.visible && !cRice.visible
-            text: I18n.tr("Nada de Acerca de coincide con «{0}».", ShellState.settingsQuery)
+            text: I18n.tr("Nothing in About matches “{0}”.", ShellState.settingsQuery)
         }
     }
 }

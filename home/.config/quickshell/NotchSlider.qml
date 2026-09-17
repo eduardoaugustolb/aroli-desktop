@@ -1,6 +1,6 @@
-// NotchSlider.qml — slider compacto (icono + barra + %) para el panel del notch.
-// Colores fijos oscuros porque vive dentro del negro del notch; el relleno usa
-// el acento de pywal que le pases.
+// NotchSlider.qml — compact slider (icon + bar + %) for the notch panel.
+// Fixed dark colors because it lives inside the notch black; the fill uses
+// whichever pywal accent you pass in.
 import QtQuick
 import QtQuick.Layouts
 
@@ -12,11 +12,11 @@ RowLayout {
     signal moved(real v)
     signal iconClicked()
 
-    // Se anima el VALOR, no el ancho. El ancho es derivado (carril x fracción):
-    // si lo animas, cualquier cambio de tamaño del contenedor —el notch
-    // expandiéndose al abrir el panel— hace que la barra persiga al carril con
-    // retraso y se vea un rebote raro. Animando el valor, redimensionar es
-    // instantáneo y solo se anima un cambio real de volumen o brillo.
+    // The VALUE is animated, not the width. Width is derived (track x fraction):
+    // animating it means any container resize —the notch expanding as the panel
+    // opens— makes the bar chase the track late with a weird bounce. Animating
+    // the value keeps resizes instant and only real volume/brightness changes
+    // animate.
     property real shown: root.value
     Behavior on shown {
         enabled: !drag.pressed

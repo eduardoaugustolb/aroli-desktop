@@ -1,27 +1,27 @@
-# Pacotes opcionais: cada um requer confirmação individual no instalador.
-# Formato: pacote<TAB>motivo
-arch-wiki-docs	wiki Arch offline completa (~225 MB)
-arch-wiki-lite	wiki Arch offline reduzida
-btop	monitor de recursos alternativo
-cava	visualizador de áudio
-cmatrix	animação de terminal
-discord	cliente Discord oficial
-docker	daemon de containers
-duf	uso de disco no terminal
-dust	analisador de espaço no terminal
-gcc-ada	compilador Ada
-imv	visualizador de imagens alternativo
-java-hamcrest	biblioteca de testes Java
-jdk-openjdk	kit completo de desenvolvimento Java
-junit	framework de testes Java
-onefetch	resumo de repositórios no terminal
-loupe	visualizador gráfico de imagens
-mpv	player multimídia
-nano	editor Nano
-nautilus	gerenciador gráfico de arquivos
-neovim	editor Neovim
-procs	listagem alternativa de processos
-tailscale	VPN mesh
-vim	editor Vim adicional
-vlc	player multimídia alternativo
-yazi	gerenciador de arquivos no terminal
+# Optional packages: each one requires individual confirmation in the installer.
+# Format: package<TAB>reason
+arch-wiki-docs	complete offline Arch wiki (~225 MB)
+arch-wiki-lite	trimmed offline Arch wiki
+btop	alternative resource monitor
+cava	audio visualizer
+cmatrix	terminal animation
+discord	official Discord client
+docker	container daemon
+duf	terminal disk usage
+dust	terminal disk space analyzer
+gcc-ada	Ada compiler
+imv	alternative image viewer
+java-hamcrest	Java testing library
+jdk-openjdk	complete Java development kit
+junit	Java testing framework
+onefetch	terminal repository summary
+loupe	graphical image viewer
+mpv	media player
+nano	Nano editor
+nautilus	graphical file manager
+neovim	Neovim editor
+procs	alternative process listing
+tailscale	mesh VPN
+vim	extra Vim editor
+vlc	alternative media player
+yazi	terminal file manager

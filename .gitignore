@@ -2,9 +2,9 @@
 **/hosts.yml
 **/credentials
 **/credentials.json
-# Las clases de caracteres no son adorno: un .gitignore distingue
-# mayusculas de minusculas, y asi escrito `**/*token*` dejaba pasar
-# API_TOKEN.txt o Secret.json. Comprobado con `git check-ignore -v`.
+# Character classes matter: .gitignore is case-sensitive, and writing
+# `**/*token*` allowed API_TOKEN.txt or Secret.json through. Verified with
+# `git check-ignore -v`.
 **/*[Tt][Oo][Kk][Ee][Nn]*
 **/*[Ss][Ee][Cc][Rr][Ee][Tt]*
 **/*.pem
@@ -60,7 +60,7 @@ home/.agent-memory/
 **/.bash_history
 **/.python_history
 **/*[Hh][Ii][Ss][Tt][Oo][Rr][Yy]*
-# ...menos este, que es codigo del shell y no un historial de nada.
+# ...except this one, which is shell code rather than a history file.
 !home/.config/quickshell/HistoryGraph.qml
 
 home/.cache/
@@ -77,29 +77,30 @@ home/.config/yazi/flavors/pywal.yazi/
 home/.config/systemd/user/*.wants/
 
 home/.config/hypr/hypridle.conf
-# El fichero de idioma VIVO del bloqueo. Se siembra copiando encima
-# language.es.conf o language.en.conf, y esos dos si van versionados.
-# Sin esta linea, './install.sh --lang en' escribia dentro del propio
-# repo -en modo --link, ~/.config/hypr ES el repo- y dejaba git sucio.
+# The ACTIVE lock-screen language file. It is seeded by copying over
+# language.es.conf or language.en.conf, and those two are versioned.
+# Without this line, './install.sh --lang en' wrote inside the repository
+# itself - in --link mode, ~/.config/hypr IS the repository - and dirtied Git.
 home/.config/hypr/language.conf
-# Lo mismo, y por lo mismo: lo escribe el interruptor de Ajustes > Apariencia >
-# Efectos cada vez que lo tocas, y en modo --link eso cae dentro del repo. Los
-# valores por defecto ya viven versionados en hyprland.lua, asi que aqui no se
-# pierde nada: si el fichero falta, manda hyprland.lua.
+# The Settings > Appearance > Effects switch rewrites this file. In --link
+# mode it therefore lives inside the repo. Defaults stay versioned in
+# hyprland.lua, so nothing is lost if this runtime state file is absent.
+home/.config/hypr/effects.lua
+# Pre-en-US name, retained only to keep existing installations clean until the
+# installer migrates it to effects.lua.
 home/.config/hypr/efectos.lua
-# Y lo mismo con las paletas de Qt: las reescribe qt-pywal.py en CADA
-# cambio de fondo (su propia cabecera dice "no editar a mano"). Los
-# qt5ct.conf/qt6ct.conf de al lado si van versionados: son ajustes de
-# verdad -dialogos, tipografia- y de ellos el script solo reescribe las
-# cuatro claves que hacen falta para que la paleta se aplique
+# The same applies to Qt palettes: qt-pywal.py rewrites them on EVERY
+# wallpaper change (its own header says "do not edit manually"). The
+# neighboring qt5ct.conf/qt6ct.conf files are versioned: they contain actual
+# settings - dialogs and typography - and the script rewrites only the four
+# keys required for the palette to apply
 # (color_scheme_path, custom_palette, style e icon_theme).
 home/.config/qt5ct/colors/
 home/.config/qt6ct/colors/
-# kdeglobals, en cambio, SI va versionado aunque el mismo script lo reescriba:
-# ademas de colores lleva las tipografias del escritorio y los ajustes del
-# dialogo de ficheros, que si son parte del rice. El precio es que en modo
-# --link saldra como modificado despues de cada cambio de fondo; lo que hay en
-# el repo es la semilla con la que arranca una instalacion nueva.
+# kdeglobals, on the other hand, IS versioned even though the same script
+# rewrites it: besides colors, it contains desktop typography and file-dialog
+# settings, which are part of the rice. In --link mode it will appear modified
+# after each wallpaper change; the repository version seeds a new installation.
 home/.config/poke-theme/state
 home/.config/spicetify/config-xpui.ini
 

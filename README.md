@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="home/Pictures/wallpapers/umbra-ink-mountains.png" alt="Montanhas em tinta — wallpaper Umbra Liminal" width="100%">
+  <img src="home/Pictures/wallpapers/umbra-ink-mountains.png" alt="Ink mountains — Umbra Liminal wallpaper" width="100%">
 </p>
 
 <p align="center">
@@ -9,145 +9,146 @@
 <h1 align="center">Umbra Liminal</h1>
 
 <p align="center">
-  Um rice para <strong>Omarchy</strong>, Arch Linux, Hyprland e Quickshell.<br>
-  Escuro por natureza. Pessoal por wallpaper. Seu por escolha.
+  A rice for <strong>Omarchy</strong>, Arch Linux, Hyprland, and Quickshell.<br>
+  Dark by nature. Personal by wallpaper. Yours by choice.
 </p>
 
 <p align="center">
-  <a href="#instalação">Instalar</a> ·
-  <a href="#o-limiar">O limiar</a> ·
-  <a href="#privacidade-e-controle">Privacidade</a> ·
+  <a href="#installation">Install</a> ·
+  <a href="#the-threshold">The threshold</a> ·
+  <a href="#privacy-and-control">Privacy</a> ·
   <a href="OMARCHY.md">Omarchy</a> ·
   <a href="LLMS.md">LLMS</a>
 </p>
 
 ---
 
-## O limiar
+## The threshold
 
-**Umbra Liminal** é a camada visual do workspace Umbra para a base estável do
-Omarchy. “Liminal” é o ponto de passagem entre sistema e pessoa: o rice mantém
-a estrutura — notch, superfícies escuras, recortes e bandas de luminância — e
-deixa cada wallpaper determinar a cor do ambiente com Pywal.
+**Umbra Liminal** is the visual layer of the Umbra workspace on top of the
+stable Omarchy base. "Liminal" is the crossing point between system and
+person: the rice keeps the structure — notch, dark surfaces, cutouts, and
+luminance bands — and lets each wallpaper set the mood of the environment
+with Pywal.
 
-Não há uma paleta fixa para decorar o desktop. Há uma linguagem: profundidade,
-espaço negativo e contraste. O resultado muda quando a sua imagem muda, mas
-continua reconhecível como Umbra.
+There is no fixed palette decorating the desktop. There is a language:
+depth, negative space, and contrast. The result changes when your image
+changes, but it is still recognizable as Umbra.
 
-| Base | Superfície Umbra | Sua escolha |
+| Base | Umbra surface | Your choice |
 | --- | --- | --- |
-| Omarchy · Arch · Hyprland | Quickshell, notch e paleta dinâmica | Wallpaper, idioma e opcionais |
+| Omarchy · Arch · Hyprland | Quickshell, notch, and dynamic palette | Wallpaper, language, and optionals |
 
 <p align="center">
-  <img src="home/Pictures/wallpapers/umbra-ember-coast.png" alt="Ember Coast — wallpaper incluído" width="49%">
-  <img src="home/Pictures/wallpapers/umbra-obsidian-dunes.png" alt="Obsidian Dunes — wallpaper incluído" width="49%">
+  <img src="home/Pictures/wallpapers/umbra-ember-coast.png" alt="Ember Coast — bundled wallpaper" width="49%">
+  <img src="home/Pictures/wallpapers/umbra-obsidian-dunes.png" alt="Obsidian Dunes — bundled wallpaper" width="49%">
 </p>
 
-## O que chega com o Liminal
+## What ships with Liminal
 
-- Interface Quickshell completa, com notch, lançador, painéis e visão geral.
-- Tradução da interface em **português do Brasil** e teclado ABNT2.
-- Cursor **Umbra** e identificação visual da plataforma ativa: Omarchy no
-  Omarchy, Arch no Arch.
-- Paleta Pywal extraída do wallpaper atual, aplicada ao shell e às superfícies
-  compatíveis.
-- Quatro wallpapers Umbra instalados junto do rice: Ember Coast, Silent
-  Threshold, Obsidian Dunes e Ink Mountains.
-- Migração assistida para instalações oriundas do fork anterior.
+- Complete Quickshell interface, with notch, launcher, panels, and overview.
+- Interface translation in **Brazilian Portuguese** and ABNT2 keyboard layout.
+- **Umbra** cursor and visual identification of the active platform: Omarchy on
+  Omarchy, Arch on Arch.
+- Pywal palette extracted from the current wallpaper, applied to the shell and
+  compatible surfaces.
+- Four Umbra wallpapers installed with the rice: Ember Coast, Silent
+  Threshold, Obsidian Dunes, and Ink Mountains.
+- Assisted migration for installs coming from the previous fork.
 
 <details>
-<summary><strong>Ver o rice em movimento</strong></summary>
+<summary><strong>See the rice in motion</strong></summary>
 <br>
 
-[Abrir demo em vídeo](https://github.com/user-attachments/assets/2b35a6fb-5a08-4539-99a9-7c525eb463b3)
+[Open video demo](https://github.com/user-attachments/assets/2b35a6fb-5a08-4539-99a9-7c525eb463b3)
 
 </details>
 
-## Instalação
+## Installation
 
 > [!IMPORTANT]
-> Leia o plano antes de escrever no sistema. O modo seco não altera arquivos,
-> não instala pacotes e não pede privilégios.
+> Read the plan before writing to the system. Dry-run mode changes no files,
+> installs no packages, and asks for no privileges.
 
 ```sh
 git clone https://github.com/eduardoaugustolb/umbra-liminal.git
 cd umbra-liminal
 
-# veja exatamente o que aconteceria
+# see exactly what would happen
 ./install.sh --dry-run --lang pt-BR
 
-# instale somente após revisar o plano
+# install only after reviewing the plan
 ./install.sh --lang pt-BR
 ```
 
-Requer **Hyprland 0.56+**. Este rice usa `hyprland.lua`, não
+Requires **Hyprland 0.56+**. This rice uses `hyprland.lua`, not
 `hyprland.conf`.
 
-| Comando | Resultado |
+| Command | Result |
 | --- | --- |
-| `./install.sh --dry-run --lang pt-BR` | Mostra o plano sem mudar nada. |
-| `./install.sh --lang pt-BR` | Instala o rice em português do Brasil. |
-| `./install.sh restore` | Restaura os arquivos anteriores da configuração. |
-| `./diagnose` | Diagnóstico somente leitura. |
-| `rice status` | Versão instalada, último check e ref de rollback. |
-| `rice update --dry-run` | Mostra o plano de atualização sem mudar nada. |
-| `rice prune` | Lista arquivos aposentados pela última release (nada é apagado sem `--apply`). |
+| `./install.sh --dry-run --lang pt-BR` | Shows the plan without changing anything. |
+| `./install.sh --lang pt-BR` | Installs the rice in Brazilian Portuguese. |
+| `./install.sh restore` | Restores the previous configuration files. |
+| `./diagnose` | Read-only diagnostics. |
+| `rice status` | Installed version, last check, and rollback ref. |
+| `rice update --dry-run` | Shows the update plan without changing anything. |
+| `rice prune` | Lists files retired by the latest release (nothing is deleted without `--apply`). |
 
-## Atualizações
+## Updates
 
-O rice segue **tags estáveis** (`vX.Y.Z`, SemVer) — nunca o `main` —
-e avisa sozinho quando sai release no GitHub:
+The rice follows **stable tags** (`vX.Y.Z`, SemVer) — never `main` —
+and notifies you on its own when a release lands on GitHub:
 
-- Um timer diário (`rice-update-check.timer`, prioridade idle, sem
-  processo residente) transfere alguns KB e escreve
-  `~/.cache/umbra-liminal/update.json`. A barra/notch mostra um ponto
-  e `Settings > Sobre` mostra a versão vista.
-- Atualizar é sempre um ato seu: `rice update --dry-run` mostra o plano,
-  `rice update` pede confirmação, registra o ponto de volta e re-roda
-  o instalador. `rice rollback` desfaz. `rice prune --apply` move
-  resíduos para a Lixeira (com backup), nunca apaga direto — e nunca
-  toca em arquivos que você modificou.
-- Desligar o aviso: `systemctl --user disable rice-update-check.timer`.
-  Detalhes e histórico em [CHANGELOG.md](CHANGELOG.md).
+- A daily timer (`rice-update-check.timer`, idle priority, no
+  resident process) transfers a few KB and writes
+  `~/.cache/umbra-liminal/update.json`. The bar/notch shows a dot
+  and `Settings > About` shows the version seen.
+- Updating is always your own act: `rice update --dry-run` shows the plan,
+  `rice update` asks for confirmation, records the rollback point, and re-runs
+  the installer. `rice rollback` undoes it. `rice prune --apply` moves
+  leftovers to the Trash (with backup), never deletes directly — and never
+  touches files you modified.
+- To turn off the notice: `systemctl --user disable rice-update-check.timer`.
+  Details and history in [CHANGELOG.md](CHANGELOG.md).
 
-## Privacidade e controle
+## Privacy and control
 
-O Liminal não decide seu desktop por você.
+Liminal does not decide your desktop for you.
 
-- Aplicativos extras nunca entram como padrão: cada item em
-  `packages/optional-*.txt` requer confirmação individual.
-- Execuções com `--yes`, CI ou sem terminal **não instalam opcionais**.
-- O projeto não adiciona telemetria, analytics ou serviços remotos.
-- O instalador preserva backups das configurações substituídas.
-- O projeto não toca em `/boot`, bootloader ou partições.
+- Extra apps never come by default: each item in
+  `packages/optional-*.txt` requires individual confirmation.
+- Runs with `--yes`, CI, or no terminal **do not install optionals**.
+- The project adds no telemetry, analytics, or remote services.
+- The installer preserves backups of replaced configurations.
+- The project does not touch `/boot`, the bootloader, or partitions.
 
-Para automações e agentes de IA, [LLMS.md](LLMS.md) é o contrato operacional:
-auditar antes de alterar, pedir consentimento para ações materiais e nunca
-coletar ou expor credenciais, tokens, histórico ou perfis pessoais.
+For automations and AI agents, [LLMS.md](LLMS.md) is the operating contract:
+audit before changing, ask for consent for material actions, and never
+collect or expose credentials, tokens, history, or personal profiles.
 
 ## Omarchy-friendly
 
-O Umbra Liminal trabalha sobre o Omarchy, sem substituir sua fundação. Ele não
-edita `/usr/share/omarchy/` e mantém as personalizações nos caminhos de usuário
-apropriados. Consulte [OMARCHY.md](OMARCHY.md) para compatibilidade, limites e
-diagnóstico seguro.
+Umbra Liminal works on top of Omarchy without replacing its foundation. It does
+not edit `/usr/share/omarchy/` and keeps customizations in the appropriate
+user paths. See [OMARCHY.md](OMARCHY.md) for compatibility, limits, and
+safe diagnostics.
 
-## Migrando do rice anterior
+## Migrating from the previous rice
 
-O script primeiro inspeciona os links existentes; só muda algo com `--apply`.
+The script first inspects existing links; it only changes anything with `--apply`.
 
 ```sh
 ./scripts/migrate-from-legacy-rice.sh
 ./scripts/migrate-from-legacy-rice.sh --apply
 ```
 
-Veja o passo a passo e as garantias em [docs/MIGRACAO.md](docs/MIGRACAO.md).
+See the step-by-step walkthrough and guarantees in [docs/MIGRATION.md](docs/MIGRATION.md).
 
 ---
 
 <p align="center">
   <sub>
-    Umbra Liminal · identidade Umbra sobre plataformas abertas<br>
-    Código sob <a href="LICENSE">GPL-3.0</a> · detalhes em <a href="docs/IDENTIDADE.md">Identidade</a>
+    Umbra Liminal · Umbra identity on open platforms<br>
+    Code under <a href="LICENSE">GPL-3.0</a> · details in <a href="docs/IDENTITY.md">Identity</a>
   </sub>
 </p>

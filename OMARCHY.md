@@ -1,35 +1,35 @@
-# Umbra Liminal no Omarchy
+# Umbra Liminal on Omarchy
 
-Umbra Liminal é **Omarchy-friendly**: uma camada Umbra para Arch, Hyprland e
-Quickshell que roda sobre a pilha já fornecida pelo Omarchy.
+Umbra Liminal is **Omarchy-friendly**: an Umbra layer for Arch, Hyprland, and
+Quickshell that runs on top of the stack already provided by Omarchy.
 
-## Regras de compatibilidade
+## Compatibility rules
 
-- Nunca modifique `/usr/share/omarchy/`. O diretório pertence ao pacote e será
-  substituído em atualizações.
-- Mantenha personalizações em `~/.config`, `~/.local/share` e neste clone.
-- Prefira os comandos `omarchy` para operações do sistema: `omarchy update`,
-  `omarchy pkg` e `omarchy theme`.
-- O Liminal inicia seu shell Quickshell depois que `WAYLAND_DISPLAY` está
-  disponível. Um flash curto da barra nativa pode aparecer durante o login.
+- Never modify `/usr/share/omarchy/`. The directory belongs to the package and
+  will be replaced on updates.
+- Keep customizations in `~/.config`, `~/.local/share`, and this clone.
+- Prefer the `omarchy` commands for system operations: `omarchy update`,
+  `omarchy pkg`, and `omarchy theme`.
+- Liminal starts its Quickshell shell after `WAYLAND_DISPLAY` is
+  available. A brief flash of the native bar may appear during login.
 
-## O que o Liminal altera
+## What Liminal changes
 
-| Área | Comportamento |
+| Area | Behavior |
 | --- | --- |
-| Shell | Notch e painéis Quickshell do Liminal. |
-| Paleta | Pywal extrai cores do wallpaper selecionado. |
-| Idioma | Shell, Hyprlock e SDDM em pt-BR. |
-| Cursor | XCursor Umbra, sem definir `HYPRCURSOR_THEME`. |
-| Teclado | ABNT2 (`br`) no Hyprland. |
-| Pacotes opcionais | Cada item exige confirmação individual. |
+| Shell | Liminal Quickshell notch and panels. |
+| Palette | Pywal extracts colors from the selected wallpaper. |
+| Language | Shell, Hyprlock, and SDDM in pt-BR. |
+| Cursor | Umbra XCursor, without setting `HYPRCURSOR_THEME`. |
+| Keyboard | ABNT2 (`br`) in Hyprland. |
+| Optional packages | Each item requires individual confirmation. |
 
-## Componentes preservados
+## Preserved components
 
-O projeto não substitui Hyprland, SDDM, PipeWire, WirePlumber,
-NetworkManager, `xdg-desktop-portal-hyprland` ou o pacote `omarchy`.
+The project does not replace Hyprland, SDDM, PipeWire, WirePlumber,
+NetworkManager, `xdg-desktop-portal-hyprland`, or the `omarchy` package.
 
-## Diagnóstico seguro
+## Safe diagnostics
 
 ```sh
 omarchy debug --no-sudo --print
@@ -37,13 +37,13 @@ hyprctl configerrors
 ./diagnose
 ```
 
-## Migração
+## Migration
 
-Para converter symlinks de uma instalação legada, rode primeiro sem efeitos:
+To convert symlinks from a legacy install, first run with no effects:
 
 ```sh
 ./scripts/migrate-from-legacy-rice.sh
 ./scripts/migrate-from-legacy-rice.sh --apply
 ```
 
-Veja [docs/MIGRACAO.md](docs/MIGRACAO.md) e [LLMS.md](LLMS.md).
+See [docs/MIGRATION.md](docs/MIGRATION.md) and [LLMS.md](LLMS.md).

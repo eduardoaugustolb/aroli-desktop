@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# wall-triage — revisa los fondos uno a uno y aparta los que descartes.
+# wall-triage — reviews wallpapers one by one and sets aside those you discard.
 #
-#   g / espacio  guardar        d  descartar
-#   u            deshacer       q  salir (retoma donde lo dejaste)
+#   g / space  keep             d  discard
+#   u          undo             q  quit (resumes where you left off)
 #
-# No borra nada: los descartados se mueven a ~/Pictures/wallpapers/.descartes/
-# El borrado definitivo lo haces tú despues de repasar esa carpeta.
+# Nothing is deleted: discarded files move to ~/Pictures/wallpapers/.descartes/
+# Delete them permanently only after reviewing that directory.
 
 set -uo pipefail
 
@@ -13,12 +13,12 @@ DIR="${1:-$HOME/Pictures/wallpapers}"
 TRASH="$DIR/.descartes"
 STATE="$HOME/.cache/wall-triage.state"
 
-[[ -d "$DIR" ]] || { echo "no existe el directorio: $DIR"; exit 1; }
+[[ -d "$DIR" ]] || { echo "directory does not exist: $DIR"; exit 1; }
 
 LOG="$HOME/.cache/wall-triage.log"
 : > "$LOG"
 
-# Motor de dibujo: kitty si estamos dentro de kitty, si no timg o chafa.
+# Rendering engine: kitty when running inside kitty, otherwise timg or chafa.
 if [[ -n "${KITTY_WINDOW_ID:-}" ]] && command -v kitten >/dev/null; then
   ENGINE=kitty; ICAT=(kitten icat)
 elif [[ -n "${KITTY_WINDOW_ID:-}" ]] && command -v kitty >/dev/null; then
@@ -28,17 +28,17 @@ elif command -v timg >/dev/null; then
 elif command -v chafa >/dev/null; then
   ENGINE=chafa
 else
-  echo "no encuentro kitty, timg ni chafa para dibujar las imagenes."; exit 1
+  echo "could not find kitty, timg, or chafa to render images."; exit 1
 fi
 
-# El timeout es por si el protocolo grafico no llega (tmux sin passthrough, ssh)
-# y icat se queda esperando respuesta del terminal.
+# The timeout is for cases where the graphics protocol does not arrive (tmux
+# without passthrough, ssh) and icat waits indefinitely for a terminal response.
 #
-# --foreground es OBLIGATORIO: sin el, timeout mete el comando en su propio
-# grupo de procesos, deja de ser el grupo en primer plano del tty, y en cuanto
-# icat intenta leer la respuesta del handshake grafico le llega SIGTTIN y se
-# queda parado. Resultado: pantalla en negro y ninguna imagen.
-draw() {  # draw <fichero> <cols> <filas>
+# --foreground is REQUIRED: without it, timeout puts the command in its own
+# process group, so it is no longer the tty foreground group. As soon as icat
+# tries to read the graphics handshake response, it gets SIGTTIN and stops.
+# Result: black screen and no image.
+draw() {  # draw <file> <cols> <rows>
   case "$ENGINE" in
     kitty) timeout --foreground 5 "${ICAT[@]}" --clear --align center \
              --place "${2}x${3}@0x2" "$1" 2>>"$LOG" ;;
@@ -47,8 +47,8 @@ draw() {  # draw <fichero> <cols> <filas>
   esac
 }
 if [[ ! -t 0 ]]; then
-  echo "Esto necesita una terminal interactiva."
-  echo "Abre una kitty y ejecuta:  wall-triage"
+  echo "This requires an interactive terminal."
+  echo "Open kitty and run:  wall-triage"
   exit 1
 fi
 
@@ -60,7 +60,7 @@ GRN=$'\e[38;5;114m'; RED=$'\e[38;5;203m'; YEL=$'\e[38;5;179m'; CYA=$'\e[38;5;110
 
 cleanup() { printf '\e[?25h\e[2J\e[H'; }
 trap cleanup EXIT
-printf '\e[?25l'   # oculta el cursor
+printf '\e[?25l'   # hides the cursor
 
 mapfile -t ALL < <(find "$DIR" -maxdepth 1 -type f \
   \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) | sort)
@@ -73,8 +73,8 @@ done
 total=${#FILES[@]}
 if (( total == 0 )); then
   cleanup
-  echo "Nada nuevo que revisar en $DIR"
-  echo "${D}(borra $STATE si quieres repasarlos todos otra vez)${R}"
+  echo "Nothing new to review in $DIR"
+  echo "${D}(delete $STATE to review them all again)${R}"
   exit 0
 fi
 
@@ -99,7 +99,7 @@ while (( i < total )); do
   draw "$f" "$cols" "$imgrows"
 
   printf '\e[%d;1H' $(( rows - 1 ))
-  printf ' %sg%s guardar  %sd%s descartar  %su%s deshacer  %sq%s salir   %s│  %d guardados · %d descartados%s' \
+  printf ' %sg%s keep  %sd%s discard  %su%s undo  %sq%s quit   %s│  %d kept · %d discarded%s' \
     "$GRN" "$R" "$RED" "$R" "$YEL" "$R" "$D" "$R" "$D" "$kept" "$dropped" "$R"
 
   IFS= read -rsn1 key </dev/tty || break
@@ -136,14 +136,14 @@ done
 
 cleanup
 n_trash=$(find "$TRASH" -maxdepth 1 -type f | wc -l)
-echo " ${B}Repasadas${R} $((kept + dropped)) de $total   ${GRN}$kept guardadas${R} · ${RED}$dropped descartadas${R}"
+echo " ${B}Reviewed${R} $((kept + dropped)) of $total   ${GRN}$kept kept${R} · ${RED}$dropped discarded${R}"
 if (( i < total )); then
-  echo " ${D}Quedan $(( total - i )) sin ver — vuelve a lanzar wall-triage y sigue donde ibas.${R}"
+  echo " ${D}$(( total - i )) remain unseen - run wall-triage again to resume where you left off.${R}"
 fi
 if (( n_trash > 0 )); then
   echo
-  echo " En ${B}$TRASH${R} hay $n_trash ficheros apartados:"
+  echo " ${B}$TRASH${R} contains $n_trash set-aside files:"
   find "$TRASH" -maxdepth 1 -type f -printf '   %f\n' | sort
   echo
-  echo " ${D}Ya no salen en el picker. Bórralos de esa carpeta cuando los hayas repasado.${R}"
+  echo " ${D}They no longer appear in the picker. Delete them from that directory after reviewing them.${R}"
 fi

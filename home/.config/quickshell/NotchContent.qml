@@ -67,7 +67,7 @@ Item {
                 Text {
                     height: 12
                     verticalAlignment: Text.AlignVCenter
-                    text: ShellState.now.toLocaleDateString(ShellState.loc, I18n.tr("d 'de' MMMM"))
+                    text: ShellState.now.toLocaleDateString(ShellState.loc, I18n.tr("d MMMM"))
                     color: "#7f7f7f"
                     font.family: Appearance.fontUI
                     font.pixelSize: 10
@@ -240,7 +240,7 @@ Item {
                 Text {
                     height: 14
                     verticalAlignment: Text.AlignVCenter
-                    text: ShellState.now.toLocaleDateString(ShellState.loc, I18n.tr("d 'de' MMMM 'de' yyyy"))
+                    text: ShellState.now.toLocaleDateString(ShellState.loc, I18n.tr("d MMMM yyyy"))
                     color: "#8a8a8a"
                     font.family: Appearance.fontUI
                     font.pixelSize: 11
@@ -337,7 +337,7 @@ Item {
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: I18n.tr("Escritorio")
+                text: I18n.tr("Workspace")
                 color: "#8a8a8a"
                 font.family: Appearance.fontUI
                 font.pixelSize: 12
@@ -383,7 +383,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 // "Con batería" y no "Desenchufado": lo que importa no es que
                 // hayas quitado un cable, es de qué estás tirando ahora.
-                text: ShellState.ac ? I18n.tr("Cargando") : I18n.tr("Con batería")
+                text: ShellState.ac ? I18n.tr("Charging") : I18n.tr("On battery")
                 color: "#e6e6e6"
                 font.family: Appearance.fontUI
                 font.pixelSize: 13
@@ -392,7 +392,7 @@ Item {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: ShellState.batt >= 0
-                text: I18n.tr("{0} %", ShellState.batt)
+                text: I18n.tr("{0}%", ShellState.batt)
                 color: chargeLayer.tone
                 font.family: Appearance.fontUI
                 font.pixelSize: 15
@@ -435,7 +435,7 @@ Item {
                     spacing: 0
                     Text {
                         Layout.fillWidth: true
-                        text: ShellState.btName.length > 0 ? ShellState.btName : I18n.tr("Aparato desconocido")
+                        text: ShellState.btName.length > 0 ? ShellState.btName : I18n.tr("Unknown device")
                         color: "#ffffff"
                         elide: Text.ElideRight
                         font.family: Appearance.fontUI
@@ -445,10 +445,10 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         text: ShellState.btKind === "display"
-                                ? I18n.tr("Teclea este código y pulsa Enter")
+                                ? I18n.tr("Type this code and press Enter")
                                 : ShellState.btKind === "authorize"
-                                    ? I18n.tr("Quiere emparejarse con este equipo")
-                                    : I18n.tr("¿Sale este mismo código en el aparato?")
+                                    ? I18n.tr("Wants to pair with this computer")
+                                    : I18n.tr("Does the device show this same code?")
                         color: "#8a8a8a"
                         elide: Text.ElideRight
                         font.family: Appearance.fontUI
@@ -500,7 +500,7 @@ Item {
                 Repeater {
                     model: [
                         { txt: I18n.tr("No"), ico: Icons.no, ok: false },
-                        { txt: I18n.tr("Sí"), ico: Icons.yes, ok: true }
+                        { txt: I18n.tr("Yes"), ico: Icons.yes, ok: true }
                     ]
                     delegate: Rectangle {
                         required property var modelData

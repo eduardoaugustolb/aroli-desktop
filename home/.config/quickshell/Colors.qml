@@ -3,12 +3,12 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 
-// Lee la paleta pywal (~/.cache/wal/colors.json) y se actualiza en vivo
-// cada vez que cambias de fondo (set-wallpaper.sh regenera ese archivo).
+// Reads the pywal palette (~/.cache/wal/colors.json) and refreshes live
+// every time you switch wallpaper (set-wallpaper.sh regenerates that file).
 Singleton {
     id: root
 
-    // Fallbacks (gruvbox-ish) por si aún no hay pywal generado
+    // Fallbacks (gruvbox-ish) in case no pywal has been generated yet
     property color bg:      "#1d2021"
     property color bgAlt:   "#282828"
     property color fg:      "#ebdbb2"
@@ -21,55 +21,54 @@ Singleton {
     property color c4: "#83a598"
     property color c5: "#d3869b"
 
-    // Colores SEMÁNTICOS: fijos a propósito. c1..c5 salen de pywal y cambian con
-    // el fondo (color2 no tiene por qué ser verde), así que no valen para decir
-    // "cargando" o "crítico" — con según qué fondo la batería cargando salía
-    // roja y parecía una alarma.
+    // SEMANTIC colors: fixed on purpose. c1..c5 come from pywal and change with
+    // the wallpaper (color2 does not have to be green), so they cannot say
+    // "charging" or "critical" — with some wallpapers the charging battery came
+    // out red and looked like an alarm.
     readonly property color ok:   "#6dbd7a"
     readonly property color warn: "#e0a458"
     readonly property color crit: "#e05c5c"
 
-    // Ruta del fondo de pantalla actual. Vive aquí y no en Config porque el que
-    // manda es pywal: colors.json trae la ruta del fondo del que salió la paleta,
-    // así que color y fondo NUNCA se pueden desincronizar. Guardarla aparte en el
-    // JSON del rice sería tener dos fuentes de verdad para lo mismo.
-    // La usa el overview para pintar cada escritorio.
+    // Current wallpaper path. Lives here and not in Config because pywal
+    // is in charge: colors.json carries the path of the wallpaper the palette
+    // came from, so color and wallpaper can NEVER desync. Storing it separately
+    // in the rice JSON would mean two sources of truth for the same thing.
+    // The overview uses it to paint each workspace.
     property string wallpaper: ""
 
     // ══════════════════════════════════════════════════════════════════════
-    //  TINTA PARA LO QUE FLOTA SOBRE EL FONDO DE PANTALLA
+    //  INK FOR WHAT FLOATS OVER THE WALLPAPER
     //
-    //  La barra no tiene superficie propia —el velo va a 0 por defecto—, así
-    //  que sus cuerpos se pintan DIRECTAMENTE sobre el wallpaper. Y como
-    //  pywal saca la paleta de ese mismo wallpaper, con un fondo monocromo el
-    //  acento vuelve teñido del mismo tono que el fondo y con una luminosidad
-    //  parecida: se retematiza bien y aun así no se ve.
+    //  The bar has no surface of its own —the veil defaults to 0—, so
+    //  its bodies paint DIRECTLY onto the wallpaper. And since
+    //  pywal derives the palette from that same wallpaper, on a monochrome
+    //  background the accent comes back tinted the same hue as the background
+    //  with similar lightness: it re-themes fine and still cannot be seen.
     //
-    //  Medido sobre el indicador de escritorios con un fondo azul: la píldora
-    //  activa (#366ca3) estaba a 1.6:1 de los puntos inactivos, y los puntos
-    //  —blanco al 50 %— eran LO MÁS CLARO del grupo. O sea, lo apagado
-    //  destacaba más que lo encendido, y encima la píldora salía más oscura
-    //  que trozos del propio fondo.
+    //  Measured on the workspace indicator with a blue wallpaper: the active
+    //  pill (#366ca3) sat at 1.6:1 against the inactive dots, and the dots
+    //  —white at 50%— were the BRIGHTEST thing in the group. That is, the dim
+    //  stood out more than the lit, and on top the pill came out darker
+    //  than chunks of the wallpaper itself.
     //
-    //  Se mide contra `wallStrip`, que es un trozo DE VERDAD del wallpaper
-    //  (ver más abajo), no contra el fondo de pywal. Y se resuelve así:
-    //    · activo   → 3.5:1 contra la franja. Por encima del 3:1 que pide un
-    //      elemento gráfico, porque es EL indicador.
-    //    · inactivo → justo en el PUNTO MEDIO entre la franja y el activo, o
-    //      sea a la raíz del contraste de este (~1.9:1 por cada lado). Un punto
-    //      medio no puede fundirse ni con el fondo ni con la píldora, que son
-    //      las dos maneras de perderse; y como sale de la píldora, la jerarquía
-    //      se cumple sola sin ajustar números a mano.
+    //  Measured against `wallStrip`, which is a REAL slice of the wallpaper
+    //  (see below), not against the pywal background. And resolved like this:
+    //    · active   → 3.5:1 against the strip. Above the 3:1 a graphic
+    //      element asks for, because it IS the indicator.
+    //    · inactive → right at the MIDPOINT between the strip and the active,
+    //      that is at the root of this contrast (~1.9:1 per side). A midpoint
+    //      can blend neither into the background nor into the pill, which are
+    //      the two ways to get lost; and since it derives from the pill, the
+    //      hierarchy holds on its own with no hand-tuned numbers.
     //
-    //  Solo se mueve la LUMINOSIDAD: el tono sigue siendo el de pywal, así que
-    //  el retematizado se conserva entero.
+    //  Only LIGHTNESS moves: the hue stays pywal's, so re-theming is fully kept.
     // ══════════════════════════════════════════════════════════════════════
     readonly property bool darkWall: wallStrip.hslLightness < 0.5
 
     readonly property color onWallAccent: {
         const h = accent.hslHue < 0 ? 0 : accent.hslHue;
-        // Un acento gris es gris: forzarle saturación le inventaría un tono
-        // (con una paleta acromática el indicador salía rojo de la nada).
+        // A gray accent is gray: forcing saturation onto it would invent a hue
+        // (with an achromatic palette the indicator came out red from nowhere).
         const s = accent.hslSaturation < 0.08
             ? accent.hslSaturation : Math.max(accent.hslSaturation, 0.6);
         let l = accent.hslLightness;
@@ -81,11 +80,11 @@ Singleton {
         return out;
     }
 
-    // OPACO a propósito. Con tinta translúcida el color final lo acababa
-    // poniendo el wallpaper: los mismos puntos medían 0.19 o 0.31 de luminancia
-    // según el trozo de fondo que les tocara detrás, así que sobre una zona
-    // clara volvían a fundirse con ella. Un cuerpo opaco se calcula una vez y
-    // se cumple siempre.
+    // OPAQUE on purpose. With translucent ink the wallpaper ended up
+    // setting the final color: the same dots measured 0.19 or 0.31 luminance
+    // depending on which background chunk sat behind them, so over a light
+    // area they blended back into it. An opaque body is computed once and
+    // always holds.
     readonly property color onWallDim: {
         const h = accent.hslHue < 0 ? 0 : accent.hslHue;
         const target = Math.sqrt(contrast(onWallAccent, wallStrip));
@@ -98,10 +97,10 @@ Singleton {
         return out;
     }
 
-    // El color REAL de la franja de arriba del wallpaper, que es lo que hay
-    // DETRÁS de los cuerpos de la barra. Lo muestrea set-wallpaper.sh con
-    // magick; si ese fichero no existe (o magick falló) esto se queda en el
-    // fondo de pywal, que es lo que había antes.
+    // The REAL color of the wallpaper's top strip, which is what sits
+    // BEHIND the bar bodies. set-wallpaper.sh samples it with
+    // magick; if that file is missing (or magick failed) this stays on the
+    // pywal background, which is what there was before.
     property color wallStrip: bg
     FileView {
         id: stripFile
@@ -116,7 +115,7 @@ Singleton {
 
     function _lin(x) { return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }
     function luminance(c) { return 0.2126 * _lin(c.r) + 0.7152 * _lin(c.g) + 0.0722 * _lin(c.b); }
-    // Contraste WCAG entre dos colores opacos, 1:1 (iguales) a 21:1 (negro/blanco).
+    // WCAG contrast between two opaque colors, 1:1 (equal) to 21:1 (black/white).
     function contrast(a, b) {
         const x = luminance(a), y = luminance(b);
         return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
@@ -149,10 +148,10 @@ Singleton {
             root.c3 = _c(c.color3, root.c3);
             root.c4 = _c(c.color4, root.c4);
             root.c5 = _c(c.color5, root.c5);
-            // "file://" explícito: Image lo pide como URL y una ruta suelta se
-            // resolvería relativa al .qml, no a la raíz.
+            // Explicit "file://": Image wants it as a URL and a bare path would
+            // resolve relative to the .qml, not to the root.
             if (j.wallpaper && String(j.wallpaper).length > 0)
                 root.wallpaper = "file://" + j.wallpaper;
-        } catch (e) { /* mantiene fallbacks */ }
+        } catch (e) { /* keeps fallbacks */ }
     }
 }

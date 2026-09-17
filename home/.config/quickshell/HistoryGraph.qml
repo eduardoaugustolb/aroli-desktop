@@ -1,23 +1,22 @@
-// HistoryGraph.qml — curva temporal compacta para métricas floor..ceiling.
-// Canvas se usa aquí a propósito: una serie que cambia cada 1,5 s no merece
-// sesenta Rectangle ni un modelo de delegados. El relleno, el suelo y el punto
-// vivo salen de la misma geometría, así que nunca se separan entre sí.
+// HistoryGraph.qml — compact time curve for floor..ceiling metrics.
+// Canvas is used here on purpose: a series changing every 1.5 s does not
+// deserve sixty Rectangles or a delegate model. Fill, floor, and live dot come
+// from the same geometry, so they never drift apart.
 //
-// ESPECIFICACIÓN DE MARCAS (y no son gustos, son las medidas que hacen que un
-// gráfico se lea tranquilo en vez de gritar):
-//   · trazo de 2 px, con las uniones y los extremos redondos;
-//   · relleno de área al ~10 % del tono — un velo, NUNCA un bloque saturado.
-//     Estaba al 24 % y por eso la banda de memoria parecía un ladrillo: un
-//     relleno grande y opaco es lo que separa un gráfico de un cartel;
-//   · punto final de 8 px de diámetro (r 4) — por debajo de eso no es una
-//     marca, es una mota;
-//   · anillo de 2 px de SUPERFICIE alrededor del punto, para que se lea allí
-//     donde cruza su propia línea. Se hace agujereando (destination-out) en vez
-//     de pintando un borde: un borde es tinta que no es dato, y además aquí no
-//     serviría porque la tarjeta es translúcida y no hay un color de fondo que
-//     copiar;
-//   · rejilla y suelo, filete de 1 px SÓLIDO. Punteados no: el punteado mete
-//     ruido y se lee como «umbral» o «proyección» cuando solo es una rejilla.
+// MARK SPEC (not taste, the measurements that make a chart read calm instead
+// of shouting):
+//   · 2 px stroke, with round joins and caps;
+//   · area fill at ~10% of the hue — a veil, NEVER a saturated block.
+//     It sat at 24% and that is why the memory band looked like a brick: a
+//     big opaque fill is what separates a chart from a poster;
+//   · 8 px end dot (r 4) — below that it is not a mark, it is a speck;
+//   · 2 px SURFACE ring around the dot, so it reads where it crosses its own
+//     line. Done by punching the hole (destination-out) instead of painting a
+//     border: a border is ink that is not data, and here it would not even
+//     work because the card is translucent and there is no background color to
+//     copy;
+//   · grid and floor, SOLID 1 px hairline. No dashes: dashing adds noise and
+//     reads as "threshold" or "projection" when it is only a grid.
 import QtQuick
 
 Canvas {
@@ -34,17 +33,17 @@ Canvas {
     property bool showBaseline: false
     property bool showPoint: true
 
-    // Fracción del ancho por la que la serie se desvanece al entrar (0 = nada).
-    // El extremo izquierdo es el pasado que se está cayendo del historial: si se
-    // corta a hueso, la curva parece amputada contra el borde de la tarjeta y el
-    // ojo va justo ahí. Difuminado, la banda no tiene principio y la mirada se
-    // va sola al lado que importa, que es el de «ahora».
+    // Fraction of the width the series fades in over (0 = none).
+    // The left end is past falling off the history: cut to the bone, the curve
+    // looks amputated against the card edge and the eye goes right there.
+    // Faded, the band has no beginning and the gaze drifts on its own to the
+    // side that matters, the "now" side.
     property real fadeIn: 0
 
-    // Muestra señalada por el puntero, o -1. La cruz la pinta el propio Canvas
-    // porque tiene que caer EXACTAMENTE sobre la muestra: si fuera un Rectangle
-    // colocado desde fuera habría que reproducir aquí el mismo cálculo de
-    // coordenadas, y dos copias de una fórmula acaban separándose.
+    // Sample under the pointer, or -1. The cross is painted by Canvas itself
+    // because it must land EXACTLY on the sample: a Rectangle placed from
+    // outside would have to reproduce the same coordinate math here, and two
+    // copies of one formula end up drifting apart.
     property int markIndex: -1
 
     antialiasing: true
@@ -83,17 +82,17 @@ Canvas {
         ctx.clearRect(0, 0, width, height);
         if (width < 2 || height < 2) return;
 
-        // 7 px de aire arriba y abajo: es el radio del punto vivo (4) más su
-        // anillo (2), o el punto se recorta contra el borde cuando la serie
-        // toca techo o suelo.
+        // 7 px of air top and bottom: the live dot radius (4) plus its
+        // ring (2), or the dot clips against the edge when the series
+        // touches ceiling or floor.
         const top = 7, bottom = height - 7;
         const graphH = Math.max(1, bottom - top);
 
-        // Filete sólido de 1 px, un escalón por encima de la superficie. Lo
-        // tuve punteado un rato porque «competía menos con la curva»; es al
-        // revés: el punteado añade ruido y encima significa otra cosa (umbral,
-        // proyección). Lo que hace que la rejilla no compita es que sea tenue,
-        // no que esté rota.
+        // Solid 1 px hairline, one step above the surface. I had it dashed
+        // for a while because it "competed less with the curve"; it is the
+        // reverse: dashing adds noise and on top means something else
+        // (threshold, projection). What keeps the grid from competing is being
+        // faint, not being broken.
         if (root.showGrid) {
             ctx.lineWidth = 1;
             ctx.strokeStyle = root.gridColor;
@@ -106,8 +105,8 @@ Canvas {
             }
         }
 
-        // El suelo. Sin él el área se corta en el vacío y la carta no tiene
-        // dónde apoyarse; con él la curva descansa sobre algo.
+        // The floor. Without it the area cuts off into the void and the card
+        // has nothing to rest on; with it the curve rests on something.
         if (root.showBaseline) {
             ctx.lineWidth = 1;
             ctx.strokeStyle = root.gridColor;
@@ -129,7 +128,7 @@ Canvas {
             });
         }
 
-        // Área: más tinta junto a la señal, casi transparente contra la base.
+        // Area: more ink next to the signal, nearly transparent against the base.
         const gradient = ctx.createLinearGradient(0, top, 0, bottom);
         gradient.addColorStop(0, root.fillTop);
         gradient.addColorStop(1, root.fillBottom);
@@ -149,10 +148,10 @@ Canvas {
         ctx.strokeStyle = root.lineColor;
         ctx.stroke();
 
-        // Una marca con su anillo: se agujerea (destination-out) el hueco de la
-        // superficie y luego se posa el punto dentro. Antes esto era un halo
-        // del propio tono sobre una mota de r 2,3 — o sea, más tinta de la
-        // serie encima de la serie, que es justo lo que el anillo evita.
+        // One mark with its ring: punch (destination-out) the surface gap
+        // and then set the dot inside. This used to be a halo of the hue
+        // itself over an r 2.3 speck — that is, more series ink on top of the
+        // series, exactly what the ring avoids.
         function dot(x, y) {
             ctx.globalCompositeOperation = "destination-out";
             ctx.beginPath();
@@ -166,8 +165,8 @@ Canvas {
             ctx.fill();
         }
 
-        // La cruz busca la X: se engancha a la muestra más cercana, así que se
-        // apunta a un instante y no a una línea de dos píxeles.
+        // The cross hunts the X: it snaps to the nearest sample, so it points
+        // at an instant and not at a two-pixel line.
         const mi = root.markIndex;
         if (mi >= 0 && mi < pts.length) {
             const m = pts[mi];
@@ -180,19 +179,18 @@ Canvas {
             dot(m.x, m.y);
         }
 
-        // El punto de «ahora». Se aparta 4 px del borde para que su anillo no
-        // se salga del lienzo.
+        // The "now" dot. Kept 4 px off the edge so its ring does not
+        // leave the canvas.
         if (root.showPoint) {
             const p = pts[pts.length - 1];
             dot(p.x - 4, p.y);
         }
 
-        // El desvanecido va AL FINAL y se come todo lo pintado antes (rejilla,
-        // suelo, área y trazo a la vez). Con 'destination-out' el degradado no
-        // añade tinta: quita alfa, así que funciona igual sea cual sea el color
-        // que haya debajo de la tarjeta. Pintar encima un degradado del color
-        // del fondo no valdría: la tarjeta es translúcida y se notaría el
-        // parche.
+        // The fade goes LAST and eats everything painted before (grid,
+        // floor, area, and stroke at once). With 'destination-out' the gradient
+        // adds no ink: it removes alpha, so it works the same whatever color
+        // sits under the card. Painting a background-colored gradient on top
+        // would not do: the card is translucent and the patch would show.
         if (root.fadeIn > 0) {
             const edge = Math.max(1, width * root.fadeIn);
             const mask = ctx.createLinearGradient(0, 0, edge, 0);

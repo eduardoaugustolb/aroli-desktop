@@ -1,7 +1,7 @@
-// MediaControls.qml — reproductor flotante (MPRIS) con carátula, progreso y
-// controles. Toggle por GlobalShortcut "media" (bind en hyprland.conf) o
-// `hyprctl dispatch global quickshell:media`. La carátula aporta el acento y
-// pywal queda como fallback cuando el reproductor no publica ninguna.
+// MediaControls.qml — floating player (MPRIS) with cover art, progress, and
+// controls. Toggled by the "media" GlobalShortcut (bind in hyprland.conf) or
+// `hyprctl dispatch global quickshell:media`. Cover art provides the accent;
+// pywal stays as fallback when the player publishes none.
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -32,7 +32,7 @@ Scope {
 
     PanelWindow {
         id: win
-        // Solo en la pantalla que estas mirando, no siempre en la primera.
+        // Only on the screen you are looking at, not always the first.
         screen: ShellState.focusedScreen
         visible: root.open
         color: "transparent"
@@ -41,8 +41,8 @@ Scope {
         implicitHeight: card.implicitHeight + 40
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
-        // Sin namespace no hay layerrule posible: es el asa por la que
-        // Hyprland anima ESTA superficie y no todas por igual.
+        // Without a namespace no layerrule is possible: it is the handle by
+        // which Hyprland animates THIS surface and not all alike.
         WlrLayershell.namespace: "quickshell:media"
 
         Item {
@@ -73,7 +73,7 @@ Scope {
                     anchors { fill: parent; margins: 16 }
                     spacing: 16
 
-                    // ---- carátula ----
+                    // ---- cover art ----
                     Rectangle {
                         Layout.preferredWidth: 116; Layout.preferredHeight: 116
                         radius: Appearance.radM
@@ -83,7 +83,7 @@ Scope {
                             anchors.fill: parent
                             source: (root.player && root.player.trackArtUrl) ? root.player.trackArtUrl : ""
                             fillMode: Image.PreserveAspectCrop
-                            // Decodifica al tamaño de pintado, no al nativo.
+                            // Decodes at paint size, not native.
                             sourceSize.width: 116
                             visible: status === Image.Ready
                         }
@@ -105,14 +105,14 @@ Scope {
                         }
                     }
 
-                    // ---- info + progreso + controles ----
+                    // ---- info + progress + controls ----
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 4
                         StyledText {
                             Layout.fillWidth: true
-                            text: root.player ? (root.player.trackTitle || I18n.tr("Sin reproducción"))
-                                              : I18n.tr("Sin reproducción")
+                            text: root.player ? (root.player.trackTitle || I18n.tr("Nothing playing"))
+                                              : I18n.tr("Nothing playing")
                             color: Colors.fg; font.pixelSize: Appearance.fsL; font.bold: true
                             elide: Text.ElideRight
                         }
@@ -123,7 +123,7 @@ Scope {
                             elide: Text.ElideRight
                         }
                         Item { Layout.fillHeight: true }
-                        // progreso
+                        // progress
                         Rectangle {
                             id: prog
                             Layout.fillWidth: true; height: 6; radius: 3

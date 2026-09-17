@@ -1,25 +1,17 @@
 #!/usr/bin/env bash
-# Hace que las aplicaciones GTK YA ABIERTAS cojan la paleta nueva, sin cerrarlas.
+# Makes ALREADY OPEN GTK applications adopt the new palette without closing.
 #
-# El problema: ~/.config/gtk-3.0/gtk.css y gtk-4.0/gtk.css no llevan colores,
-# llevan un @import de ~/.cache/wal/colors-gtk.css. Cuando pywal reescribe ese
-# fichero, GTK ni se entera: el import se resolvio una vez, al arrancar la
-# aplicacion. Medido con pavucontrol delante -no se movio ni cambiando la
-# paleta, ni haciendo touch de los dos gtk.css, ni cambiando gtk-theme-name.
+# GTK CSS files import ~/.cache/wal/colors-gtk.css rather than containing
+# colors. GTK resolves that import once at startup and does not notice pywal
+# rewrites it; changing the palette, touching CSS, and changing the theme fail.
 #
-# Lo que si funciona es el portal de apariencia. libadwaita y GTK escuchan
-# org.freedesktop.appearance del portal xdg-desktop-portal, y cuando les llega
-# un cambio de color-scheme reconstruyen su cascada de estilos entera - y al
-# reconstruirla vuelven a leer el gtk.css del usuario, o sea el @import con los
-# colores nuevos. Asi que se les da un tiron del color-scheme y se devuelve
-# enseguida al que estaba. Medido: pavucontrol pasa de #0B1018 a #0D0F11, que
-# son exactamente los dos fondos de pywal.
+# The appearance portal works: libadwaita and GTK rebuild their style cascade
+# after an xdg-desktop-portal color-scheme change, rereading the user CSS import.
+# Toggle the setting briefly, then restore it immediately.
 #
-# El precio son 0,15 s de tema claro en las aplicaciones GTK que esten abiertas
-# (y en Chrome, que tambien escucha el portal). Es el minimo que funciona: por
-# debajo, el portal no llega a propagar los dos cambios. Si algun dia molesta
-# mas de lo que aporta, se quita la llamada de set-wallpaper.sh y las
-# aplicaciones simplemente cogeran el color al abrirse, como antes.
+# The cost is 0.15 s of light theme in open GTK applications (and Chrome). This
+# is the minimum delay that propagates both changes; remove the set-wallpaper
+# call if it ever becomes more distracting than useful.
 set -uo pipefail
 
 ESQUEMA="org.gnome.desktop.interface color-scheme"
@@ -33,8 +25,7 @@ case "$actual" in
   *)           otro=prefer-dark  ;;
 esac
 
-# Pase lo que pase se vuelve al esquema que tenia: dejarlo en claro seria peor
-# que no haber hecho nada.
+# Always restore the original scheme; leaving it light would be worse than no-op.
 restaurar() { gsettings set ${ESQUEMA} "$actual" 2>/dev/null || true; }
 trap restaurar EXIT INT TERM
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Captura de región: congela la pantalla, recorta, guarda y copia.
-# El congelado (capture-region.sh) es lo que permite fotografiar menús, el
-# notch o cualquier cosa que se cierre al perder el foco.
+# Region screenshot: freezes the screen, crops, saves, and copies.
+# Freezing (capture-region.sh) makes it possible to capture menus, the notch,
+# or anything that closes when it loses focus.
 set -uo pipefail
 
 dir="$HOME/Pictures/screenshots"
@@ -10,8 +10,8 @@ file="$dir/screenshot-$(date +%Y%m%d_%H%M%S).png"
 
 if "$HOME/.config/hypr/scripts/capture-region.sh" > "$file" && [ -s "$file" ]; then
     wl-copy < "$file"
-    # Al fondo: la notificación se queda esperando por si pulsas "Editar".
+    # In the background: the notification waits in case you click "Edit".
     "$HOME/.config/hypr/scripts/notify-shot.sh" "$file" &
 else
-    rm -f "$file"   # cancelada: no dejes un PNG de 0 bytes en Pictures
+    rm -f "$file"   # Canceled: do not leave a zero-byte PNG in Pictures.
 fi

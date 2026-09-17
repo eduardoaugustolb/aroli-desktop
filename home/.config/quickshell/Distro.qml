@@ -4,8 +4,8 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 
-// Identifica a distribuição sem supor que todo uso deste rice é Arch puro.
-// A marca do Omarchy é um SVG próprio; as demais usam glifos da Nerd Font.
+// Detects the distro without assuming every use of this rice is pure Arch.
+// The Omarchy mark is its own SVG; the rest use Nerd Font glyphs.
 Singleton {
     id: root
 

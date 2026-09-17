@@ -1,11 +1,11 @@
-// SettingsAppearance.qml — lo que hasta ahora había que tocar editando QML.
-// Todo escribe en Config.qml y se guarda solo en ~/.config/quickshell-rice.json;
-// la barra y el notch reaccionan en vivo mientras mueves los sliders.
+// SettingsAppearance.qml — what used to require editing QML by hand.
+// Everything writes to Config.qml and saves itself to
+// ~/.config/quickshell-rice.json; the bar and notch react live as you drag
+// the sliders.
 //
-// Las descripciones NO se pintan aquí: van en `hint` y la ventana las enseña en
-// la franja del pie cuando pasas el ratón por encima (ver SettingsControls.qml).
-// El botón "Restablecer" tampoco: lo pinta la cabecera fija de la ventana a
-// partir de `actionText`.
+// Descriptions are NOT painted here: they go in `hint` and the window shows
+// them in the footer strip on hover (see SettingsControls.qml). Neither is the
+// "Reset" button: the window's fixed header paints it from `actionText`.
 import Quickshell
 import Quickshell.Hyprland
 import QtQuick
@@ -15,11 +15,11 @@ import QtQuick.Layouts
 Flickable {
     id: root
 
-    // contrato con SettingsWindow: botón de la cabecera y texto por defecto del pie
-    property string actionText: I18n.tr("Restablecer")
+    // contract with SettingsWindow: header button and default footer text
+    property string actionText: I18n.tr("Reset")
     property bool actionDanger: true
     property bool actionConfirm: true
-    property string note: I18n.tr("Se guarda solo en ~/.config/quickshell-rice.json")
+    property string note: I18n.tr("Saved on its own to ~/.config/quickshell-rice.json")
     readonly property int matchCount: cLang.visibleRows + cNotch.visibleRows
         + cBehav.visibleRows + cBar.visibleRows + cFont.visibleRows + cFx.visibleRows
         + cWin.visibleRows + cWall.visibleRows
@@ -30,7 +30,7 @@ Flickable {
     clip: true
     boundsBehavior: Flickable.StopAtBounds
     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded; width: 5 }
-    // volver a una sección con el scroll a medias es desorientador
+    // returning to a section with the scroll halfway is disorienting
     onVisibleChanged: if (visible) contentY = 0
 
     ColumnLayout {
@@ -40,17 +40,18 @@ Flickable {
         y: 16
         spacing: 10
 
-        // ─────────────────── idioma ───────────────────
-        // Va primero porque es lo único de esta página que cambia el resto de
-        // la página. Los dos rótulos van cada uno en su idioma a propósito: si
-        // abres el shell en un idioma que no lees, "English" se reconoce.
+        // ─────────────────── language ───────────────────
+        // Goes first because it is the only thing on this page changing the
+        // rest of the page. Both labels each go in their own language on
+        // purpose: opening the shell in a language you cannot read, "English"
+        // still registers.
         SettingsControls.Card_ {
             id: cLang
-            title: I18n.tr("IDIOMA")
+            title: I18n.tr("LANGUAGE")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Idioma del shell")
-                hint: I18n.tr("Cambia la barra, el notch, los paneles y esta ventana. No toca el idioma del sistema ni el de las aplicaciones: es solo el shell. El cambio es inmediato, no hay que reiniciar nada.")
+                label: I18n.tr("Shell language")
+                hint: I18n.tr("Changes the bar, the notch, the panels and this window. It does not touch the system language or the applications': it is only the shell. The change is immediate, nothing needs restarting.")
                 SettingsControls.Choice_ {
                     options: I18n.labels
                     current: I18n.labelFor(Config.language)
@@ -59,35 +60,35 @@ Flickable {
             }
         }
 
-        // ─────────────────── forma del notch ───────────────────
+        // ─────────────────── notch shape ───────────────────
         SettingsControls.Card_ {
             id: cNotch
             title: I18n.tr("NOTCH")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Estilo")
-                hint: I18n.tr("Notch: pegado al borde con las esquinas invertidas del MacBook. Isla: píldora flotante, redonda por los cuatro lados, como el Dynamic Island.")
+                label: I18n.tr("Style")
+                hint: I18n.tr("Notch: flush with the edge, with the MacBook's inverted corners. Island: a floating pill, rounded on all four sides, like the Dynamic Island.")
                 SettingsControls.Choice_ {
-                    // Se traduce el rótulo, nunca el valor que va al JSON.
-                    options: ["Notch", I18n.tr("Isla")]
-                    current: Config.notchStyle === "island" ? I18n.tr("Isla") : "Notch"
-                    onPicked: function (v) { Config.notchStyle = (v === I18n.tr("Isla") ? "island" : "notch"); }
+                    // The label is translated, never the value going to JSON.
+                    options: ["Notch", I18n.tr("Island")]
+                    current: Config.notchStyle === "island" ? I18n.tr("Island") : "Notch"
+                    onPicked: function (v) { Config.notchStyle = (v === I18n.tr("Island") ? "island" : "notch"); }
                 }
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Color")
-                hint: I18n.tr("El negro puro es el que imita al MacBook; el del tema sigue a pywal.")
+                label: I18n.tr("Colour")
+                hint: I18n.tr("Pure black is the one that mimics the MacBook; the theme colour follows pywal.")
                 SettingsControls.Choice_ {
-                    options: [I18n.tr("Negro"), I18n.tr("Tema")]
-                    current: Config.notchColor.toString().toLowerCase() === "#000000" ? I18n.tr("Negro") : I18n.tr("Tema")
-                    onPicked: function (v) { Config.notchColor = (v === I18n.tr("Negro") ? "#000000" : Colors.bg.toString()); }
+                    options: [I18n.tr("Black"), I18n.tr("Theme")]
+                    current: Config.notchColor.toString().toLowerCase() === "#000000" ? I18n.tr("Black") : I18n.tr("Theme")
+                    onPicked: function (v) { Config.notchColor = (v === I18n.tr("Black") ? "#000000" : Colors.bg.toString()); }
                 }
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Alto de la banda")
-                hint: I18n.tr("También es el alto del notch en reposo, y el espacio que se reserva arriba.")
+                label: I18n.tr("Band height")
+                hint: I18n.tr("Also the height of the notch at rest, and the space reserved at the top.")
                 SettingsControls.Slider_ {
                     value: Config.bandH; from: 24; to: 48; suffix: " px"
                     onMoved: function (v) { Config.bandH = Math.round(v); }
@@ -95,8 +96,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Ancho en reposo")
-                hint: I18n.tr("Para la hora sola. Si enciendes la fecha o la batería, el notch se ensancha solo.")
+                label: I18n.tr("Width at rest")
+                hint: I18n.tr("For the clock on its own. If you turn on the date or the battery, the notch widens by itself.")
                 SettingsControls.Slider_ {
                     value: Config.idleW; from: 110; to: 380; suffix: " px"
                     onMoved: function (v) { Config.idleW = Math.round(v); }
@@ -105,8 +106,8 @@ Flickable {
 
             SettingsControls.Row_ {
                 shown: Config.notchStyle === "island"
-                label: I18n.tr("Separación del borde")
-                hint: I18n.tr("Cuánto se despega la isla del borde de la pantalla. Sale de la banda reservada, así que no tapa nada.")
+                label: I18n.tr("Gap from the edge")
+                hint: I18n.tr("How far the island sits from the edge of the screen. It comes out of the reserved band, so it covers nothing.")
                 SettingsControls.Slider_ {
                     value: Config.islandGap; from: 0; to: 14; suffix: " px"
                     onMoved: function (v) { Config.islandGap = Math.round(v); }
@@ -115,8 +116,8 @@ Flickable {
 
             SettingsControls.Row_ {
                 shown: Config.notchStyle !== "island"
-                label: I18n.tr("Esquina invertida")
-                hint: I18n.tr("El vuelo cóncavo con el que el notch se une al borde de la pantalla.")
+                label: I18n.tr("Inverted corner")
+                hint: I18n.tr("The concave sweep that joins the notch to the edge of the screen.")
                 SettingsControls.Slider_ {
                     value: Config.flare; from: 0; to: 22; suffix: " px"
                     onMoved: function (v) { Config.flare = Math.round(v); }
@@ -124,8 +125,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: Config.notchStyle === "island" ? I18n.tr("Redondeo") : I18n.tr("Redondeo inferior")
-                hint: I18n.tr("Cuánto se redondean las esquinas del notch cuando está desplegado.")
+                label: Config.notchStyle === "island" ? I18n.tr("Rounding") : I18n.tr("Bottom rounding")
+                hint: I18n.tr("How much the corners of the notch round off when it is open.")
                 SettingsControls.Slider_ {
                     value: Config.roundMax; from: 8; to: 40; suffix: " px"
                     onMoved: function (v) { Config.roundMax = Math.round(v); }
@@ -133,14 +134,14 @@ Flickable {
             }
         }
 
-        // ─────────────────── qué enseña y cuándo ───────────────────
+        // ─────────────────── what it shows and when ───────────────────
         SettingsControls.Card_ {
             id: cBehav
-            title: I18n.tr("COMPORTAMIENTO")
+            title: I18n.tr("BEHAVIOUR")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Retardo del hover")
-                hint: I18n.tr("Cuánto hay que quedarse encima antes de que se despliegue. A 0 se abre al cruzar el ratón.")
+                label: I18n.tr("Hover delay")
+                hint: I18n.tr("How long you have to stay on it before it opens. At 0 it opens as the pointer crosses.")
                 SettingsControls.Slider_ {
                     value: Config.hoverDelay; from: 0; to: 900; suffix: " ms"
                     onMoved: function (v) { Config.hoverDelay = Math.round(v); }
@@ -148,8 +149,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Fecha en reposo")
-                hint: I18n.tr("En reposo el notch enseña solo la hora. Con esto añade también la fecha, y se ensancha solo para que quepa.")
+                label: I18n.tr("Date at rest")
+                hint: I18n.tr("At rest the notch shows only the time. With this it shows the date as well, and widens by itself to fit.")
                 SettingsControls.Switch_ {
                     checked: Config.showDate
                     onToggled: function (v) { Config.showDate = v; }
@@ -157,8 +158,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Batería en el notch")
-                hint: I18n.tr("La batería sale siempre al pasar el ratón; esto la deja fija también en reposo.")
+                label: I18n.tr("Battery in the notch")
+                hint: I18n.tr("The battery always shows on hover; this keeps it there at rest too.")
                 SettingsControls.Switch_ {
                     checked: Config.showBattery
                     onToggled: function (v) { Config.showBattery = v; }
@@ -166,8 +167,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Reservar espacio")
-                hint: I18n.tr("Si lo apagas, las ventanas suben hasta el borde y el notch queda por encima.")
+                label: I18n.tr("Reserve space")
+                hint: I18n.tr("If you turn it off, windows go right up to the edge and the notch sits over them.")
                 SettingsControls.Switch_ {
                     checked: Config.reserveSpace
                     onToggled: function (v) { Config.reserveSpace = v; }
@@ -175,14 +176,14 @@ Flickable {
             }
         }
 
-        // ─────────────────── barra ───────────────────
+        // ─────────────────── bar ───────────────────
         SettingsControls.Card_ {
             id: cBar
-            title: I18n.tr("BARRA")
+            title: I18n.tr("BAR")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Velo de fondo")
-                hint: I18n.tr("A 0 la barra es del todo transparente. Súbelo si con fondos claros no lees los glifos.")
+                label: I18n.tr("Background scrim")
+                hint: I18n.tr("At 0 the bar is fully transparent. Raise it if you cannot read the glyphs over light wallpapers.")
                 SettingsControls.Slider_ {
                     value: Config.scrimAlpha; from: 0; to: 0.7; decimals: 2
                     onMoved: function (v) { Config.scrimAlpha = v; }
@@ -190,8 +191,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Margen lateral")
-                hint: I18n.tr("Cuánto se separan del borde de la pantalla las islas de los extremos.")
+                label: I18n.tr("Side margin")
+                hint: I18n.tr("How far the end islands sit from the edge of the screen.")
                 SettingsControls.Slider_ {
                     value: Config.sideMargin; from: 4; to: 48; suffix: " px"
                     onMoved: function (v) { Config.sideMargin = Math.round(v); }
@@ -199,35 +200,35 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Logo de Arch")
-                hint: I18n.tr("El glifo de Arch en el extremo izquierdo de la barra.")
+                label: I18n.tr("Arch logo")
+                hint: I18n.tr("The Arch glyph at the far left of the bar.")
                 SettingsControls.Switch_ { checked: Config.showArch; onToggled: function (v) { Config.showArch = v; } }
             }
             SettingsControls.Row_ {
                 label: I18n.tr("Workspaces")
-                hint: I18n.tr("Los puntos de escritorio, con el activo alargado.")
+                hint: I18n.tr("The workspace dots, with the active one stretched.")
                 SettingsControls.Switch_ { checked: Config.showWorkspaces; onToggled: function (v) { Config.showWorkspaces = v; } }
             }
             SettingsControls.Row_ {
-                label: I18n.tr("Nombre de la app")
-                hint: I18n.tr("El nombre de la ventana que tienes enfocada.")
+                label: I18n.tr("App name")
+                hint: I18n.tr("The name of the window you have focused.")
                 SettingsControls.Switch_ { checked: Config.showAppName; onToggled: function (v) { Config.showAppName = v; } }
             }
             SettingsControls.Row_ {
-                label: I18n.tr("Bandeja del sistema")
-                hint: I18n.tr("Los iconos que publican las apps: nm-applet, rustdesk, etc.")
+                label: I18n.tr("System tray")
+                hint: I18n.tr("The icons apps publish: nm-applet, rustdesk and so on.")
                 SettingsControls.Switch_ { checked: Config.showTray; onToggled: function (v) { Config.showTray = v; } }
             }
         }
 
-        // ─────────────────── tipografía ───────────────────
+        // ─────────────────── typography ───────────────────
         SettingsControls.Card_ {
             id: cFont
-            title: I18n.tr("TIPOGRAFÍA")
+            title: I18n.tr("TYPOGRAPHY")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Fuente del notch")
-                hint: I18n.tr("Proporcional, solo para el texto de dentro del notch. Los iconos van siempre en la Nerd Font.")
+                label: I18n.tr("Notch font")
+                hint: I18n.tr("Proportional, only for the text inside the notch. The icons always use the Nerd Font.")
                 SettingsControls.Choice_ {
                     options: Config.fontChoices
                     current: Config.fontUI
@@ -236,8 +237,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Tamaño de la hora")
-                hint: I18n.tr("El reloj del notch en reposo.")
+                label: I18n.tr("Clock size")
+                hint: I18n.tr("The notch clock at rest.")
                 SettingsControls.Slider_ {
                     value: Config.clockSize; from: 12; to: 24; suffix: " px"
                     onMoved: function (v) { Config.clockSize = Math.round(v); }
@@ -245,18 +246,18 @@ Flickable {
             }
         }
 
-        // ─────────────────── efectos del compositor ───────────────────
-        // La única tarjeta de la página que no manda sobre algo que pinte el
-        // shell: esto es de Hyprland. Por eso el ajuste sale además a
-        // ~/.config/hypr/efectos.lua y no solo al JSON que anuncia el pie —
-        // el porqué de los dos caminos está en Config.applyEffects().
+        // ─────────────────── compositor effects ───────────────────
+        // The only card on the page ruling nothing the shell paints: this is
+        // Hyprland's. So the setting also goes to ~/.config/hypr/effects.lua
+        // and not just the JSON the footer announces — the why of both paths
+        // lives in Config.applyEffects().
         SettingsControls.Card_ {
             id: cFx
-            title: I18n.tr("EFECTOS")
+            title: I18n.tr("EFFECTS")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Desenfoque de movimiento")
-                hint: I18n.tr("La ventana se desenfoca hacia donde va, mientras dura la animación. Solo en las transiciones: arrastrar con el ratón ya va 1:1 con tu mano y no deja estela. Si la batería aprieta, este es el primero que apagar.")
+                label: I18n.tr("Motion blur")
+                hint: I18n.tr("The window blurs in the direction it is travelling, for as long as the animation lasts. Transitions only: dragging with the mouse already tracks your hand 1:1 and leaves no trail. If battery is tight, this is the first thing to turn off.")
                 SettingsControls.Switch_ {
                     checked: Config.motionBlur
                     onToggled: function (v) { Config.motionBlur = v; Config.applyEffects(); }
@@ -265,8 +266,8 @@ Flickable {
 
             SettingsControls.Row_ {
                 shown: Config.motionBlur
-                label: I18n.tr("Muestras")
-                hint: I18n.tr("Cuántas copias de la ventana se promedian a lo largo del recorrido. Más muestras, estela más suave y más cara de pintar. No alarga la estela: eso lo decide cuánto se ha movido la ventana.")
+                label: I18n.tr("Samples")
+                hint: I18n.tr("How many copies of the window are averaged along its path. More samples, smoother trail and more expensive to draw. It does not lengthen the trail: that is decided by how far the window has moved.")
                 SettingsControls.Slider_ {
                     value: Config.motionBlurSamples; from: 2; to: 24
                     onMoved: function (v) { Config.motionBlurSamples = Math.round(v); Config.applyEffects(); }
@@ -274,16 +275,16 @@ Flickable {
             }
         }
 
-        // ─────────────────── janelas ───────────────────
-        // Como EFECTOS: isto é do Hyprland, não do shell. Sai também para
-        // ~/.config/hypr/efectos.lua via Config.applyEffects() — ver Config.
+        // ─────────────────── windows ───────────────────
+        // Like EFFECTS: this is Hyprland's, not the shell's. It also goes to
+        // ~/.config/hypr/effects.lua via Config.applyEffects() — see Config.
         SettingsControls.Card_ {
             id: cWin
-            title: I18n.tr("VENTANAS")
+            title: I18n.tr("WINDOWS")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Esquinas redondeadas")
-                hint: I18n.tr("Cuánto se redondean las esquinas de las ventanas. A 0 van rectas. Con redondeo, las esquinas salen rectas mientras la ventana viaja: es un límite de Hyprland, no un fallo.")
+                label: I18n.tr("Rounded corners")
+                hint: I18n.tr("How much window corners round off. At 0 they stay square. With rounding, corners go square while the window travels: that is a Hyprland limit, not a bug.")
                 SettingsControls.Slider_ {
                     value: Config.windowRounding; from: 0; to: 20; suffix: " px"
                     onMoved: function (v) { Config.windowRounding = Math.round(v); Config.applyEffects(); }
@@ -291,8 +292,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Borde de la ventana")
-                hint: I18n.tr("Grosor del borde, tematizado con pywal. A 0 el foco se marca solo con luz y sombra.")
+                label: I18n.tr("Window border")
+                hint: I18n.tr("Border thickness, themed with pywal. At 0 focus is shown with light and shadow alone.")
                 SettingsControls.Slider_ {
                     value: Config.windowBorderSize; from: 0; to: 4; suffix: " px"
                     onMoved: function (v) { Config.windowBorderSize = Math.round(v); Config.applyEffects(); }
@@ -300,8 +301,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Espacio entre ventanas")
-                hint: I18n.tr("Hueco entre dos ventanas. El hueco visible es el doble: 3 y 3 se juntan en 6.")
+                label: I18n.tr("Gap between windows")
+                hint: I18n.tr("Gap between two windows. The visible gap is double: 3 and 3 meet at 6.")
                 SettingsControls.Slider_ {
                     value: Config.windowGapsIn; from: 0; to: 20; suffix: " px"
                     onMoved: function (v) { Config.windowGapsIn = Math.round(v); Config.applyEffects(); }
@@ -309,8 +310,8 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Espacio al borde")
-                hint: I18n.tr("Hueco entre las ventanas y el borde de la pantalla. Igualarlo al doble del anterior deja el mismo vano por todas partes.")
+                label: I18n.tr("Gap to the edge")
+                hint: I18n.tr("Gap between windows and the edge of the screen. Matching it to double the previous one keeps the same gap everywhere.")
                 SettingsControls.Slider_ {
                     value: Config.windowGapsOut; from: 0; to: 30; suffix: " px"
                     onMoved: function (v) { Config.windowGapsOut = Math.round(v); Config.applyEffects(); }
@@ -318,35 +319,36 @@ Flickable {
             }
         }
 
-        // ─────────────────── fondo de pantalla ───────────────────
+        // ─────────────────── wallpaper ───────────────────
         SettingsControls.Card_ {
             id: cWall
-            title: I18n.tr("FONDO")
+            title: I18n.tr("WALLPAPER")
 
             SettingsControls.Action_ {
-                label: I18n.tr("Cambiar fondo de pantalla")
-                hint: I18n.tr("Abre el selector: tus fondos y búsqueda en la web. Al aplicar uno, pywal retematiza el escritorio entero.")
+                label: I18n.tr("Change wallpaper")
+                hint: I18n.tr("Opens the picker: your own wallpapers and a web search. Apply one and pywal recolours the whole desktop.")
                 icon: Icons.image
                 value: "Super+Shift+W"
-                // Este boton ya se ha roto DOS VECES por la misma razon —el
-                // texto que se manda no es el que Hyprland espera— y las dos
-                // fallo en silencio, sin hacer NADA al pulsarlo. Vale la pena
-                // dejar las dos escritas, porque el sintoma es identico:
+                // This button already broke TWICE for the same reason —the
+                // text sent is not what Hyprland expects— and both times it
+                // failed silently, doing NOTHING when pressed. Worth leaving
+                // both written down, because the symptom is identical:
                 //
-                // 1. Se mandaba "global,quickshell:wallpaper", copiando la coma
-                //    de `bind =`. Por IPC la coma no separa nada: el primer
-                //    token ES el nombre del despachador, y "global," no existe.
-                // 2. Ya con espacio, "global quickshell:wallpaper" dejo de valer
-                //    en Hyprland 0.55: el argumento de `dispatch` pasa a ser una
-                //    EXPRESION LUA, y como tal `global quickshell:wallpaper` es
-                //    un error de sintaxis. Ahora se llama al despachador de
-                //    verdad, `hl.dsp.global`, con el nombre del atajo global que
-                //    declara el GlobalShortcut de WallpaperPicker.qml.
+                // 1. "global,quickshell:wallpaper" was sent, copying the comma
+                //    from `bind =`. Over IPC the comma separates nothing: the
+                //    first token IS the dispatcher name, and "global," does not
+                //    exist.
+                // 2. Even spaced, "global quickshell:wallpaper" stopped working
+                //    in Hyprland 0.55: the `dispatch` argument became a LUA
+                //    EXPRESSION, and as such `global quickshell:wallpaper` is a
+                //    syntax error. Now the true dispatcher, `hl.dsp.global`, is
+                //    called with the global-shortcut name the WallpaperPicker.qml
+                //    GlobalShortcut declares.
                 //
-                // La moraleja de las dos: si este boton no responde, lo primero
-                // es mirar `journalctl --user -u quickshell` o probar el mismo
-                // texto con `hyprctl dispatch '...'`, porque el error se queda
-                // en Hyprland y no llega a la interfaz.
+                // The moral of both: if this button never answers, first look at
+                // `journalctl --user -u quickshell` or try the same text with
+                // `hyprctl dispatch '...'`, because the error stays in Hyprland
+                // and never reaches the UI.
                 onTriggered: Hyprland.dispatch('hl.dsp.global("quickshell:wallpaper")')
             }
         }
@@ -356,7 +358,7 @@ Flickable {
             visible: ShellState.settingsQuery.length > 0
                      && !cLang.visible && !cNotch.visible && !cBehav.visible && !cBar.visible
                      && !cFont.visible && !cFx.visible && !cWin.visible && !cWall.visible
-            text: I18n.tr("Ningún ajuste de Apariencia coincide con «{0}».", ShellState.settingsQuery)
+            text: I18n.tr("No Appearance setting matches “{0}”.", ShellState.settingsQuery)
         }
     }
 }

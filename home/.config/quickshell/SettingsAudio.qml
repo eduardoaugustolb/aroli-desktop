@@ -1,20 +1,19 @@
-// SettingsAudio.qml — salida y entrada de audio (Pipewire nativo, sin pavucontrol).
+// SettingsAudio.qml — audio output and input (native Pipewire, no pavucontrol).
 //
-// EL BUG QUE ARREGLA ESTA VERSIÓN: los cuatro dispositivos de salida de este
-// portátil se llaman, literalmente:
+// THE BUG THIS VERSION FIXES: this laptop's four output devices are all
+// literally called:
 //
 //   "500 Series Chipset Family On-Package High Definition Audio (HD Audio) Speaker"
 //   "500 Series Chipset Family On-Package High Definition Audio (HD Audio) HDMI / DisplayPort 1 Output"
 //   …
 //
-// Lo que los distingue va AL FINAL, así que la lista enseñaba cuatro filas
-// idénticas cortadas por el mismo sitio y era imposible elegir. Ahora:
-//   1) si el nodo trae `nickname` (node.nick: "Speaker", "HDMI 1"), se usa ese;
-//   2) si no, se le quita el prefijo común a todos los dispositivos, calculado
-//      en vivo — así funciona con cualquier tarjeta, no solo con esta;
-//   3) y se traducen los cuatro términos de siempre al idioma del shell.
-// El nombre completo no se pierde: sale en la franja del pie al pasar por
-// encima de la fila.
+// What tells them apart sits AT THE END, so the list showed four identical
+// rows cut at the same spot and picking was impossible. Now:
+//   1) if the node carries a `nickname` (node.nick: "Speaker", "HDMI 1"), use it;
+//   2) else strip the prefix common to every device, computed live — so it
+//      works with any card, not just this one;
+//   3) and translate the same four terms to the shell language.
+// The full name is never lost: it shows in the footer strip hovering the row.
 import Quickshell
 import Quickshell.Services.Pipewire
 import QtQuick
@@ -24,7 +23,7 @@ import QtQuick.Layouts
 Flickable {
     id: root
 
-    property string note: I18n.tr("El dispositivo marcado es el predeterminado; pincha otro para cambiarlo.")
+    property string note: I18n.tr("The marked device is the default one; click another to change it.")
     readonly property int matchCount: cVol.visibleRows + cSinks.visibleRows + cSources.visibleRows
 
     contentHeight: col.implicitHeight + 34
@@ -38,9 +37,9 @@ Flickable {
         const out = [];
         for (let i = 0; i < vs.length; i++) {
             const n = vs[i];
-            if (n.isStream) continue;          // los streams son apps, no dispositivos
+            if (n.isStream) continue;          // streams are apps, not devices
             if (!n.audio) continue;
-            // los "Monitor of …" son la salida reinyectada, no un micrófono
+            // "Monitor of …" units are re-injected output, not a microphone
             if (!n.isSink && String(n.name || "").indexOf(".monitor") >= 0) continue;
             if (n.isSink === sink) out.push(n);
         }
@@ -50,11 +49,11 @@ Flickable {
     readonly property var sinks: nodesOf(true)
     readonly property var sources: nodesOf(false)
 
-    // Sin esto las propiedades de los nodos (descripción, volumen) no se pueblan.
+    // Without this node properties (description, volume) never populate.
     PwObjectTracker { objects: root.sinks.concat(root.sources) }
 
-    // Prefijo común a TODOS los dispositivos: es el nombre de la tarjeta, y es
-    // exactamente lo que sobra. Con un solo dispositivo no se quita nada.
+    // Prefix common to EVERY device: it is the card name, exactly what is
+    // extra. With a single device nothing is stripped.
     readonly property string commonPrefix: {
         const all = root.sinks.concat(root.sources).map(function (n) { return String(n.description || ""); });
         if (all.length < 2) return "";
@@ -86,20 +85,20 @@ Flickable {
         return root.toES(s.length > 0 ? s : root.fullName(n));
     }
 
-    // Los nombres de ALSA vienen en inglés y siempre son los mismos cuatro.
-    // El nombre del dispositivo es un dato y se respeta; lo que se traduce son
-    // estos términos genéricos, al idioma del shell.
+    // ALSA names come in English and are always the same four.
+    // The device name is data and is respected; what translates are
+    // these generic terms, to the shell language.
     function toES(s) {
         return s
             .replace(/HDMI \/ DisplayPort (\d+) Output/i, "HDMI $1")
-            .replace(/\bDigital Microphone\b/i, I18n.tr("Micrófono digital"))
-            .replace(/\bStereo Microphone\b/i, I18n.tr("Micrófono estéreo"))
-            .replace(/\bInternal Microphone\b/i, I18n.tr("Micrófono interno"))
-            .replace(/\bMicrophone\b/i, I18n.tr("Micrófono"))
-            .replace(/\bSpeakers?\b/i, I18n.tr("Altavoces"))
-            .replace(/\bHeadphones\b/i, I18n.tr("Auriculares"))
-            .replace(/\bHeadset\b/i, I18n.tr("Auriculares"))
-            .replace(/\bBuilt-?in\b/i, I18n.tr("Integrado"))
+            .replace(/\bDigital Microphone\b/i, I18n.tr("Digital microphone"))
+            .replace(/\bStereo Microphone\b/i, I18n.tr("Stereo microphone"))
+            .replace(/\bInternal Microphone\b/i, I18n.tr("Internal microphone"))
+            .replace(/\bMicrophone\b/i, I18n.tr("Microphone"))
+            .replace(/\bSpeakers?\b/i, I18n.tr("Speakers"))
+            .replace(/\bHeadphones\b/i, I18n.tr("Headphones"))
+            .replace(/\bHeadset\b/i, I18n.tr("Headphones"))
+            .replace(/\bBuilt-?in\b/i, I18n.tr("Built-in"))
             .replace(/\s+(Output|Input)\b/i, "")
             .trim();
     }
@@ -111,14 +110,14 @@ Flickable {
         y: 16
         spacing: 10
 
-        // ─────────────────── volumen ───────────────────
+        // ─────────────────── volume ───────────────────
         SettingsControls.Card_ {
             id: cVol
-            title: I18n.tr("SALIDA")
+            title: I18n.tr("OUTPUT")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Volumen")
-                hint: I18n.tr("El del dispositivo predeterminado. Es el mismo que mueven las teclas de volumen.")
+                label: I18n.tr("Volume")
+                hint: I18n.tr("The default device's. It is the same one the volume keys move.")
                 SettingsControls.Slider_ {
                     value: ShellState.muted ? 0 : ShellState.vol
                     from: 0; to: 100; suffix: " %"
@@ -126,8 +125,8 @@ Flickable {
                 }
             }
             SettingsControls.Row_ {
-                label: I18n.tr("Silenciar")
-                hint: I18n.tr("Silencia la salida sin perder el nivel al que la tenías.")
+                label: I18n.tr("Mute")
+                hint: I18n.tr("Mutes the output without losing the level you had it at.")
                 SettingsControls.Switch_ {
                     checked: ShellState.muted
                     onToggled: ShellState.toggleMute()
@@ -135,10 +134,10 @@ Flickable {
             }
         }
 
-        // ─────────────────── dispositivos de salida ───────────────────
+        // ─────────────────── output devices ───────────────────
         SettingsControls.Card_ {
             id: cSinks
-            title: I18n.tr("DISPOSITIVO DE SALIDA")
+            title: I18n.tr("OUTPUT DEVICE")
 
             Repeater {
                 model: root.sinks
@@ -148,10 +147,10 @@ Flickable {
             }
         }
 
-        // ─────────────────── dispositivos de entrada ───────────────────
+        // ─────────────────── input devices ───────────────────
         SettingsControls.Card_ {
             id: cSources
-            title: I18n.tr("DISPOSITIVO DE ENTRADA")
+            title: I18n.tr("INPUT DEVICE")
 
             Repeater {
                 model: root.sources
@@ -166,19 +165,19 @@ Flickable {
             visible: ShellState.settingsQuery.length === 0
                 && root.sinks.length === 0 && root.sources.length === 0
             icon: "󰕾"
-            title: I18n.tr("No se ven dispositivos de audio")
-            body: I18n.tr("Comprueba que PipeWire esté activo o vuelve a conectar el dispositivo.")
+            title: I18n.tr("No audio devices found")
+            body: I18n.tr("Check that PipeWire is running, or plug the device back in.")
         }
 
         SettingsControls.Note_ {
             Layout.topMargin: 10
             visible: ShellState.settingsQuery.length > 0
                      && !cVol.visible && !cSinks.visible && !cSources.visible
-            text: I18n.tr("Nada de Sonido coincide con «{0}».", ShellState.settingsQuery)
+            text: I18n.tr("Nothing in Sound matches “{0}”.", ShellState.settingsQuery)
         }
     }
 
-    // ─────────── fila de dispositivo ───────────
+    // ─────────── device row ───────────
     component DeviceRow: Rectangle {
         id: dev
         required property var modelData
@@ -229,7 +228,7 @@ Flickable {
             }
             Text {
                 visible: dev.isDefault
-                text: I18n.tr("predeterminado")
+                text: I18n.tr("default")
                 color: Colors.accent
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsXS

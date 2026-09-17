@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Abre el editor de NetworkManager para una red WPA-EAP sin pasar identidad ni
-# contrasena por argv. El shell solo entrega el SSID, que no es un secreto.
+# Opens NetworkManager's editor for a WPA-EAP network without passing identity
+# or password through argv. The shell provides only the SSID, which is not secret.
 
 set -euo pipefail
 
@@ -15,8 +15,8 @@ find_profile_uuid() {
         [[ "$type" == "802-11-wireless" ]] || continue
         candidate="$(nmcli --escape no -g 802-11-wireless.ssid connection show uuid "$uuid" 2>/dev/null | head -n 1 || true)"
         if [[ "$candidate" == "$ssid" ]]; then
-            # Dos perfiles con el mismo SSID pueden tener identidades o CA
-            # distintas. No adivinamos cuál: el editor enseñará la lista.
+            # Two profiles with the same SSID may have different identities or
+            # CAs. Do not guess which one: the editor will show the list.
             [[ -z "$found" ]] || return 2
             found="$uuid"
         fi
@@ -30,26 +30,25 @@ case "$action" in
         if uuid="$(find_profile_uuid)"; then
             exec nm-connection-editor --edit="$uuid"
         fi
-        # Si Quickshell la marcaba como conocida pero NetworkManager no devuelve
-        # un perfil casado por SSID, ensena la lista: mejor pedir una eleccion que
-        # editar el perfil equivocado.
+        # If Quickshell marked it known but NetworkManager finds no profile for
+        # the SSID, show the list rather than editing the wrong profile.
         exec nm-connection-editor --show
         ;;
     create)
-        # Quickshell puede tardar un instante en marcar `known`; vuelve a mirar
-        # antes de crear para no duplicar un perfil que ya existe.
+        # Quickshell may take a moment to mark `known`; check again before
+        # creating so an existing profile is not duplicated.
         if uuid="$(find_profile_uuid)"; then
             exec nm-connection-editor --edit="$uuid"
         else
             result=$?
             [[ "$result" -ne 2 ]] || exec nm-connection-editor --show
         fi
-        # El editor guarda los secretos mediante NetworkManager. No construimos
-        # un `nmcli ... password ...` porque eso expondria la clave en `ps`.
+        # The editor saves secrets through NetworkManager. Do not construct
+        # `nmcli ... password ...`, which would expose the password in `ps`.
         exec nm-connection-editor --create --type=802-11-wireless
         ;;
     *)
-        printf 'Uso: %s {edit|create} SSID\n' "${0##*/}" >&2
+        printf 'Usage: %s {edit|create} SSID\n' "${0##*/}" >&2
         exit 2
         ;;
 esac

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Popup flotante que invoca un pokemon animado al azar (SUPER+O).
-# Una tecla cualquiera (o 10s) lo cierra.
+# Floating popup that summons a random animated Pokemon (SUPER+O).
+# Any keypress (or 10 seconds) closes it.
 d="$HOME/.cache/pokeanim/.box"
 shopt -s nullglob
 gifs=("$d"/*.gif)

@@ -1,74 +1,75 @@
-# Guia operacional para agentes de IA — Umbra Liminal
+# Operating guide for AI agents — Umbra Liminal
 
-Este documento define como agentes devem instalar, auditar e corrigir o Umbra
-Liminal sem tirar o controle do usuário. A segurança e a privacidade têm
-precedência sobre conveniência.
+This document defines how agents should install, audit, and fix Umbra
+Liminal without taking control away from the user. Safety and privacy take
+precedence over convenience.
 
-## Princípios inegociáveis
+## Non-negotiable principles
 
-1. **Inspecione antes de alterar.** Execute diagnóstico e modo seco antes de
-   instalar, migrar, habilitar serviços ou editar configurações.
-2. **Consentimento explícito para efeitos materiais.** Peça autorização antes
-   de usar sudo/pkexec, instalar ou remover pacotes, habilitar serviços,
-   escrever em `/etc`, trocar wallpaper, relogar/reiniciar a sessão ou enviar
-   qualquer dado pela rede.
-3. **Nenhum bloatware automático.** Os arquivos `packages/optional-*.txt`
-   contêm aplicativos e ferramentas opcionais. Cada pacote exige confirmação
-   individual; `--yes`, CI e execuções não interativas devem ignorá-los.
-4. **Privacidade por padrão.** Não leia, imprima, armazene, envie ou versione
-   chaves, tokens, senhas, cookies, histórico, perfis de navegador, dados de
-   mensageria ou arquivos em `~/.ssh`, `~/.gnupg`, `~/.config/gh` e similares.
-5. **Nunca edite `/usr/share/omarchy/`.** Use somente caminhos de usuário e
-   mecanismos oficiais do Omarchy.
-6. **Não faça ações destrutivas sem alvo e motivo confirmados.** Prefira backup
-   verificável, Lixeira e operações reversíveis.
+1. **Inspect before changing.** Run diagnostics and dry-run mode before
+   installing, migrating, enabling services, or editing configurations.
+2. **Explicit consent for material effects.** Ask for authorization before
+   using sudo/pkexec, installing or removing packages, enabling services,
+   writing to `/etc`, changing the wallpaper, re-logging/restarting the
+   session, or sending any data over the network.
+3. **No automatic bloatware.** The `packages/optional-*.txt` files
+   contain optional apps and tools. Each package requires individual
+   confirmation; `--yes`, CI, and non-interactive runs must skip them.
+4. **Privacy by default.** Do not read, print, store, send, or version
+   keys, tokens, passwords, cookies, history, browser profiles, messaging
+   data, or files in `~/.ssh`, `~/.gnupg`, `~/.config/gh`, and the like.
+5. **Never edit `/usr/share/omarchy/`.** Use only user paths and
+   official Omarchy mechanisms.
+6. **No destructive actions without a confirmed target and reason.** Prefer
+   verifiable backup, Trash, and reversible operations.
 
-## Estrutura relevante
+## Relevant structure
 
-| Caminho | Finalidade |
+| Path | Purpose |
 | --- | --- |
-| `install.sh` | Instalador por fases; use `--dry-run` primeiro. |
-| `diagnose` | Diagnóstico somente leitura. |
-| `packages/pacman.txt` | Base necessária do rice. |
-| `packages/optional-*.txt` | Itens opt-in, nunca padrão. |
-| `home/` | Arquivos que serão ligados ou copiados para `$HOME`. |
-| `home/.local/bin/rice` | CLI de versão, update, rollback e limpeza (`rice --help`). |
-| `VERSION` / `CHANGELOG.md` | Fonte única da versão e histórico por release. |
-| `home/Pictures/wallpapers/` | Wallpapers padrão distribuídos pelo rice. |
-| `scripts/migrate-from-legacy-rice.sh` | Migração segura do fork legado. |
-| `OMARCHY.md` | Contrato de compatibilidade com Omarchy. |
+| `install.sh` | Phased installer; use `--dry-run` first. |
+| `diagnose` | Read-only diagnostics. |
+| `packages/pacman.txt` | Required rice base. |
+| `packages/optional-*.txt` | Opt-in items, never default. |
+| `home/` | Files to be linked or copied into `$HOME`. |
+| `home/.local/bin/rice` | Version, update, rollback, and cleanup CLI (`rice --help`). |
+| `VERSION` / `CHANGELOG.md` | Single source of truth for the version and per-release history. |
+| `home/Pictures/wallpapers/` | Default wallpapers shipped by the rice. |
+| `scripts/migrate-from-legacy-rice.sh` | Safe migration from the legacy fork. |
+| `OMARCHY.md` | Compatibility contract with Omarchy. |
 
-## Fluxo seguro para instalação
+## Safe install flow
 
 ```sh
-# 1. Auditoria sem escrita.
+# 1. Audit with no writes.
 ./diagnose
 ./install.sh --dry-run --lang pt-BR
 
-# 2. Só após aprovação explícita do usuário.
+# 2. Only after the user's explicit approval.
 ./install.sh --lang pt-BR
 ```
 
-Não use `--yes` como substituto da escolha humana para pacotes opcionais. Se o
-usuário quiser um opcional, mostre o nome, a finalidade, a origem (repositório
-oficial ou AUR), dependências relevantes e espaço estimado antes de instalar.
+Do not use `--yes` as a substitute for human choice for optional packages. If
+the user wants an optional package, show the name, purpose, origin (official
+repository or AUR), relevant dependencies, and estimated size before
+installing.
 
-## Fluxo seguro para migração
+## Safe migration flow
 
 ```sh
-# Não altera nada.
+# Changes nothing.
 ./scripts/migrate-from-legacy-rice.sh
 
-# Só após o usuário aprovar a lista de symlinks.
+# Only after the user approves the symlink list.
 ./scripts/migrate-from-legacy-rice.sh --apply
 ```
 
-O script mantém o clone legado intacto. Não remova o diretório antigo nem
-apague backups sem pedido explícito.
+The script keeps the legacy clone intact. Do not remove the old directory or
+delete backups without an explicit request.
 
-## Auditoria e correção
+## Auditing and fixing
 
-Comece com comandos sem escrita:
+Start with write-free commands:
 
 ```sh
 omarchy debug --no-sudo --print
@@ -78,31 +79,32 @@ systemctl --user is-active quickshell
 git status --short
 ```
 
-Antes de corrigir, explique causa provável, arquivos alvo, efeito esperado e
-como reverter. Após uma alteração em Hyprland, valide com `hyprctl reload` e
-`hyprctl configerrors`. Após alterar o shell, valide se `quickshell` continua
-ativo. Não use `omarchy refresh` sem confirmação: ele substitui configurações
-do usuário, embora crie backup.
+Before fixing, explain the likely cause, target files, expected effect, and
+how to revert. After a Hyprland change, validate with `hyprctl reload` and
+`hyprctl configerrors`. After changing the shell, check that `quickshell`
+is still active. Do not use `omarchy refresh` without confirmation: it
+replaces user configurations, although it creates a backup.
 
-## Rede e dados
+## Network and data
 
-- Downloads de wallpapers, atualizações, clones e consultas a AUR exigem
-  consentimento explícito, com UMA exceção declarada: o timer diário
-  `rice-update-check.timer` (habilitado pelo instalador) transfere alguns
-  KB (`git ls-remote --tags` ou um GET condicional na API de releases do
-  GitHub, com ETag) uma vez ao dia e escreve só
-  `~/.cache/umbra-liminal/update.json`. Sem telemetria, sem identificadores,
-  sem corpo de resposta guardado. Desligar:
+- Wallpaper downloads, updates, clones, and AUR queries require
+  explicit consent, with ONE declared exception: the daily timer
+  `rice-update-check.timer` (enabled by the installer) transfers a few
+  KB (`git ls-remote --tags` or a conditional GET against the GitHub
+  releases API, with ETag) once a day and only writes
+  `~/.cache/umbra-liminal/update.json`. No telemetry, no identifiers,
+  no cached response body. To turn it off:
   `systemctl --user disable rice-update-check.timer`. `rice update`,
-  `rice rollback` e `rice prune --apply` nunca rodam sozinhos: exigem o
-  comando (e confirmação, salvo `--yes` explícito do usuário).
-- Não envie relatórios de diagnóstico completos a serviços externos; remova
-  nomes de usuário, caminhos pessoais, endereços IP, SSIDs e identificadores.
-- Não adicione telemetria, analytics, plugins remotos ou processos em segundo
-  plano sem uma escolha clara e reversível do usuário.
+  `rice rollback`, and `rice prune --apply` never run on their own: they
+  require the command (and confirmation, except for the user's explicit
+  `--yes`).
+- Do not send complete diagnostic reports to external services; strip
+  usernames, personal paths, IP addresses, SSIDs, and identifiers.
+- Do not add telemetry, analytics, remote plugins, or background
+  processes without a clear, reversible user choice.
 
-## Contribuições
+## Contributions
 
-Preserve [LICENSE](LICENSE), a atribuição ao upstream e a identidade Umbra
-Liminal. Todo novo pacote deve ser classificado como essencial ou opcional; em
-caso de dúvida, trate-o como opcional.
+Preserve [LICENSE](LICENSE), the upstream attribution, and the Umbra
+Liminal identity. Every new package must be classified as essential or
+optional; when in doubt, treat it as optional.
