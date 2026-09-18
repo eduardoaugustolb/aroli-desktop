@@ -3,7 +3,6 @@
 arch-wiki-docs	complete offline Arch wiki (~225 MB)
 arch-wiki-lite	trimmed offline Arch wiki
 btop	alternative resource monitor
-cava	audio visualizer
 cmatrix	terminal animation
 discord	official Discord client
 docker	container daemon

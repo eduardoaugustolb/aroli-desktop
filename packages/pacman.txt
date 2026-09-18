@@ -8,6 +8,7 @@ librsvg
 libxcursor
 bat
 bc
+cava
 bluetui
 bluez
 bluez-utils
@@ -15,6 +16,7 @@ brightnessctl
 chrono-date
 cli11
 cliphist
+curl
 dosfstools
 efibootmgr
 expac
@@ -51,6 +53,7 @@ lib32-glibc
 libaio
 libappindicator
 libgirepository
+libnotify
 libpulse
 linux
 linux-firmware
