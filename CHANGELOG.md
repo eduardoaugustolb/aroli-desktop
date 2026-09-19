@@ -10,6 +10,38 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [2.1.0] - 2026-09-19
+
+### Added
+
+- Configurable wallpaper palette intensity (0-4 slider): level 0 keeps the
+  stable Umbra surfaces, level 4 reproduces the previous raw pywal output,
+  and existing `paletteMode` settings migrate to the matching endpoint so
+  no one's desktop changes on upgrade.
+- Full configurable Umbra palette system: `Wallpaper`, `Umbra`, `Hybrid`,
+  and `Manual` presets, manual canvas/surface/text/accent tokens with
+  capture and restore, saturation and minimum-contrast guards, and
+  independent scopes for shell, terminal, GTK/Qt, and Hyprland.
+- Quickshell threshold lock screen (WlSessionLock + PAM card with morph
+  badge, pill input, caps/num states, and pt-BR/es translations) replacing
+  the hyprlock session island. Lock entry points (idle, power menu,
+  launcher, `Super+L`) go through `loginctl`; the hyprlock binary stays
+  installed for the remote/RustDesk profile.
+- Consolidated adaptive desktop controls: unified hypridle normal/remote
+  profiles, Umbra XCursor build with text-cursor aliases and live apply,
+  and expanded network, Bluetooth, and system settings panels.
+
+### Fixed
+
+- Declared the runtime shell dependencies in `packages/pacman.txt`.
+- Kept the Umbra threshold treatment out of expanded panels and removed
+  the broken threshold notch treatment.
+
+### Changed
+
+- The remote profile now runs hyprlock with its built-in defaults (the
+  session lock-preference sync script left with the hyprlock island).
+
 ## [2.0.0] - 2026-09-17
 
 ### Added
