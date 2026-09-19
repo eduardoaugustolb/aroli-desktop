@@ -325,13 +325,15 @@ Flickable {
             title: I18n.tr("COLOUR SYSTEM")
 
             SettingsControls.Row_ {
-                label: I18n.tr("Surface source")
-                hint: I18n.tr("Umbra keeps application backgrounds dark and neutral while the wallpaper supplies accents. Wallpaper also tints backgrounds, matching the original pywal behaviour.")
-                SettingsControls.Choice_ {
-                    options: [I18n.tr("Umbra dark"), I18n.tr("Wallpaper")]
-                    current: Config.paletteMode === "wallpaper" ? I18n.tr("Wallpaper") : I18n.tr("Umbra dark")
-                    onPicked: function (v) {
-                        Config.paletteMode = (v === I18n.tr("Wallpaper")) ? "wallpaper" : "umbra";
+                label: I18n.tr("Palette intensity")
+                hint: I18n.tr("How strongly the wallpaper tints generated surfaces. 0 keeps neutral Umbra surfaces; 4 restores the full wallpaper-derived pywal behaviour. The middle values blend the two.")
+                SettingsControls.Slider_ {
+                    value: Config.paletteIntensity; from: 0; to: 4
+                    onMoved: function (v) {
+                        Config.paletteIntensity = Math.round(v);
+                        // Keep the old key meaningful for scripts and for a
+                        // downgrade to a previous rice release.
+                        Config.paletteMode = Config.paletteIntensity === 4 ? "wallpaper" : "umbra";
                         Config.applyPalette();
                     }
                 }

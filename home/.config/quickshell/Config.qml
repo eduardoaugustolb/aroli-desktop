@@ -46,9 +46,11 @@ Singleton {
     property alias showAppName: opts.showAppName
     property alias showTray: opts.showTray
 
-    // "umbra" keeps dark, neutral application surfaces; "wallpaper" restores
-    // the original pywal behaviour where dominant wallpaper colours tint them.
+    // Kept for one-release migration compatibility. paletteIntensity is the
+    // actual policy: 0 is the old "umbra" result and 4 is the old
+    // "wallpaper" result, with three useful stops between them.
     property alias paletteMode: opts.paletteMode
+    property alias paletteIntensity: opts.paletteIntensity
 
     // ───────── launcher ─────────
     // Favorites, by .desktop entry `id` and IN ORDER: position is what
@@ -85,10 +87,21 @@ Singleton {
 
     function applyPalette() {
         root.save()
-        palette.command = [Quickshell.env("HOME") + "/.config/hypr/scripts/pywal-reapply.sh"]
-        palette.running = true
+        // A palette reapply regenerates every pywal template. A slider sends a
+        // value for every pixel crossed, so wait for the drag to settle rather
+        // than starting competing wal processes.
+        paletteDebounce.restart()
     }
     Process { id: palette }
+    Timer {
+        id: paletteDebounce
+        interval: 220
+        repeat: false
+        onTriggered: {
+            palette.command = [Quickshell.env("HOME") + "/.config/hypr/scripts/pywal-reapply.sh"]
+            palette.running = true
+        }
+    }
 
     // Hyprland does not read quickshell-rice.json, so the setting must travel
     // two ways, and BOTH are needed:
@@ -152,6 +165,7 @@ Singleton {
         opts.windowRounding = 12; opts.windowBorderSize = 0;
         opts.windowGapsIn = 3; opts.windowGapsOut = 6;
         opts.paletteMode = "umbra";
+        opts.paletteIntensity = 0;
         root.applyEffects();   // this one does not catch on by itself: it must be pushed to Hyprland
         // favApps and language are NOT touched on purpose: "restore defaults"
         // is about appearance, and neither your favorites nor the language you
@@ -165,6 +179,17 @@ Singleton {
         watchChanges: true
         onFileChanged: reload()
         onAdapterUpdated: writeAdapter()
+        // Existing "wallpaper" users must keep their fully tinted desktop
+        // when this setting lands. JsonAdapter supplies the default for a
+        // missing key, so inspect the original JSON before writing the
+        // migration value back.
+        onLoaded: {
+            try {
+                const saved = JSON.parse(file.text())
+                if (!Object.prototype.hasOwnProperty.call(saved, "paletteIntensity"))
+                    opts.paletteIntensity = opts.paletteMode === "wallpaper" ? 4 : 0
+            } catch (e) { /* missing/partial JSON keeps the safe default */ }
+        }
         // First time: missing -> created with the defaults.
         onLoadFailed: function (error) {
             if (error === FileViewError.FileNotFound) writeAdapter();
@@ -194,6 +219,7 @@ Singleton {
             property bool showAppName: true
             property bool showTray: true
             property string paletteMode: "umbra"
+            property int paletteIntensity: 0
 
             // Factory-on: one of the few rice things visible
             // without touching anything. The switch is there for the day

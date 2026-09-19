@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # pywal-normalize.py — reassigns pywal's chromatic slots by hue and applies
-# the selected Umbra surface policy.
+# the selected surface intensity.
 #
 # pywal clusters the wallpaper and fills the ANSI slots by lightness/order,
 # with no hue semantics: a small green detail can land in color1 (the red
@@ -42,22 +42,42 @@ UMBRA_SURFACE_SLOTS = {
 }
 
 
-def surface_mode():
-    """Read the user's persistent setting; missing means Umbra by design."""
+def surface_intensity():
+    """Read the user's 0..4 wallpaper-surface intensity.
+
+    paletteMode predates the slider. Its values deliberately map to the old
+    endpoints so upgrading changes no one's desktop: ``umbra`` is 0 and
+    ``wallpaper`` is 4.
+    """
     config = os.path.join(os.path.expanduser("~"), ".config", "quickshell-rice.json")
     try:
         with open(config) as f:
-            mode = json.load(f).get("paletteMode", "umbra")
-        return mode if mode in ("umbra", "wallpaper") else "umbra"
+            settings = json.load(f)
+        if "paletteIntensity" not in settings:
+            return 4 if settings.get("paletteMode") == "wallpaper" else 0
+        return max(0, min(4, int(settings["paletteIntensity"])))
     except Exception:
-        return "umbra"
+        return 0
 
 
-def apply_surface(data, mode):
-    """Keep a raw pywal snapshot, then choose stable or wallpaper surfaces.
+def blend_hex(stable, wallpaper, amount):
+    """Mix two #rrggbb colours. amount is 0.0 (stable) through 1.0 (raw)."""
+    def channels(value):
+        value = value.lstrip("#")
+        return tuple(int(value[i:i + 2], 16) for i in (0, 2, 4))
 
-    The snapshot makes switching modes reversible without extracting the image
-    again. Accent slots (color1..6 and color9..14) deliberately stay dynamic.
+    a, b = channels(stable), channels(wallpaper)
+    return "#%02x%02x%02x" % tuple(round(x + (y - x) * amount)
+                                     for x, y in zip(a, b))
+
+
+def apply_surface(data, intensity):
+    """Keep a raw pywal snapshot, then blend stable and wallpaper surfaces.
+
+    The snapshot makes switching intensity reversible without extracting the
+    image again. Accent slots (color1..6 and color9..14) deliberately stay
+    dynamic. The stops give the middle of the slider more room than a linear
+    0..4 mapping: each is visibly distinct without making level 1 noisy.
     """
     meta = data.setdefault("umbra", {})
     colors, special = data["colors"], data["special"]
@@ -71,13 +91,16 @@ def apply_surface(data, mode):
             slot: colors.get(slot) for slot in UMBRA_SURFACE_SLOTS
         }
 
-    if mode == "umbra":
-        special.update(UMBRA_SPECIAL)
-        colors.update(UMBRA_SURFACE_SLOTS)
-    else:
-        special.update({k: v for k, v in meta["wallpaper_special"].items() if v})
-        colors.update({k: v for k, v in meta["wallpaper_surface_slots"].items() if v})
-    meta["surface_mode"] = mode
+    amount = (0.0, 0.18, 0.42, 0.72, 1.0)[intensity]
+    for key, stable in UMBRA_SPECIAL.items():
+        raw = meta["wallpaper_special"].get(key)
+        if raw:
+            special[key] = blend_hex(stable, raw, amount)
+    for key, stable in UMBRA_SURFACE_SLOTS.items():
+        raw = meta["wallpaper_surface_slots"].get(key)
+        if raw:
+            colors[key] = blend_hex(stable, raw, amount)
+    meta["surface_intensity"] = intensity
 
 
 def hls(hex_color):
@@ -133,7 +156,8 @@ def main(argv):
         for slot, idx in enumerate(perm):
             data["colors"]["color%d" % (slot + 1)] = group[idx]
             data["colors"]["color%d" % (slot + 9)] = brights[idx]
-    apply_surface(data, surface_mode())
+    intensity = surface_intensity()
+    apply_surface(data, intensity)
     tmp = src + ".tmp"
     with open(tmp, "w") as f:
         json.dump(data, f, indent="\t")
@@ -142,7 +166,7 @@ def main(argv):
     moves = ["color%d->%s" % (idx + 1, names[slot])
              for slot, idx in enumerate(perm) if slot != idx]
     detail = ", ".join(moves) if moves else "slots already hue-aligned"
-    print("pywal-normalize: %s; surface=%s" % (detail, data["umbra"]["surface_mode"]))
+    print("pywal-normalize: %s; surface-intensity=%s" % (detail, data["umbra"]["surface_intensity"]))
     return 0
 
 
