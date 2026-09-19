@@ -1,9 +1,10 @@
 // SettingsShortcuts.qml — los atajos de teclado, leídos en vivo de
-// ~/.config/hypr/hyprland.conf.
+// ~/.config/hypr/hyprland.conf MÁS ~/.config/hypr/user.conf (tus overrides,
+// que el installer crea una vez y los updates no tocan).
 //
 // POR QUÉ LEERLOS Y NO ESCRIBIRLOS A MANO: una lista escrita aquí se
-// desincroniza el primer día que toques un bind. Esto parsea el fichero de
-// verdad (resolviendo $mainMod) y se recarga solo cuando cambia, así que no
+// desincroniza el primer día que toques un bind. Esto parsea los ficheros de
+// verdad (resolviendo $mainMod) y se recarga solo cuando cambian, así que no
 // puede mentir.
 //
 // Esta es YA la única lista de atajos: Super+K abría un rofi aparte
@@ -14,7 +15,8 @@
 //
 // De momento es SOLO LECTURA: reasignar teclas implicaría reescribir el .conf
 // con el riesgo de destrozar comentarios y orden, y ese fichero es la fuente de
-// verdad del rice.
+// verdad del rice. Tus binds personales van en user.conf — aparecen aquí
+// igual, sin tocar los defaults versionados.
 import Quickshell
 import Quickshell.Io
 import QtQuick
@@ -24,7 +26,7 @@ import QtQuick.Layouts
 Flickable {
     id: root
 
-    property string note: I18n.tr("Read from ~/.config/hypr/hyprland.conf. Super+K opens this same list.")
+    property string note: I18n.tr("Read from hyprland.conf plus your user.conf overrides. Super+K opens this same list.")
     property var binds: []
     readonly property int matchCount: cShell.visibleRows + cWin.visibleRows + cWs.visibleRows
         + cApps.visibleRows + cSys.visibleRows
@@ -40,25 +42,45 @@ Flickable {
         path: ShellState.home + "/.config/hypr/hyprland.conf"
         watchChanges: true
         onFileChanged: reload()
-        onLoaded: root.binds = root.parseConf(text())
+        onLoaded: root.refresh()
     }
 
-    // La lista se construye UNA vez, al leer el fichero: no es un binding.
+    // Tus overrides: el installer crea user.conf una vez desde
+    // user.conf.example y los updates no lo tocan. Puede no existir
+    // (clon fresco antes del primer install): parseConf("") es [].
+    FileView {
+        id: userConf
+        path: ShellState.home + "/.config/hypr/user.conf"
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: root.refresh()
+    }
+
+    function refresh() {
+        // Vars ($mainMod, $terminal...) are defined in hyprland.conf but
+        // USED in user.conf too (Hyprland sources textually, so it resolves
+        // at runtime). Parse main first into shared vars so the user lines
+        // resolve here exactly like they do there.
+        const vars = {};
+        root.binds = root.parseConf(conf.text(), vars).concat(root.parseConf(userConf.text(), vars));
+    }
+
+    // La lista se construye UNA vez, al leer los ficheros: no es un binding.
     // Como los rótulos de tecla y de dispatcher SÍ están traducidos, al
     // cambiar de idioma hay que volver a parsear o se quedarían en el
     // idioma anterior hasta que alguien tocara hyprland.conf.
     Connections {
         target: I18n
-        function onLangChanged() {
-            const t = conf.text();
-            if (t && t.length > 0) root.binds = root.parseConf(t);
-        }
+        function onLangChanged() { root.refresh(); }
     }
 
     // ─────────── parseo ───────────
-    function parseConf(txt) {
+    // sharedVars is filled while parsing (with $mainMod and friends) so a
+    // second file can resolve the first one's variables. Pass a fresh {}
+    // for the first file on every refresh.
+    function parseConf(txt, sharedVars) {
         if (!txt || txt.length === 0) return [];
-        const vars = {};
+        const vars = sharedVars || {};
         const out = [];
         const lines = txt.split("\n");
         for (let i = 0; i < lines.length; i++) {

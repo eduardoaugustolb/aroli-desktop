@@ -77,6 +77,13 @@ home/.config/yazi/flavors/pywal.yazi/
 home/.config/systemd/user/*.wants/
 
 home/.config/hypr/hypridle.conf
+# Personal overrides: seeded once by install.sh from user.lua.example /
+# user.conf.example, then owned by you. Tracked defaults stay in
+# hyprland.lua / hyprland.conf; the user files load last and win. Because
+# they are untracked, tag checkouts (`rice update`) and `git pull` never
+# touch them — and they never dirty the tree, so the update guard stays green.
+home/.config/hypr/user.lua
+home/.config/hypr/user.conf
 # The ACTIVE lock-screen language file. It is seeded by copying over
 # language.es.conf or language.en.conf, and those two are versioned.
 # Without this line, './install.sh --lang en' wrote inside the repository

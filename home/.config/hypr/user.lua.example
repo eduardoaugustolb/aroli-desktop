@@ -1,0 +1,32 @@
+-- ###########################################################################
+--  USER OVERRIDES — YOUR FILE. UPDATES NEVER TOUCH IT.
+--
+--  This is a TEMPLATE (user.lua.example is versioned; user.lua is not).
+--  The installer copies this file to ~/.config/hypr/user.lua ONCE, only when
+--  it does not exist yet. After that it is yours: git ignores it, so
+--  `rice update` (a tag checkout + ./install.sh) can neither overwrite nor
+--  conflict with it.
+--
+--  RULE: never edit hyprland.lua for personal tweaks — put them here.
+--  This file loads LAST, so everything here wins over the rice defaults.
+--  mainMod, terminal and fileManager are published here by hyprland.lua,
+--  so they read exactly like they do there.
+--
+--  Keybinds you define here ALSO work, but they will NOT show in
+--  Settings > Shortcuts (that list is parsed from hyprland.conf). If you
+--  want a custom bind to appear there, put it in user.conf instead and
+--  keep the rest here.
+-- ###########################################################################
+
+-- -- Example: open the file manager on Super+Alt+F
+-- hl.bind(mainMod .. " + ALT + F", hl.dsp.exec_cmd("uwsm app -- " .. fileManager))
+--
+-- -- Example: a window rule for your editor
+-- hl.window_rule({
+--     name  = "my-editor",
+--     match = { class = "^(code)$" },
+--     float = false,
+-- })
+--
+-- -- Example: an environment variable only you need
+-- hl.env("MY_TOOL_CONFIG", os.getenv("HOME") .. "/.config/my-tool")

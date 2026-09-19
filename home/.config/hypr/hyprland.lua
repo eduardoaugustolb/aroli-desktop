@@ -523,6 +523,15 @@ hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + M", hl.dsp.exit())
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("uwsm app -- " .. fileManager))
 
+-- Quick apps. Os scripts launch-*.sh honram o padrão do sistema
+-- (xdg-terminal-exec, xdg-mime, cliente instalado) com fallback
+-- para o app do rice, então funcionam em qualquer máquina.
+hl.bind(mainMod .. " + T",       hl.dsp.exec_cmd("~/.config/hypr/scripts/launch-terminal.sh"))
+hl.bind(mainMod .. " + ALT + T", hl.dsp.exec_cmd("~/.config/hypr/scripts/launch-terminal.sh"))
+hl.bind(mainMod .. " + ALT + M", hl.dsp.exec_cmd("~/.config/hypr/scripts/launch-spotify.sh"))
+hl.bind(mainMod .. " + ALT + D", hl.dsp.exec_cmd("~/.config/hypr/scripts/launch-discord.sh"))
+hl.bind(mainMod .. " + ALT + C", hl.dsp.exec_cmd("~/.config/hypr/scripts/launch-editor.sh"))
+
 
 -- Local AI: panel that knows this system. Special workspace so the
 -- session and model stay alive between presses.
@@ -744,5 +753,28 @@ do
         pcall(dofile, effects_state)
     else
         pcall(dofile, os.getenv("HOME") .. "/.config/hypr/efectos.lua")
+    end
+end
+
+-- ==========================================================================
+--  USER OVERRIDES. ~/.config/hypr/user.lua is YOURS: gitignored, seeded once
+--  by the installer from user.lua.example, never rewritten by updates.
+--  It loads absolutely LAST, so it wins over the rice defaults above and
+--  over effects.lua. Personal binds, rules and env vars belong here, never
+--  edited into this file. Missing file = no overrides, nothing breaks.
+-- ==========================================================================
+do
+    local user_path = os.getenv("HOME") .. "/.config/hypr/user.lua"
+    local probe = io.open(user_path, "r")
+    if probe then
+        probe:close()
+        -- A dofile'd chunk cannot see this file's locals (mainMod,
+        -- terminal, fileManager), so publish them as globals first.
+        -- Names are plain on purpose: inside user.lua they read exactly
+        -- like they do here.
+        _G.mainMod = mainMod
+        _G.terminal = terminal
+        _G.fileManager = fileManager
+        pcall(dofile, user_path)
     end
 end

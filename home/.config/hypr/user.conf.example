@@ -1,0 +1,19 @@
+# ###########################################################################
+#  USER OVERRIDES — YOUR FILE. UPDATES NEVER TOUCH IT.
+#
+#  This is a TEMPLATE (user.conf.example is versioned; user.conf is not).
+#  The installer copies this file to ~/.config/hypr/user.conf ONCE, only when
+#  it does not exist yet. After that it is yours: git ignores it, so
+#  `rice update` (a tag checkout + ./install.sh) can neither overwrite nor
+#  conflict with it. This file is sourced LAST, so everything here wins over
+#  the rice defaults.
+#
+#  RULE: never edit hyprland.conf for personal tweaks — put them here.
+#  Bonus: binds defined here DO show in Settings > Shortcuts (Super+K),
+#  because that list parses hyprland.conf AND this file.
+#
+#  $mainMod is already set to SUPER above; reuse it directly.
+# ###########################################################################
+
+# Example: open the file manager on Super+Alt+F
+# bind = $mainMod ALT, F, exec, uwsm app -- nautilus

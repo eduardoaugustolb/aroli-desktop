@@ -276,12 +276,14 @@ cmd_update() {
         exit 0
     fi
 
-    if ! git -C "$REPO" diff --quiet && ! git -C "$REPO" diff --cached --quiet; then
-        if [ -z "$(git -C "$REPO" status --porcelain 2>/dev/null)" ]; then :; fi
-    fi
+    # Dirty-tree guard: a checkout over local edits is how updates eat
+    # customizations. Personal tweaks belong in the gitignored overrides
+    # (~/.config/hypr/user.lua / user.conf, seeded once by install.sh),
+    # which never show up here — so a clean status is the normal case.
     if [ -n "$(git -C "$REPO" status --porcelain 2>/dev/null)" ]; then
-        err "the checkout has unsaved changes; update refuses to run over them."
-        err "commit, stash, or discard them first (git -C \"$REPO\" status --short)."
+        err "the checkout has local changes; update refuses to run over them."
+        err "custom binds/rules/env go in ~/.config/hypr/user.lua or user.conf (gitignored: updates never touch them)."
+        err "inspect with: git -C \"$REPO\" status --short — then commit, stash, or move the edits into user.*"
         exit 1
     fi
 
@@ -338,10 +340,14 @@ cmd_rollback() {
 # Files the desktop rewrites while you use it: state, not config. Never trash.
 # effects.lua is the en-US name; efectos.lua is its pre-rename legacy twin,
 # still honored by hyprland.lua as a fallback, so it is protected too.
+# user.lua / user.conf are yours (gitignored overrides seeded once by
+# install.sh): they are never tracked, so they can never be diff-filter=D
+# candidates — listed here anyway so no future refactor can trash them.
 is_protected() {
     case "$1" in
         home/.config/hypr/hypridle.conf|home/.config/hypr/language.conf|\
         home/.config/hypr/effects.lua|home/.config/hypr/efectos.lua|\
+        home/.config/hypr/user.lua|home/.config/hypr/user.conf|\
         home/.config/qt5ct/colors/*|\
         home/.config/qt6ct/colors/*|home/.config/poke-theme/state|\
         home/.config/spicetify/config-xpui.ini|home/.config/vlc/vlc-qt-interface.conf)

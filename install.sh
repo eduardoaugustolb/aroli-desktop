@@ -1059,6 +1059,22 @@ EOF
         run mv -- "$old_fx" "$new_fx" && ok "efectos.lua migrated to effects.lua (en-US rename)"
     fi
 
+    # 7c) personal overrides: user.lua / user.conf are gitignored and seeded
+    #     ONCE from their .example templates — "defaults for what is missing".
+    #     Updates never rewrite them; they load last and win over the rice.
+    #     At $HOME and not at $root on purpose, same as 7b: in --link mode
+    #     both paths are the same file anyway.
+    local user_src user_dest
+    for user_src in "$root/.config/hypr/user.lua.example" "$root/.config/hypr/user.conf.example"; do
+        user_dest="$HOME/.config/hypr/$(basename "$user_src" .example)"
+        if [ ! -f "$user_dest" ] && [ -f "$user_src" ]; then
+            run cp -- "$user_src" "$user_dest" \
+                && ok "$(basename "$user_dest") seeded from the template (yours; updates never touch it)"
+        else
+            skip "$(basename "$user_dest") already yours (kept)"
+        fi
+    done
+
     # 8) the language. Last, because it edits files that have just been laid
     #    down, and before the 'sddm' phase, which copies one of them into /usr.
     apply_language
