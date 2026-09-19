@@ -976,7 +976,10 @@ Scope {
                     // ---- modo notch: esquinas superiores INVERTIDAS contra el borde ----
                     Shape {
                         anchors.fill: parent
-                        visible: !root.island && !notch.threshold
+                        // An expanded panel is a work surface. Its perimeter must
+                        // stay quiet and rectangular enough to read; the Umbra
+                        // threshold belongs only to the resting notch.
+                        visible: !root.island && (!notch.threshold || ShellState.open)
                         preferredRendererType: Shape.CurveRenderer
                         antialiasing: true
 
@@ -1028,7 +1031,7 @@ Scope {
                     // transition. Only the attached notch's silhouette changes.
                     Shape {
                         anchors.fill: parent
-                        visible: !root.island && notch.threshold
+                        visible: !root.island && notch.threshold && !ShellState.open
                         preferredRendererType: Shape.CurveRenderer
                         antialiasing: true
                         ShapePath {
