@@ -34,6 +34,7 @@ Scope {
     readonly property var sections: [
         { id: "look",   icon: "󰸌", label: I18n.tr("Appearance"), desc: I18n.tr("Shape, bar, typeface and wallpaper") },
         { id: "system", icon: "󰒓", label: I18n.tr("System"), desc: I18n.tr("Screen, power, network and notifications") },
+        { id: "network",icon: "󰖩", label: I18n.tr("Wi-Fi"), desc: I18n.tr("Networks, saved profiles and connection") },
         { id: "audio",  icon: "󰕾", label: I18n.tr("Sound"), desc: I18n.tr("Volume and PipeWire devices") },
         { id: "bt",     icon: "󰂯", label: I18n.tr("Bluetooth"), desc: I18n.tr("Radio, saved devices and discovery") },
         { id: "keys",   icon: "󰌌", label: I18n.tr("Shortcuts"), desc: I18n.tr("Live map of Hyprland keys") },
@@ -54,10 +55,18 @@ Scope {
     function sectionHits(id) {
         if (id === "look") return look.matchCount;
         if (id === "system") return system.matchCount;
+        if (id === "network") return 0;
         if (id === "audio") return audio.matchCount;
         if (id === "bt") return bt.matchCount;
         if (id === "keys") return keys.matchCount;
         return about.matchCount;
+    }
+    Connections {
+        target: ShellState
+        function onSettingsSectionChanged() {
+            if (root.sectionInfo(ShellState.settingsSection).id !== "")
+                root.section = ShellState.settingsSection;
+        }
     }
     function selectFirstMatchingSection() {
         if (!root.searching || root.totalHits === 0 || root.sectionHits(root.section) > 0) return;
@@ -544,6 +553,7 @@ Scope {
 
                         readonly property var current: root.section === "look" ? look
                                                      : root.section === "system" ? system
+                                                     : root.section === "network" ? network
                                                      : root.section === "audio" ? audio
                                                      : root.section === "bt" ? bt
                                                      : root.section === "keys" ? keys
@@ -562,6 +572,11 @@ Scope {
                         // sección hace su onVisibleChanged.
                         SettingsAppearance { id: look;   anchors.fill: parent; visible: ShellState.settingsOpen && !content.noResults && root.section === "look" }
                         SettingsSystem     { id: system; anchors.fill: parent; visible: ShellState.settingsOpen && !content.noResults && root.section === "system" }
+                        SettingsNetwork {
+                            id: network
+                            anchors.fill: parent
+                            visible: ShellState.settingsOpen && !content.noResults && root.section === "network"
+                        }
                         SettingsAudio      { id: audio;  anchors.fill: parent; visible: ShellState.settingsOpen && !content.noResults && root.section === "audio" }
                         SettingsBluetooth  { id: bt;     anchors.fill: parent; visible: ShellState.settingsOpen && !content.noResults && root.section === "bt" }
                         SettingsShortcuts  { id: keys;   anchors.fill: parent; visible: ShellState.settingsOpen && !content.noResults && root.section === "keys" }

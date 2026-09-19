@@ -1035,7 +1035,7 @@ Scope {
                         onClicked: function (m) {
                             if (m.button === Qt.RightButton && ShellState.player)
                                 ShellState.player.isPlaying ? ShellState.player.pause() : ShellState.player.play();
-                            else ShellState.togglePanel("control");
+                            else ShellState.openPanelFromNotch("control");
                         }
                         // Dos ejes, dos cosas. El vertical era lo unico que habia y
                         // sigue igual (volumen); el horizontal no hacia nada y ahora

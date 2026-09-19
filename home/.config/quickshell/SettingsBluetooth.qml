@@ -137,7 +137,9 @@ Flickable {
                 ? (dev.modelData.batteryAvailable
                     ? I18n.tr("Connected · {0} %", Math.round(dev.modelData.battery * 100))
                     : I18n.tr("Connected"))
-            : (dev.modelData.paired || dev.modelData.bonded) ? I18n.tr("Paired") : ""
+            : ShellState.btFailureFor === (dev.modelData.address || "")
+                ? I18n.tr("Couldn’t connect · try again")
+                : (dev.modelData.paired || dev.modelData.bonded) ? I18n.tr("Paired") : ""
 
         readonly property bool isSettingsRow: true
         readonly property bool matches: ShellState.settingsMatch(dev.name_, dev.modelData.address || "")
@@ -180,14 +182,30 @@ Flickable {
             Text {
                 visible: dev.state_.length > 0
                 text: dev.state_
-                color: dev.modelData.connected ? Colors.accent : "#7d7d7d"
+                color: dev.modelData.connected ? Colors.accent
+                     : ShellState.btFailureFor === (dev.modelData.address || "") ? Colors.crit : "#7d7d7d"
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsXS
             }
 
-            // olvidar
             Text {
-                visible: dMa.containsMouse && (dev.modelData.paired || dev.modelData.bonded)
+                text: dev.modelData.connected ? I18n.tr("Disconnect")
+                    : (dev.modelData.paired || dev.modelData.bonded) ? I18n.tr("Connect") : I18n.tr("Pair")
+                color: actionMa.containsMouse ? Colors.accent : "#b0b0b0"
+                font.family: Appearance.fontUI
+                font.pixelSize: Appearance.fsXS
+                MouseArea {
+                    id: actionMa
+                    anchors.fill: parent; anchors.margins: -6
+                    hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                    onClicked: ShellState.connectBluetooth(dev.modelData)
+                }
+            }
+
+            // Forget stays visible for saved devices: it is a first-class
+            // recovery action, not a hover-only hidden affordance.
+            Text {
+                visible: dev.modelData.paired || dev.modelData.bonded
                 text: "󰩹"
                 color: fMa.containsMouse ? Colors.crit : "#7d7d7d"
                 font.family: Appearance.font
@@ -215,10 +233,7 @@ Flickable {
                 : dev.name_
             onExited: ShellState.settingsHint = ""
             onClicked: {
-                const d = dev.modelData;
-                if (d.connected) d.disconnect();
-                else if (d.paired || d.bonded) d.connect();
-                else d.pair();
+                ShellState.connectBluetooth(dev.modelData);
             }
         }
     }

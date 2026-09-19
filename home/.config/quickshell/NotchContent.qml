@@ -721,10 +721,16 @@ Item {
 
     // ─────────────── launcher: lanzador de aplicaciones ───────────────
     NotchLayer {
+        id: launcherLayer
         anchors.fill: parent
         active: root.mode === "launcher"
         origin: -1   // el boton de Arch esta a la izquierda
-        LauncherPanel { anchors.fill: parent }
+        Loader {
+            anchors.fill: parent
+            active: launcherLayer.active
+            asynchronous: false
+            sourceComponent: Component { LauncherPanel { anchors.fill: parent } }
+        }
     }
 
     // ─────────────── overview: mapa de escritorios ───────────────
@@ -732,56 +738,98 @@ Item {
     // la barra, lo abre Super+Tab. Lo que no has pedido desde un sitio concreto
     // no tiene por qué venir de un sitio concreto.
     NotchLayer {
+        id: overviewLayer
         anchors.fill: parent
         active: root.mode === "overview"
-        OverviewPanel { anchors.fill: parent }
+        Loader {
+            anchors.fill: parent
+            active: overviewLayer.active
+            asynchronous: false
+            sourceComponent: Component { OverviewPanel { anchors.fill: parent } }
+        }
     }
 
     // ─────────────── control: centro de control ───────────────
     NotchLayer {
+        id: controlLayer
         anchors.fill: parent
         active: root.mode === "control"
         origin: 1   // la campana de notificaciones esta a la derecha
-        ControlPanel { anchors.fill: parent }
+        Loader {
+            anchors.fill: parent
+            active: controlLayer.active
+            asynchronous: false
+            sourceComponent: Component { ControlPanel { anchors.fill: parent } }
+        }
     }
 
     // ─────────────── system: una mirada tranquila al equipo ───────────────
     NotchLayer {
+        id: systemLayer
         anchors.fill: parent
         active: root.mode === "system"
         origin: 1   // nace del botón Tu equipo del centro de control
-        PerformancePanel { anchors.fill: parent }
+        Loader {
+            anchors.fill: parent
+            active: systemLayer.active
+            asynchronous: false
+            sourceComponent: Component { PerformancePanel { anchors.fill: parent } }
+        }
     }
 
     // ─────────────── network: selector de red ───────────────
     NotchLayer {
+        id: networkLayer
         anchors.fill: parent
         active: root.mode === "network"
         origin: 1   // se abre desde el panel de control, a la derecha
-        NetworkPanel { anchors.fill: parent }
+        Loader {
+            anchors.fill: parent
+            active: networkLayer.active
+            asynchronous: false
+            sourceComponent: Component { NetworkPanel { anchors.fill: parent } }
+        }
     }
 
     // ─────────────── bluetooth: dispositivos ───────────────
     NotchLayer {
+        id: bluetoothLayer
         anchors.fill: parent
         active: root.mode === "bluetooth"
         origin: 1   // se abre desde el panel de control, a la derecha
-        BluetoothPanel { anchors.fill: parent }
+        Loader {
+            anchors.fill: parent
+            active: bluetoothLayer.active
+            asynchronous: false
+            sourceComponent: Component { BluetoothPanel { anchors.fill: parent } }
+        }
     }
 
     // ─────────────── power: menú de encendido ───────────────
     NotchLayer {
+        id: powerLayer
         anchors.fill: parent
         active: root.mode === "power"
         origin: 1   // su icono esta a la derecha
-        PowerPanel { anchors.fill: parent }
+        Loader {
+            anchors.fill: parent
+            active: powerLayer.active
+            asynchronous: false
+            sourceComponent: Component { PowerPanel { anchors.fill: parent } }
+        }
     }
 
     // ─────────────── calendar: calendario del mes ───────────────
     NotchLayer {
+        id: calendarLayer
         anchors.fill: parent
         active: root.mode === "calendar"
         origin: 1   // se abre desde el centro de control, a la derecha
-        CalendarPanel { anchors.fill: parent }
+        Loader {
+            anchors.fill: parent
+            active: calendarLayer.active
+            asynchronous: false
+            sourceComponent: Component { CalendarPanel { anchors.fill: parent } }
+        }
     }
 }

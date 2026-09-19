@@ -59,11 +59,9 @@ case "${1:-status}" in
 on)
     [ -f "$REMOTE" ] || die "missing $REMOTE"
     apply "$REMOTE"
-    # Lua syntax (Hyprland 0.55+): bare `dpms on` is a syntax error and hyprctl
-    # exits with 7 without turning anything on. This matters more here: entering
-    # remote mode with the screen off causes DPMS off to stop compositing and
-    # RustDesk capture to turn black.
-    hyprctl dispatch 'hl.dsp.dpms("on")' >/dev/null 2>&1
+    # `dispatch` expects the native dispatcher and its argument; it does not
+    # evaluate Lua.  Wake outputs so RustDesk has a composited frame at once.
+    hyprctl dispatch dpms on >/dev/null 2>&1
 
     # RustDesk must be running for there to be something to connect to.
     if ! pgrep -x rustdesk >/dev/null 2>&1; then

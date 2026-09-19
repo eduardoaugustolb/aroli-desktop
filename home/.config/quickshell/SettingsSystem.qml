@@ -182,16 +182,21 @@ Flickable {
             }
 
             SettingsControls.Action_ {
-                label: I18n.tr("Available networks")
-                hint: I18n.tr("Opens the network picker in the notch. Settings closes so it does not cover it.")
+                label: I18n.tr("Wi-Fi settings")
+                hint: I18n.tr("Opens Wi-Fi here: available networks, saved profiles and forgetting a network.")
                 icon: Icons.wifi
                 value: ShellState.wiredDev ? I18n.tr("wired")
                      : ShellState.wifiNet ? ShellState.wifiNet.name
                      : (ShellState.wifiOn || !ShellState.hasWifi) ? I18n.tr("not connected") : I18n.tr("off")
-                onTriggered: {
-                    ShellState.settingsOpen = false;
-                    ShellState.togglePanel("network");
-                }
+                onTriggered: ShellState.openSettings("network")
+            }
+
+            SettingsControls.Action_ {
+                label: I18n.tr("Bluetooth settings")
+                hint: I18n.tr("Opens Bluetooth here to pair, connect or forget devices.")
+                icon: Icons.bluetooth
+                value: ShellState.btConnected > 0 ? I18n.tr("connected") : I18n.tr("devices")
+                onTriggered: ShellState.openSettings("bt")
             }
 
             SettingsControls.Action_ {

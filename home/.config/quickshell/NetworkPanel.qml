@@ -14,14 +14,25 @@ import QtQuick.Layouts
 Item {
     id: root
 
-    readonly property bool active: ShellState.panel === "network"
+    // The same network UI lives in the transient notch and in Settings. In
+    // Settings it must keep scanning, but Escape must remain owned by the
+    // settings window rather than closing an unrelated notch panel.
+    property bool settingsMode: false
+    readonly property bool active: settingsMode
+        ? (ShellState.settingsOpen && root.visible)
+        : ShellState.panel === "network"
     // SSID whose row is unfolded asking for a password
     property string askingFor: ""
     property string errorFor: ""
+    // NetworkManager refreshes/reorders the live model while scanning. A
+    // delegate-local TextField is destroyed during that refresh, so the draft
+    // must belong to the panel, not the row instance.
+    property string passwordFor: ""
+    property string passwordDraft: ""
 
     onActiveChanged: {
         if (root.active) keys.forceActiveFocus();
-        else { root.askingFor = ""; root.errorFor = ""; }
+        else { root.askingFor = ""; root.errorFor = ""; root.passwordFor = ""; root.passwordDraft = ""; }
     }
 
     MouseArea { anchors.fill: parent }
@@ -34,8 +45,9 @@ Item {
         anchors.fill: parent
         focus: true
         Keys.onEscapePressed: function (e) {
-            if (root.askingFor !== "") { root.askingFor = ""; root.errorFor = ""; }
-            else ShellState.closePanel();
+            if (root.askingFor !== "") { root.askingFor = ""; root.errorFor = ""; root.passwordFor = ""; root.passwordDraft = ""; }
+            else if (!root.settingsMode) ShellState.closePanel();
+            else return;
             e.accepted = true;
         }
         Keys.onDownPressed: if (list.count > 0) list.currentIndex = Math.min(list.count - 1, list.currentIndex + 1)
@@ -121,7 +133,7 @@ Item {
                 root.errorFor = "";
                 if (n.known || !ShellState.isSecured(n)) n.connect();
                 else if (ShellState.isEnterprise(n)) ShellState.editEnterprise(n);
-                else root.askingFor = n.name || "";
+                else { root.askingFor = n.name || ""; root.passwordFor = root.askingFor; root.passwordDraft = ""; }
             }
 
             delegate: Rectangle {
@@ -150,6 +162,7 @@ Item {
                     function onConnectionFailed(reason) {
                         root.errorFor = netRow.ssid;
                         root.askingFor = netRow.secured && !netRow.enterprise ? netRow.ssid : "";
+                        if (root.askingFor !== "") root.passwordFor = netRow.ssid;
                     }
                     function onConnectedChanged() {
                         if (netRow.modelData.connected) { root.askingFor = ""; root.errorFor = ""; }
@@ -232,6 +245,27 @@ Item {
                                 onClicked: netRow.modelData.disconnect()
                             }
                         }
+
+                        // Forget is explicit in both the quick picker and the
+                        // Settings section. It applies to saved profiles even
+                        // when they are not currently connected.
+                        Text {
+                            visible: netMa.containsMouse && netRow.modelData.known
+                            text: "󰩹"
+                            color: forgetMa.containsMouse ? Colors.crit : "#8a8a8a"
+                            font.family: Appearance.font; font.pixelSize: 13
+                            MouseArea {
+                                id: forgetMa
+                                anchors.fill: parent; anchors.margins: -6
+                                hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (root.askingFor === netRow.ssid) {
+                                        root.askingFor = ""; root.passwordFor = ""; root.passwordDraft = "";
+                                    }
+                                    netRow.modelData.forget();
+                                }
+                            }
+                        }
                     }
 
                     // ---- password, unfolded in the row itself ----
@@ -262,9 +296,14 @@ Item {
                                 background: null
                                 padding: 0
                                 verticalAlignment: TextInput.AlignVCenter
+                                text: root.passwordFor === netRow.ssid ? root.passwordDraft : ""
 
-                                onVisibleChanged: if (visible) forceActiveFocus()
-                                Keys.onEscapePressed: { root.askingFor = ""; root.errorFor = ""; }
+                                // A recreated delegate rehydrates this field
+                                // from root.passwordDraft, then regains focus
+                                // on the next event turn after ListView settles.
+                                onVisibleChanged: if (visible) inputRefocus.restart()
+                                onTextEdited: root.passwordDraft = text
+                                Keys.onEscapePressed: { root.askingFor = ""; root.errorFor = ""; root.passwordFor = ""; root.passwordDraft = ""; }
                                 Keys.onReturnPressed: netRow.tryConnect()
                                 Keys.onEnterPressed: netRow.tryConnect()
                             }
@@ -291,11 +330,17 @@ Item {
                     }
                 }
 
+                Timer {
+                    id: inputRefocus
+                    interval: 0
+                    onTriggered: if (netRow.asking && pskField.visible) pskField.forceActiveFocus()
+                }
+
                 function tryConnect() {
                     root.errorFor = "";
                     if (netRow.enterprise && !netRow.modelData.known) {
                         ShellState.editEnterprise(netRow.modelData);
-                    } else if (netRow.secured && !netRow.modelData.known) netRow.modelData.connectWithPsk(pskField.text);
+                    } else if (netRow.secured && !netRow.modelData.known) netRow.modelData.connectWithPsk(root.passwordDraft);
                     else netRow.modelData.connect();
                     root.askingFor = "";
                 }
@@ -313,7 +358,11 @@ Item {
                         // only a new PSK network unfolds a key field.
                         if (netRow.modelData.known || !netRow.secured) netRow.modelData.connect();
                         else if (netRow.enterprise) ShellState.editEnterprise(netRow.modelData);
-                        else root.askingFor = netRow.asking ? "" : netRow.ssid;
+                        else if (netRow.asking) {
+                            root.askingFor = ""; root.passwordFor = ""; root.passwordDraft = "";
+                        } else {
+                            root.askingFor = netRow.ssid; root.passwordFor = netRow.ssid; root.passwordDraft = "";
+                        }
                     }
                 }
             }

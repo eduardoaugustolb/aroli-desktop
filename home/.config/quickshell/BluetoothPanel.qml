@@ -181,8 +181,11 @@ Item {
                             ? (dev.modelData.batteryAvailable
                                 ? I18n.tr("Connected · {0} %", Math.round(dev.modelData.battery * 100))
                                 : I18n.tr("Connected"))
-                        : (dev.modelData.paired || dev.modelData.bonded) ? I18n.tr("Paired") : ""
-                    color: dev.modelData.connected ? Colors.accent : "#7d7d7d"
+                        : ShellState.btFailureFor === (dev.modelData.address || "")
+                            ? I18n.tr("Couldn’t connect · try again")
+                            : (dev.modelData.paired || dev.modelData.bonded) ? I18n.tr("Paired") : ""
+                    color: dev.modelData.connected ? Colors.accent
+                        : ShellState.btFailureFor === (dev.modelData.address || "") ? Colors.crit : "#7d7d7d"
                     elide: Text.ElideRight
                     font.family: Appearance.fontUI; font.pixelSize: 10
                 }
@@ -210,9 +213,7 @@ Item {
             z: -1
             onClicked: {
                 const d = dev.modelData;
-                if (d.connected) d.disconnect();
-                else if (d.paired || d.bonded) d.connect();
-                else d.pair();
+                ShellState.connectBluetooth(d);
             }
         }
     }

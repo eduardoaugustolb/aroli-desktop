@@ -413,22 +413,19 @@ hl.config({
 -- and then this truly applies.
 -- NOTE syntax: dynamic_cursors with underscore (maps to
 -- plugin:dynamic-cursors:*); with a hyphen it errors "unknown config key".
--- "smooth" profile (base: alonso-herreros dotfiles): threshold 3 catches
--- the first sway; influence 2 grows zoom WITH shake intensity; timeout 0
--- deflates on release, like macOS. IPC-verified: 1 -> 3.6 progression,
--- continuous, no steps.
+-- Deliberate profile: threshold 7 ignores ordinary mouse movement; a modest
+-- 1.35× start and 2.4× ceiling keep it useful without dominating the screen.
+-- A short tail avoids an abrupt snap back on release.
 pcall(function()
     hl.config({
         plugin = {
             dynamic_cursors = {
                 mode = "none",
-                shake = { threshold = 3.0, base = 2.0, speed = 2.0, influence = 2.0, limit = 4.0, timeout = 0 },
-                -- nearest 0: never pixelated scaling. resolution 128: the
-                -- SVG theme rasterizes at 128 px -> sharp across the zoom range
-                -- (19 px x 4 = 76). The plugin is patched to load the SVG theme
-                -- even with cursor:enable_hyprcursor at false (the NORMAL
-                -- cursor stays the lifelong XCursor bitmap).
-                hyprcursor = { nearest = 0, resolution = 128 },
+                shake = { threshold = 5.0, base = 1.5, speed = 1.1, influence = 0.8, limit = 2.4, timeout = 700 },
+                -- High-resolution source extracted directly from the installed
+                -- Umbra XCursor theme. It retains its original bitmaps,
+                -- hotspots, and per-size variants, so zoom matches rest.
+                hyprcursor = { enabled = true, nearest = 0, resolution = 256 },
             },
         },
     })

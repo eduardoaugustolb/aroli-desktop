@@ -41,6 +41,14 @@ Singleton {
     // La app de Ajustes NO es un panel del notch (ver SettingsWindow.qml), pero
     // se lanza desde él, así que su estado vive aquí.
     property bool settingsOpen: false
+    // The settings window owns its visual section, while ShellState owns the
+    // request. This lets System link to Wi-Fi/Bluetooth without closing the
+    // app and reopening a transient notch picker.
+    property string settingsSection: "look"
+    function openSettings(section) {
+        if (section) root.settingsSection = section;
+        root.settingsOpen = true;
+    }
     function toggleSettings() { root.settingsOpen = !root.settingsOpen; }
 
     // Abrir Ajustes YA EN una sección concreta, en vez de en la de siempre.
@@ -86,6 +94,35 @@ Singleton {
     }
     function closePanel() { root.panel = ""; }
     property bool hovered: false             // ratón sobre el notch
+
+    // A click immediately after the hover dwell used to switch `peek` straight
+    // into a panel in the same event turn. Qt was then incubating model
+    // delegates while the peek layer was being torn down; Qt 6.11 can crash in
+    // QtQmlModels in precisely that overlap. Let the short exit finish before
+    // committing the panel state. This is deliberately a state transition, not
+    // a visual delay in TopShell, so every caller sees one coherent mode.
+    property string pendingNotchPanel: ""
+    Timer {
+        id: notchPanelTimer
+        interval: Appearance.mOut
+        repeat: false
+        onTriggered: {
+            const next = root.pendingNotchPanel;
+            root.pendingNotchPanel = "";
+            if (next.length > 0) root.panel = next;
+        }
+    }
+    function openPanelFromNotch(name) {
+        if (root.pendingNotchPanel.length > 0) {
+            notchPanelTimer.stop();
+            root.pendingNotchPanel = "";
+            return;
+        }
+        if (root.panel === name) { root.closePanel(); return; }
+        root.hovered = false;
+        root.pendingNotchPanel = name;
+        notchPanelTimer.restart();
+    }
     property string activity: ""             // "" | "volume" | "brightness" | "track"
     property bool armed: false               // ya pasó el arranque: se permiten OSD
 
@@ -1024,10 +1061,14 @@ Singleton {
     Binding {
         target: root.wifiDev
         property: "scannerEnabled"
-        value: root.panel === "network"
+        value: (root.panel === "network" || root.wifiScanWanted)
         when: root.wifiDev !== null
         restoreMode: Binding.RestoreNone
     }
+    // Settings asks for Wi-Fi scanning through the same single binding. Two
+    // writers to scannerEnabled make scan state flicker when a panel closes.
+    property bool wifiScanWanted: false
+
     // La sección Bluetooth de Ajustes también quiere descubrir mientras está
     // abierta. Lo pide por aquí en vez de escribir `discovering` a mano: dos
     // sitios escribiendo la misma propiedad (uno con Binding y otro
@@ -1138,6 +1179,37 @@ Singleton {
     function btLabel(d) {
         if (!d) return "";
         return d.deviceName || d.name || d.address || "";
+    }
+    // BlueZ exposes connection state but no per-attempt failure signal through
+    // Quickshell. A bounded pending state is the honest fallback: a failed
+    // paired-device connection becomes actionable instead of a silent click.
+    property string btPendingAddress: ""
+    property string btFailureFor: ""
+    function connectBluetooth(d) {
+        if (!d) return;
+        if (d.connected) { d.disconnect(); return; }
+        btFailureFor = "";
+        if (d.paired || d.bonded) {
+            btPendingAddress = d.address || "";
+            d.connect();
+            btConnectTimeout.restart();
+        } else {
+            d.pair();
+        }
+    }
+    Timer {
+        id: btConnectTimeout
+        interval: 8000
+        repeat: false
+        onTriggered: {
+            const devices = Bluetooth.devices ? Bluetooth.devices.values : [];
+            for (let i = 0; i < devices.length; i++) {
+                const d = devices[i];
+                if ((d.address || "") === root.btPendingAddress && !d.connected)
+                    root.btFailureFor = root.btPendingAddress;
+            }
+            root.btPendingAddress = "";
+        }
     }
     function toggleBt() { if (btAdapter) btAdapter.enabled = !btAdapter.enabled; }
 
