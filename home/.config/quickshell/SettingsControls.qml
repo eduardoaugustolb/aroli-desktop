@@ -321,6 +321,40 @@ QtObject {
         }
     }
 
+    // A compact hex editor for the few palette tokens a person may want to
+    // own. Invalid drafts remain visible but never reach Config, so a typo
+    // cannot leave the shell without a readable colour.
+    component ColorField_: RowLayout {
+        id: field
+        property string value: "#000000"
+        signal accepted(string value)
+        Layout.preferredWidth: 270
+        spacing: 8
+
+        Rectangle {
+            width: 22; height: 22; radius: 6
+            color: /^#[0-9a-fA-F]{6}$/.test(field.value) ? field.value : "transparent"
+            border.width: 1; border.color: "#555b5a"
+        }
+        Rectangle {
+            Layout.fillWidth: true; Layout.preferredHeight: 28
+            radius: 6; color: "#191c1c"; border.width: 1
+            border.color: input.activeFocus ? Colors.accent : "#3b4242"
+            TextInput {
+                id: input
+                anchors.fill: parent; anchors.margins: 7
+                text: field.value
+                selectByMouse: true
+                color: /^#[0-9a-fA-F]{6}$/.test(text) ? "#e7eaf0" : Colors.crit
+                font.family: Appearance.font
+                font.pixelSize: Appearance.fsS
+                maximumLength: 7
+                verticalAlignment: TextInput.AlignVCenter
+                onEditingFinished: if (/^#[0-9a-fA-F]{6}$/.test(text)) field.accepted(text.toLowerCase())
+            }
+        }
+    }
+
     // ─────────── selector de opciones ───────────
     component Choice_: Flow {
         id: ch

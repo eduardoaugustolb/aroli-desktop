@@ -87,8 +87,12 @@ awww img "$IMG" --transition-type "$awww_rt" --transition-pos 0.5,0.5 --transiti
 # Reload live daemons.
 # Quickshell (bar + notch) does NOT need a reload: Colors.qml watches
 # ~/.cache/wal/colors.json and recolors itself.
-pkill -SIGUSR1 -x kitty  2>/dev/null || true
-hyprctl reload           >/dev/null 2>&1 || true
+scope_enabled() {
+  command -v jq >/dev/null 2>&1 || return 0
+  jq -e --arg key "$1" '.[$key] // true' "$HOME/.config/quickshell-rice.json" >/dev/null 2>&1
+}
+scope_enabled paletteScopeTerminal && pkill -SIGUSR1 -x kitty 2>/dev/null || true
+scope_enabled paletteScopeHyprland && hyprctl reload >/dev/null 2>&1 || true
 # swaync removed on 2026-08-05: Quickshell provides the notification server
 ~/.config/hypr/scripts/yazi-pywal.sh 2>/dev/null || true
 ~/.config/hypr/scripts/cava-pywal.sh 2>/dev/null || true
@@ -101,9 +105,9 @@ hyprctl reload           >/dev/null 2>&1 || true
 # theme watches the .conf and the script rewrites it while preserving the inode,
 # which is what lets the watcher detect it; with the usual temp + rename trick,
 # it never does.
-~/.config/hypr/scripts/qt-pywal.py >/dev/null 2>&1 || true
+scope_enabled paletteScopeGtkQt && ~/.config/hypr/scripts/qt-pywal.py >/dev/null 2>&1 || true
 # Also update already-open GTK/libadwaita applications through the appearance portal.
-~/.config/hypr/scripts/gtk-pywal.sh >/dev/null 2>&1 || true
+scope_enabled paletteScopeGtkQt && ~/.config/hypr/scripts/gtk-pywal.sh >/dev/null 2>&1 || true
 ~/.config/hypr/scripts/discord-pywal.sh 2>/dev/null || true
 # (spicetify was already launched above, before the wallpaper transition)
 # Reorders Pokemon sprites for the new palette (~0.1 s) so the next terminal

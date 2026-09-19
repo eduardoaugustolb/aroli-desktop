@@ -963,6 +963,7 @@ Scope {
 
                     readonly property real fl: root.flare
                     readonly property real rb: Math.max(6, Math.min(root.roundMax, height - fl - 1))
+                    readonly property bool threshold: Config.notchLanguage === "threshold"
 
                     // ---- modo isla: una píldora redonda por los cuatro lados ----
                     Rectangle {
@@ -975,7 +976,7 @@ Scope {
                     // ---- modo notch: esquinas superiores INVERTIDAS contra el borde ----
                     Shape {
                         anchors.fill: parent
-                        visible: !root.island
+                        visible: !root.island && !notch.threshold
                         preferredRendererType: Shape.CurveRenderer
                         antialiasing: true
 
@@ -1018,6 +1019,32 @@ Scope {
                                 control2X: sp.fl + sp.w + sp.fl * sp.k; control2Y: 0
                                 x: sp.fl + sp.w + sp.fl;                y: 0
                             }
+                            PathLine { x: 0; y: 0 }
+                        }
+                    }
+
+                    // Umbra's threshold is an alternative skin, not a different
+                    // control: it keeps every existing hit area, width and panel
+                    // transition. Only the attached notch's silhouette changes.
+                    Shape {
+                        anchors.fill: parent
+                        visible: !root.island && notch.threshold
+                        preferredRendererType: Shape.CurveRenderer
+                        antialiasing: true
+                        ShapePath {
+                            fillColor: root.notchColor
+                            strokeWidth: 0
+                            startX: 0; startY: 0
+                            PathLine { x: notch.fl; y: 0 }
+                            PathLine { x: notch.fl; y: notch.height - notch.rb }
+                            PathCubic {
+                                control1X: notch.fl; control1Y: notch.height - notch.rb * .45
+                                control2X: notch.fl + notch.rb * .45; control2Y: notch.height
+                                x: notch.fl + notch.rb; y: notch.height
+                            }
+                            PathLine { x: notch.width * .58; y: notch.height }
+                            PathLine { x: notch.width - notch.fl; y: notch.fl }
+                            PathLine { x: notch.width - notch.fl; y: 0 }
                             PathLine { x: 0; y: 0 }
                         }
                     }

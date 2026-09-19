@@ -22,7 +22,7 @@ Flickable {
     property string note: I18n.tr("Saved on its own to ~/.config/quickshell-rice.json")
     readonly property int matchCount: cLang.visibleRows + cNotch.visibleRows
         + cBehav.visibleRows + cBar.visibleRows + cFont.visibleRows + cFx.visibleRows
-        + cWin.visibleRows + cWall.visibleRows + cPalette.visibleRows
+        + cWin.visibleRows + cWall.visibleRows + cPalette.visibleRows + cScope.visibleRows
     signal actionRun
     onActionRun: Config.reset()
 
@@ -73,6 +73,16 @@ Flickable {
                     options: ["Notch", I18n.tr("Island")]
                     current: Config.notchStyle === "island" ? I18n.tr("Island") : "Notch"
                     onPicked: function (v) { Config.notchStyle = (v === I18n.tr("Island") ? "island" : "notch"); }
+                }
+            }
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Visual language")
+                hint: I18n.tr("Classic retains the MacBook-like cutout. Threshold keeps the same notch and island behaviour but gives the attached notch Umbra's open curve and diagonal exit.")
+                SettingsControls.Choice_ {
+                    options: [I18n.tr("Classic"), I18n.tr("Threshold")]
+                    current: Config.notchLanguage === "threshold" ? I18n.tr("Threshold") : I18n.tr("Classic")
+                    onPicked: function(v) { Config.notchLanguage = v === I18n.tr("Threshold") ? "threshold" : "classic"; }
                 }
             }
 
@@ -325,12 +335,30 @@ Flickable {
             title: I18n.tr("COLOUR SYSTEM")
 
             SettingsControls.Row_ {
+                label: I18n.tr("Palette preset")
+                hint: I18n.tr("Wallpaper keeps the original full pywal palette. Umbra keeps neutral surfaces. Hybrid uses the intensity below. Manual protects the four colours you enter.")
+                SettingsControls.Choice_ {
+                    options: [I18n.tr("Wallpaper"), "Umbra", I18n.tr("Hybrid"), I18n.tr("Manual")]
+                    current: Config.palettePreset === "wallpaper" ? I18n.tr("Wallpaper") : Config.palettePreset === "umbra" ? "Umbra" : Config.palettePreset === "manual" ? I18n.tr("Manual") : I18n.tr("Hybrid")
+                    onPicked: function (v) {
+                        Config.rememberPalette();
+                        Config.palettePreset = v === I18n.tr("Wallpaper") ? "wallpaper" : v === "Umbra" ? "umbra" : v === I18n.tr("Manual") ? "manual" : "hybrid";
+                        if (Config.palettePreset === "wallpaper") Config.paletteIntensity = 4;
+                        if (Config.palettePreset === "umbra" || Config.palettePreset === "manual") Config.paletteIntensity = 0;
+                        Config.paletteMode = Config.paletteIntensity === 4 ? "wallpaper" : "umbra";
+                        Config.applyPalette();
+                    }
+                }
+            }
+
+            SettingsControls.Row_ {
                 label: I18n.tr("Palette intensity")
                 hint: I18n.tr("How strongly the wallpaper tints generated surfaces. 0 keeps neutral Umbra surfaces; 4 restores the full wallpaper-derived pywal behaviour. The middle values blend the two.")
                 SettingsControls.Slider_ {
                     value: Config.paletteIntensity; from: 0; to: 4
                     onMoved: function (v) {
                         Config.paletteIntensity = Math.round(v);
+                        Config.palettePreset = "hybrid";
                         // Keep the old key meaningful for scripts and for a
                         // downgrade to a previous rice release.
                         Config.paletteMode = Config.paletteIntensity === 4 ? "wallpaper" : "umbra";
@@ -338,6 +366,60 @@ Flickable {
                     }
                 }
             }
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Accent saturation")
+                hint: I18n.tr("Caps the colourfulness of generated accents without changing their hue. 100% preserves pywal; 0% is monochrome.")
+                SettingsControls.Slider_ { value: Config.paletteSaturation; from: 0; to: 160; suffix: "%"; onMoved: function(v) { Config.rememberPalette(); Config.paletteSaturation = Math.round(v); Config.applyPalette(); } }
+            }
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Text contrast")
+                hint: I18n.tr("Minimum contrast for generated foreground text. The generator lightens or darkens text before publishing a palette.")
+                SettingsControls.Slider_ { value: Config.paletteMinContrast; from: 3; to: 7; decimals: 1; onMoved: function(v) { Config.rememberPalette(); Config.paletteMinContrast = v; Config.applyPalette(); } }
+            }
+
+            SettingsControls.Row_ {
+                label: I18n.tr("Semantic colours")
+                hint: I18n.tr("Wallpaper makes status hues personal. Fixed keeps error, success, warning and information recognisable across every wallpaper.")
+                SettingsControls.Choice_ {
+                    options: [I18n.tr("Wallpaper"), I18n.tr("Fixed")]
+                    current: Config.paletteSemanticMode === "fixed" ? I18n.tr("Fixed") : I18n.tr("Wallpaper")
+                    onPicked: function(v) { Config.rememberPalette(); Config.paletteSemanticMode = v === I18n.tr("Fixed") ? "fixed" : "wallpaper"; Config.applyPalette(); }
+                }
+            }
+
+            SettingsControls.Row_ {
+                shown: Config.palettePreset === "manual"; label: I18n.tr("Canvas colour")
+                hint: I18n.tr("Manual palettes accept #RRGGBB. Invalid values are never applied.")
+                SettingsControls.ColorField_ { value: Config.paletteCanvas; onAccepted: function(v) { Config.rememberPalette(); Config.paletteCanvas = v; Config.applyPalette(); } }
+            }
+            SettingsControls.Row_ {
+                shown: Config.palettePreset === "manual"; label: I18n.tr("Surface colour")
+                hint: I18n.tr("Manual palettes accept #RRGGBB. Invalid values are never applied.")
+                SettingsControls.ColorField_ { value: Config.paletteSurface; onAccepted: function(v) { Config.rememberPalette(); Config.paletteSurface = v; Config.applyPalette(); } }
+            }
+            SettingsControls.Row_ {
+                shown: Config.palettePreset === "manual"; label: I18n.tr("Text colour")
+                hint: I18n.tr("Manual palettes accept #RRGGBB. Invalid values are never applied.")
+                SettingsControls.ColorField_ { value: Config.paletteText; onAccepted: function(v) { Config.rememberPalette(); Config.paletteText = v; Config.applyPalette(); } }
+            }
+            SettingsControls.Row_ {
+                shown: Config.palettePreset === "manual"; label: I18n.tr("Accent colour")
+                hint: I18n.tr("Manual palettes accept #RRGGBB. Invalid values are never applied.")
+                SettingsControls.ColorField_ { value: Config.paletteAccent; onAccepted: function(v) { Config.rememberPalette(); Config.paletteAccent = v; Config.applyPalette(); } }
+            }
+            SettingsControls.Action_ { label: I18n.tr("Capture current palette"); hint: I18n.tr("Copies the current generated palette into Manual, so the next wallpaper cannot overwrite it."); icon: Icons.clipboard; onTriggered: Config.capturePalette() }
+            SettingsControls.Action_ { label: I18n.tr("Restore previous palette"); hint: I18n.tr("Restores the palette saved before your last palette change."); icon: Icons.sync; onTriggered: Config.restorePreviousPalette() }
+        }
+
+        SettingsControls.Card_ {
+            id: cScope
+            title: I18n.tr("PALETTE SCOPE")
+            SettingsControls.Row_ { label: I18n.tr("Shell"); hint: I18n.tr("Lets wallpaper changes recolour the bar, notch and panels live."); SettingsControls.Switch_ { checked: Config.paletteScopeShell; onToggled: function(v) { Config.paletteScopeShell = v; Config.applyPalette(); } } }
+            SettingsControls.Row_ { label: I18n.tr("Terminal"); hint: I18n.tr("Reloads running Kitty terminals after a generated palette changes."); SettingsControls.Switch_ { checked: Config.paletteScopeTerminal; onToggled: function(v) { Config.paletteScopeTerminal = v; Config.applyPalette(); } } }
+            SettingsControls.Row_ { label: I18n.tr("GTK and Qt"); hint: I18n.tr("Refreshes the generated GTK, Qt and KDE application palettes."); SettingsControls.Switch_ { checked: Config.paletteScopeGtkQt; onToggled: function(v) { Config.paletteScopeGtkQt = v; Config.applyPalette(); } } }
+            SettingsControls.Row_ { label: I18n.tr("Hyprland"); hint: I18n.tr("Reloads the compositor so borders and shadows use the generated palette."); SettingsControls.Switch_ { checked: Config.paletteScopeHyprland; onToggled: function(v) { Config.paletteScopeHyprland = v; Config.applyPalette(); } } }
         }
 
         SettingsControls.Card_ {

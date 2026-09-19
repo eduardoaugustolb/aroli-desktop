@@ -15,6 +15,7 @@ import QtQuick
 
 Singleton {
     id: root
+    property bool paletteChangePending: false
 
     // ───────── language ─────────
     // "pt-BR" | "es" | "en". I18n reads it and the whole UI hangs off it. The
@@ -51,6 +52,24 @@ Singleton {
     // "wallpaper" result, with three useful stops between them.
     property alias paletteMode: opts.paletteMode
     property alias paletteIntensity: opts.paletteIntensity
+    property alias palettePreset: opts.palettePreset
+    property alias paletteSaturation: opts.paletteSaturation
+    property alias paletteMinContrast: opts.paletteMinContrast
+    property alias paletteSemanticMode: opts.paletteSemanticMode
+    property alias paletteCanvas: opts.paletteCanvas
+    property alias paletteSurface: opts.paletteSurface
+    property alias paletteText: opts.paletteText
+    property alias paletteAccent: opts.paletteAccent
+    property alias palettePrevious: opts.palettePrevious
+
+    // These scopes are opt-in boundaries for the generated targets. The shell
+    // reacts live; applications reload only when their scope is enabled.
+    property alias paletteScopeShell: opts.paletteScopeShell
+    property alias paletteScopeTerminal: opts.paletteScopeTerminal
+    property alias paletteScopeGtkQt: opts.paletteScopeGtkQt
+    property alias paletteScopeHyprland: opts.paletteScopeHyprland
+
+    property alias notchLanguage: opts.notchLanguage
 
     // ───────── launcher ─────────
     // Favorites, by .desktop entry `id` and IN ORDER: position is what
@@ -92,6 +111,39 @@ Singleton {
         // than starting competing wal processes.
         paletteDebounce.restart()
     }
+
+    function validHex(value) { return /^#[0-9a-fA-F]{6}$/.test(String(value)); }
+
+    function rememberPalette() {
+        if (root.paletteChangePending) return;
+        root.paletteChangePending = true;
+        opts.palettePrevious = {
+            preset: opts.palettePreset, intensity: opts.paletteIntensity,
+            saturation: opts.paletteSaturation, minContrast: opts.paletteMinContrast,
+            semanticMode: opts.paletteSemanticMode, canvas: opts.paletteCanvas,
+            surface: opts.paletteSurface, text: opts.paletteText, accent: opts.paletteAccent
+        };
+    }
+
+    function restorePreviousPalette() {
+        const p = opts.palettePrevious;
+        if (!p || !p.preset) return;
+        opts.palettePreset = p.preset; opts.paletteIntensity = p.intensity;
+        opts.paletteSaturation = p.saturation; opts.paletteMinContrast = p.minContrast;
+        opts.paletteSemanticMode = p.semanticMode; opts.paletteCanvas = p.canvas;
+        opts.paletteSurface = p.surface; opts.paletteText = p.text; opts.paletteAccent = p.accent;
+        opts.paletteMode = opts.paletteIntensity === 4 ? "wallpaper" : "umbra";
+        root.paletteChangePending = false;
+        root.applyPalette();
+    }
+
+    function capturePalette() {
+        root.rememberPalette();
+        opts.paletteCanvas = Colors.bg.toString(); opts.paletteSurface = Colors.bgAlt.toString();
+        opts.paletteText = Colors.fg.toString(); opts.paletteAccent = Colors.accent.toString();
+        opts.palettePreset = "manual"; opts.paletteIntensity = 0; opts.paletteMode = "umbra";
+        root.applyPalette();
+    }
     Process { id: palette }
     Timer {
         id: paletteDebounce
@@ -100,6 +152,7 @@ Singleton {
         onTriggered: {
             palette.command = [Quickshell.env("HOME") + "/.config/hypr/scripts/pywal-reapply.sh"]
             palette.running = true
+            root.paletteChangePending = false
         }
     }
 
@@ -166,6 +219,14 @@ Singleton {
         opts.windowGapsIn = 3; opts.windowGapsOut = 6;
         opts.paletteMode = "umbra";
         opts.paletteIntensity = 0;
+        opts.palettePreset = "hybrid"; opts.paletteSaturation = 100;
+        opts.paletteMinContrast = 4.5; opts.paletteSemanticMode = "wallpaper";
+        opts.paletteCanvas = "#0d0f12"; opts.paletteSurface = "#16191f";
+        opts.paletteText = "#e7eaf0"; opts.paletteAccent = "#61afef";
+        opts.palettePrevious = ({});
+        opts.paletteScopeShell = true; opts.paletteScopeTerminal = true;
+        opts.paletteScopeGtkQt = true; opts.paletteScopeHyprland = true;
+        opts.notchLanguage = "classic";
         root.applyEffects();   // this one does not catch on by itself: it must be pushed to Hyprland
         // favApps and language are NOT touched on purpose: "restore defaults"
         // is about appearance, and neither your favorites nor the language you
@@ -220,6 +281,20 @@ Singleton {
             property bool showTray: true
             property string paletteMode: "umbra"
             property int paletteIntensity: 0
+            property string palettePreset: "hybrid" // wallpaper | umbra | hybrid | manual
+            property int paletteSaturation: 100
+            property real paletteMinContrast: 4.5
+            property string paletteSemanticMode: "wallpaper" // wallpaper | fixed
+            property string paletteCanvas: "#0d0f12"
+            property string paletteSurface: "#16191f"
+            property string paletteText: "#e7eaf0"
+            property string paletteAccent: "#61afef"
+            property var palettePrevious: ({})
+            property bool paletteScopeShell: true
+            property bool paletteScopeTerminal: true
+            property bool paletteScopeGtkQt: true
+            property bool paletteScopeHyprland: true
+            property string notchLanguage: "classic" // classic | threshold
 
             // Factory-on: one of the few rice things visible
             // without touching anything. The switch is there for the day

@@ -42,17 +42,24 @@ UMBRA_SURFACE_SLOTS = {
 }
 
 
-def surface_intensity():
+def rice_settings():
+    """Return the persisted palette settings without making the shell a dependency."""
+    config = os.path.join(os.path.expanduser("~"), ".config", "quickshell-rice.json")
+    try:
+        with open(config) as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def surface_intensity(settings):
     """Read the user's 0..4 wallpaper-surface intensity.
 
     paletteMode predates the slider. Its values deliberately map to the old
     endpoints so upgrading changes no one's desktop: ``umbra`` is 0 and
     ``wallpaper`` is 4.
     """
-    config = os.path.join(os.path.expanduser("~"), ".config", "quickshell-rice.json")
     try:
-        with open(config) as f:
-            settings = json.load(f)
         if "paletteIntensity" not in settings:
             return 4 if settings.get("paletteMode") == "wallpaper" else 0
         return max(0, min(4, int(settings["paletteIntensity"])))
@@ -71,7 +78,40 @@ def blend_hex(stable, wallpaper, amount):
                                      for x, y in zip(a, b))
 
 
-def apply_surface(data, intensity):
+def valid_hex(value):
+    return isinstance(value, str) and len(value) == 7 and value.startswith("#") and \
+        all(c in "0123456789abcdefABCDEF" for c in value[1:])
+
+
+def luminance(value):
+    rgb = [int(value[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    rgb = [x / 12.92 if x <= .03928 else ((x + .055) / 1.055) ** 2.4 for x in rgb]
+    return .2126 * rgb[0] + .7152 * rgb[1] + .0722 * rgb[2]
+
+
+def contrast(a, b):
+    return (max(luminance(a), luminance(b)) + .05) / (min(luminance(a), luminance(b)) + .05)
+
+
+def readable(foreground, background, minimum):
+    """Keep the hue but move lightness until text has the requested contrast."""
+    h, l, s = hls(foreground)
+    toward_light = luminance(background) < .5
+    for _ in range(100):
+        candidate = "#%02x%02x%02x" % tuple(round(x * 255) for x in colorsys.hls_to_rgb(h, l, s))
+        if contrast(candidate, background) >= minimum:
+            return candidate
+        l = min(1, l + .01) if toward_light else max(0, l - .01)
+    return "#ffffff" if toward_light else "#000000"
+
+
+def saturate(value, amount):
+    h, l, s = hls(value)
+    s = min(1, max(0, s * amount))
+    return "#%02x%02x%02x" % tuple(round(x * 255) for x in colorsys.hls_to_rgb(h, l, s))
+
+
+def apply_surface(data, intensity, settings):
     """Keep a raw pywal snapshot, then blend stable and wallpaper surfaces.
 
     The snapshot makes switching intensity reversible without extracting the
@@ -91,6 +131,11 @@ def apply_surface(data, intensity):
             slot: colors.get(slot) for slot in UMBRA_SURFACE_SLOTS
         }
 
+    preset = settings.get("palettePreset", "hybrid")
+    if preset == "wallpaper":
+        intensity = 4
+    elif preset in ("umbra", "manual"):
+        intensity = 0
     amount = (0.0, 0.18, 0.42, 0.72, 1.0)[intensity]
     for key, stable in UMBRA_SPECIAL.items():
         raw = meta["wallpaper_special"].get(key)
@@ -100,7 +145,28 @@ def apply_surface(data, intensity):
         raw = meta["wallpaper_surface_slots"].get(key)
         if raw:
             colors[key] = blend_hex(stable, raw, amount)
+    if preset == "manual":
+        manual = {
+            "background": settings.get("paletteCanvas"),
+            "foreground": settings.get("paletteText"),
+        }
+        slots = {"color0": settings.get("paletteSurface"), "color7": settings.get("paletteText")}
+        special.update({key: value for key, value in manual.items() if valid_hex(value)})
+        colors.update({key: value for key, value in slots.items() if valid_hex(value)})
+        if valid_hex(settings.get("paletteAccent")):
+            colors["color4"] = settings["paletteAccent"]
+
+    saturation = max(0, min(200, int(settings.get("paletteSaturation", 100)))) / 100
+    for index in list(range(1, 7)) + list(range(9, 15)):
+        colors["color%d" % index] = saturate(colors["color%d" % index], saturation)
+
+    if settings.get("paletteSemanticMode") == "fixed":
+        colors.update({"color1": "#c78995", "color2": "#83b89a", "color3": "#cda27c",
+                       "color5": "#9d7fd1", "color6": "#00a6c7"})
+    minimum = max(3.0, min(7.0, float(settings.get("paletteMinContrast", 4.5))))
+    special["foreground"] = readable(special["foreground"], special["background"], minimum)
     meta["surface_intensity"] = intensity
+    meta["palette_preset"] = preset
 
 
 def hls(hex_color):
@@ -156,8 +222,9 @@ def main(argv):
         for slot, idx in enumerate(perm):
             data["colors"]["color%d" % (slot + 1)] = group[idx]
             data["colors"]["color%d" % (slot + 9)] = brights[idx]
-    intensity = surface_intensity()
-    apply_surface(data, intensity)
+    settings = rice_settings()
+    intensity = surface_intensity(settings)
+    apply_surface(data, intensity, settings)
     tmp = src + ".tmp"
     with open(tmp, "w") as f:
         json.dump(data, f, indent="\t")

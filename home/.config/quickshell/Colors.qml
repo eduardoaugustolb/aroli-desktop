@@ -137,6 +137,11 @@ Singleton {
         try {
             var j = JSON.parse(t);
             var s = j.special, c = j.colors;
+            // Wallpaper ownership and palette ownership are separate: a user
+            // may keep the image changing while freezing shell colours.
+            if (j.wallpaper && String(j.wallpaper).length > 0)
+                root.wallpaper = "file://" + j.wallpaper;
+            if (!Config.paletteScopeShell) return;
             root.bg      = _c(s.background, root.bg);
             root.fg      = _c(s.foreground, root.fg);
             root.bgAlt   = _c(c.color0,  root.bgAlt);
@@ -148,10 +153,6 @@ Singleton {
             root.c3 = _c(c.color3, root.c3);
             root.c4 = _c(c.color4, root.c4);
             root.c5 = _c(c.color5, root.c5);
-            // Explicit "file://": Image wants it as a URL and a bare path would
-            // resolve relative to the .qml, not to the root.
-            if (j.wallpaper && String(j.wallpaper).length > 0)
-                root.wallpaper = "file://" + j.wallpaper;
         } catch (e) { /* keeps fallbacks */ }
     }
 }

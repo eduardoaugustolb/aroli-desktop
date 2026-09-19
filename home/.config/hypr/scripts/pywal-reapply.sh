@@ -11,11 +11,23 @@ normalizer="$HOME/.config/hypr/scripts/pywal-normalize.py"
 "$normalizer" >/dev/null || exit 1
 wal -R -n -q -s -t || exit 1
 
+scope_enabled() {
+    local key="$1"
+    command -v jq >/dev/null 2>&1 || return 0
+    jq -e --arg key "$key" '.[$key] // true' "$HOME/.config/quickshell-rice.json" >/dev/null 2>&1
+}
+
 for script in yazi-pywal.sh cava-pywal.sh btop-pywal.sh discord-pywal.sh \
-              spicetify-pywal.sh qt-pywal.py gtk-pywal.sh; do
+              spicetify-pywal.sh; do
     path="$HOME/.config/hypr/scripts/$script"
     [ -x "$path" ] && "$path" >/dev/null 2>&1 || true
 done
 
-pkill -SIGUSR1 -x kitty 2>/dev/null || true
-hyprctl reload >/dev/null 2>&1 || true
+if scope_enabled paletteScopeGtkQt; then
+    for script in qt-pywal.py gtk-pywal.sh; do
+        path="$HOME/.config/hypr/scripts/$script"
+        [ -x "$path" ] && "$path" >/dev/null 2>&1 || true
+    done
+fi
+scope_enabled paletteScopeTerminal && pkill -SIGUSR1 -x kitty 2>/dev/null || true
+scope_enabled paletteScopeHyprland && hyprctl reload >/dev/null 2>&1 || true
