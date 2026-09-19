@@ -69,7 +69,6 @@ Singleton {
     property alias paletteScopeGtkQt: opts.paletteScopeGtkQt
     property alias paletteScopeHyprland: opts.paletteScopeHyprland
 
-    property alias notchLanguage: opts.notchLanguage
 
     // ───────── launcher ─────────
     // Favorites, by .desktop entry `id` and IN ORDER: position is what
@@ -226,7 +225,6 @@ Singleton {
         opts.palettePrevious = ({});
         opts.paletteScopeShell = true; opts.paletteScopeTerminal = true;
         opts.paletteScopeGtkQt = true; opts.paletteScopeHyprland = true;
-        opts.notchLanguage = "classic";
         root.applyEffects();   // this one does not catch on by itself: it must be pushed to Hyprland
         // favApps and language are NOT touched on purpose: "restore defaults"
         // is about appearance, and neither your favorites nor the language you
@@ -294,7 +292,6 @@ Singleton {
             property bool paletteScopeTerminal: true
             property bool paletteScopeGtkQt: true
             property bool paletteScopeHyprland: true
-            property string notchLanguage: "classic" // classic | threshold
 
             // Factory-on: one of the few rice things visible
             // without touching anything. The switch is there for the day

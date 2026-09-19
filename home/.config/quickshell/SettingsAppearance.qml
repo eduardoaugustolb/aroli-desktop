@@ -77,16 +77,6 @@ Flickable {
             }
 
             SettingsControls.Row_ {
-                label: I18n.tr("Visual language")
-                hint: I18n.tr("Classic retains the MacBook-like cutout. Threshold keeps the same notch and island behaviour but gives the attached notch Umbra's open curve and diagonal exit.")
-                SettingsControls.Choice_ {
-                    options: [I18n.tr("Classic"), I18n.tr("Threshold")]
-                    current: Config.notchLanguage === "threshold" ? I18n.tr("Threshold") : I18n.tr("Classic")
-                    onPicked: function(v) { Config.notchLanguage = v === I18n.tr("Threshold") ? "threshold" : "classic"; }
-                }
-            }
-
-            SettingsControls.Row_ {
                 label: I18n.tr("Colour")
                 hint: I18n.tr("Pure black is the one that mimics the MacBook; the theme colour follows pywal.")
                 SettingsControls.Choice_ {
