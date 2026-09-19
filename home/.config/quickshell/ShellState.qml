@@ -1786,7 +1786,7 @@ Singleton {
           desc: I18n.tr("Copy history"),
           keys: "clipboard cliphist copiar pegar historial copy paste history" },
         { kind: "cmd", id: "lock", icon: Icons.lock, name: I18n.tr("Lock screen"),
-          desc: "hyprlock",
+          desc: I18n.tr("Lock the current session"),
           keys: "lock bloquear candado lock screen padlock" },
         { kind: "cmd", id: "night", icon: Icons.moon, name: I18n.tr("Night light"),
           desc: I18n.tr("Toggle hyprsunset"),

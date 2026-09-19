@@ -490,5 +490,13 @@ var ptBR = {
     "Wi-Fi settings": "Configurações de Wi-Fi",
     "connected": "conectado",
     "devices": "dispositivos",
-    "{0}%": "{0} %"
+    "{0}%": "{0} %",
+    "Enter your password": "Digite sua senha",
+    "Checking…": "Verificando…",
+    "No match · attempt {0}": "Não confere · tentativa {0}",
+    "Caps lock is ON.": "Caps lock ativado.",
+    "Num lock is ON.": "Num lock ativado.",
+    "or touch the fingerprint reader": "ou toque no leitor de digital",
+    "Lock the current session": "Bloquear a sessão atual",
+    "Unlock the current session": "Desbloquear a sessão atual",
 };

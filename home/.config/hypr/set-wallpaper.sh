@@ -42,8 +42,6 @@ if [ -x "$HOME/.config/hypr/scripts/pywal-normalize.py" ]; then
   "$HOME/.config/hypr/scripts/pywal-normalize.py" >/dev/null 2>&1 \
     && wal -R -n -q -s -t || true
 fi
-ln -sfn -- "$IMG" "$HOME/.cache/wal/lockbg"  # Lock-screen background follows the wallpaper
-
 # The login screen (SDDM's hyprisland theme) follows the wallpaper like the
 # lock screen. It runs as the user, not root: see login-sync.sh's header
 # comment. It runs in the background because it re-encodes the image and should

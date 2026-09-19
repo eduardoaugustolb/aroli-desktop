@@ -13,4 +13,5 @@ Scope {
     SettingsWindow {}   // Settings app (floating window, launched from the notch)
     MediaControls {}
     WallpaperPicker {}
+    Lock {}         // Threshold lock screen (WlSessionLock + PAM, caelestia-inspired)
 }

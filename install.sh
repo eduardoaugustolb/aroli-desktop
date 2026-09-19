@@ -856,9 +856,67 @@ phase_cursor() {
         warn "Umbra Cursor build did not produce index.theme and cursors/"
         return 0
     }
+    # Anti-regression guard: the `text` I-beam must carry its Bone core
+    # (#C5C7C5). A build that renders it all-dark (e.g. outline covering the
+    # core) must never reach ~/.local/share/icons: refuse and keep the live
+    # theme instead. stdlib-only python3, best effort when it is missing.
+    if command -v python3 >/dev/null 2>&1; then
+        python3 - "$source/cursors/text" <<'EOF' || {
+import struct, sys
+data = open(sys.argv[1], 'rb').read()
+assert data[:4] == b'Xcur', "not an XCursor file"
+_, _, ntoc = struct.unpack('<III', data[4:16])
+frames = []
+for i in range(ntoc):
+    typ, subtype, pos = struct.unpack('<III', data[16 + i * 12:28 + i * 12])
+    if typ != 0xFFFD0002:
+        continue
+    _, _, _, _, w, h, _, _, _ = struct.unpack('<IIIIIIIII', data[pos:pos + 36])
+    frames.append((subtype, w, h, data[pos + 36:pos + 36 + w * h * 4]))
+frames = [f for f in frames if f[0] == 32] or frames
+light = 0
+for _, w, h, px in frames:
+    for i in range(0, len(px), 4):
+        b, g, r, a = px[i:i + 4]
+        if a > 128 and min(r, g, b) * 255 > 150 * a:
+            light += 1
+sys.exit(0 if light >= 20 else 1)
+EOF
+            warn "Umbra Cursor build produced an all-dark text cursor; keeping the current cursor"
+            return 0
+        }
+    else
+        warn "python3 is missing; skipping the text-cursor brightness check"
+    fi
     run mkdir -p "$(dirname "$target")"
     run mkdir -p "$target"
     run cp -a "$source/." "$target/"
+    # Complete the theme: upstream only ships `text`, but toolkits/XWayland
+    # request `xterm`/`ibeam` for text entry. Without these aliases the lookup
+    # falls through to Inherits=Adwaita and the I-beam renders black.
+    if [ -f "$target/cursors/text" ]; then
+        for alias in xterm ibeam vertical-text; do
+            [ -e "$target/cursors/$alias" ] || run ln -sf text "$target/cursors/$alias"
+        done
+    else
+        warn "Umbra Cursor has no text cursor; text fields will fall back to Adwaita"
+    fi
+    # Pin the X11/XWayland fallback (Qt, SDL, Electron, root window) to Umbra.
+    run mkdir -p "$HOME/.icons/default"
+    run tee "$HOME/.icons/default/index.theme" > /dev/null <<'EOF'
+[Icon Theme]
+Name=Default
+Comment=Default cursor theme (points at Umbra)
+Inherits=Umbra
+EOF
+    # Apply live when possible; a relog still covers already-running apps.
+    if command -v hyprctl >/dev/null 2>&1 && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+        run hyprctl setcursor Umbra 32 > /dev/null || true
+    fi
+    if command -v gsettings >/dev/null 2>&1; then
+        run gsettings set org.gnome.desktop.interface cursor-theme 'Umbra' || true
+        run gsettings set org.gnome.desktop.interface cursor-size 32 || true
+    fi
     ok "Umbra Cursor installed from the latest main revision"
 }
 

@@ -487,5 +487,13 @@ var es = {
     "Wi-Fi settings": "Ajustes de Wi-Fi",
     "connected": "conectado",
     "devices": "dispositivos",
-    "{0}%": "{0} %"
+    "{0}%": "{0} %",
+    "Enter your password": "Escribe tu contraseña",
+    "Checking…": "Comprobando…",
+    "No match · attempt {0}": "No coincide · intento {0}",
+    "Caps lock is ON.": "Bloq Mayús activado.",
+    "Num lock is ON.": "Bloq Num activado.",
+    "or touch the fingerprint reader": "o toca el lector de huellas",
+    "Lock the current session": "Bloquear la sesión actual",
+    "Unlock the current session": "Desbloquear la sesión actual",
 };

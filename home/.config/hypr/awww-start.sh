@@ -63,8 +63,8 @@ fi
     fi
     [ -n "$img" ] && [ -f "$img" ] || exit 0
 
-    # set-wallpaper.sh also writes the state `wal -i` does not: hyprlock's
-    # lockbg link, bar-strip.txt, and derived themes. Hyprland may not inherit
+    # set-wallpaper.sh also writes the state `wal -i` does not: the
+    # bar-strip.txt sample and derived themes. Hyprland may not inherit
     # ~/.local/bin in PATH.
     if [ -x "$HOME/.config/hypr/set-wallpaper.sh" ]; then
         PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:$PATH"
