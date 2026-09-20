@@ -10,6 +10,20 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [2.2.0] - 2026-09-20
+
+### Added
+
+- Quick-app keybinds with `launch-*.sh` helpers honoring system defaults
+  with rice fallbacks: `Super+T` / `Super+Alt+T` (terminal), `Super+Alt+M`
+  (Spotify), `Super+Alt+D` (Discord), and `Super+Alt+C` (default text
+  editor).
+- Update-safe Hyprland user override layer (`user.lua` / `user.conf` seeded
+  once from `.example` templates and loaded last), with dirty-tree guard
+  messaging and prune protection in `install.sh`.
+- Settings shortcuts panel now parses keybinds from both the base and user
+  override files with shared variables, plus pt-BR/es translation updates.
+
 ## [2.1.0] - 2026-09-19
 
 ### Added
