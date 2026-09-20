@@ -151,6 +151,22 @@ record_state() {  # $1=previous_ref $2=new_ref
     mv -f "$tmp" "$STATE_FILE"
 }
 
+# Notify at most once per remote tag. Both the daily check and the login
+# notifier funnel here, so a pending update nags once per release — never
+# once per day. The seen mark is only written when notify-send reports
+# success: with no notification daemon running, the next login retries
+# instead of swallowing the notice.
+SEEN_FILE="$CACHE_DIR/update-notify.seen"
+notify_update_available() {  # $1 = remote tag
+    [ "$(cat "$SEEN_FILE" 2>/dev/null)" = "$1" ] && return 1
+    command -v notify-send >/dev/null 2>&1 || return 1
+    if notify-send "Umbra Noctis $1 available" "Run: rice update --dry-run" 2>/dev/null; then
+        printf '%s' "$1" > "$SEEN_FILE" 2>/dev/null || true
+        return 0
+    fi
+    return 1
+}
+
 # ------------------------------------------------------------------ check
 
 remote_via_git() {
@@ -227,11 +243,28 @@ cmd_check() {
     write_cache "$remote" "$avail" "$took" "$source"
     if [ "$avail" = true ]; then
         say "rice: update available: $(local_version) -> $remote"
-        command -v notify-send >/dev/null 2>&1 \
-            && notify-send "Umbra Noctis $remote available" "Run: rice update --dry-run" 2>/dev/null || true
+        notify_update_available "$remote" || true
     else
         ok "rice is up to date ($(local_version))"
     fi
+}
+
+# Login notifier: cache-read only, zero network, exits in milliseconds.
+# The daily timer owns the network check; this only surfaces an already
+# known pending update as a desktop notice after graphical login. Never
+# fails: every guard exits 0 silently, so a broken cache or a missing
+# daemon can neither spam nor break the login.
+cmd_notify_login() {
+    [ "${RICE_NO_UPDATE_NOTIFY:-0}" = 1 ] && exit 0
+    local remote avail
+    remote="$(read_cache_field remote)"
+    avail="$(read_cache_field update_available)"
+    [ "$avail" = true ] && [ -n "$remote" ] || exit 0
+    # The cache may predate an update applied by hand: only nag while the
+    # checkout is actually behind the known tag.
+    ver_gt "$remote" "$(local_version)" || exit 0
+    notify_update_available "$remote" || true
+    exit 0
 }
 
 # ------------------------------------------------------------------ update
@@ -243,6 +276,52 @@ current_ref() {
             || printf '%s' "$(local_version)"
     else
         printf '%s' "$(local_version)"
+    fi
+}
+
+# Files the desktop itself rewrites wholesale and regenerates on demand:
+# qt-pywal.py rebuilds kdeglobals on every wallpaper change, and Spotify
+# theming rebuilds the spicetify color.ini on apply. In --link mode these
+# live inside the checkout, so normal desktop use dirties the tree through
+# no fault of the user. Resetting them is safe: the next wallpaper change
+# or theme apply recreates the live values.
+RUNTIME_REGENERATED="home/.config/kdeglobals
+home/.config/spicetify/Themes/termspot/color.ini"
+
+# A dirty checkout must never strand a non-technical user: ride local
+# changes out in a stash and bring them back after the checkout moves.
+STASHED=0
+stash_live_changes() {  # $1 = ref being moved to, for messages
+    STASHED=0
+    local f reset_any=0
+    for f in $RUNTIME_REGENERATED; do
+        if [ -n "$(git -C "$REPO" status --porcelain -- "$f" 2>/dev/null)" ]; then
+            git -C "$REPO" checkout -- "$f" 2>/dev/null && reset_any=1 || true
+        fi
+    done
+    [ "$reset_any" = 1 ] && say "runtime-regenerated files reset (they rebuild on the next wallpaper/theme change)"
+    [ -n "$(git -C "$REPO" status --porcelain 2>/dev/null)" ] || return 0
+    # -u covers untracked files that would otherwise block the checkout; -c
+    # identity keeps stash working before the user ever sets up git
+    # (install.sh only seeds a placeholder identity).
+    if git -C "$REPO" -c user.name="Umbra Noctis" -c user.email="rice@localhost" stash push -u -m "rice auto-stash before $1" >/dev/null 2>&1; then
+        STASHED=1
+        say "remaining local changes stashed; they are restored after the checkout"
+    else
+        err "the checkout has local changes and they could not be stashed."
+        err "look with: git -C \"$REPO\" status --short"
+        return 1
+    fi
+}
+restore_live_changes() {  # $1 = ref now checked out, for messages
+    [ "$STASHED" = 1 ] || return 0
+    STASHED=0
+    if git -C "$REPO" -c user.name="Umbra Noctis" -c user.email="rice@localhost" stash pop >/dev/null 2>&1; then
+        ok "local changes restored"
+    else
+        warn "now on $1, but some previous changes did not re-apply cleanly."
+        warn "they are kept in the stash, nothing was deleted:"
+        warn "  git -C \"$REPO\" stash list"
     fi
 }
 
@@ -276,24 +355,19 @@ cmd_update() {
         exit 0
     fi
 
-    # Dirty-tree guard: a checkout over local edits is how updates eat
-    # customizations. Personal tweaks belong in the gitignored overrides
-    # (~/.config/hypr/user.lua / user.conf, seeded once by install.sh),
-    # which never show up here — so a clean status is the normal case.
-    if [ -n "$(git -C "$REPO" status --porcelain 2>/dev/null)" ]; then
-        err "the checkout has local changes; update refuses to run over them."
-        err "custom binds/rules/env go in ~/.config/hypr/user.lua or user.conf (gitignored: updates never touch them)."
-        err "inspect with: git -C \"$REPO\" status --short — then commit, stash, or move the edits into user.*"
-        exit 1
-    fi
-
+    # Personal tweaks belong in the gitignored overrides
+    # (~/.config/hypr/user.lua / user.conf, seeded once by install.sh), which
+    # never show up here. Anything else the desktop dirtied on its own is
+    # stashed and restored below, so the update never refuses over it.
     ask "fetch and check out $remote, then re-run ./install.sh?" || {
         skip "cancelled; nothing changed"
         exit 0
     }
 
-    git -C "$REPO" fetch --tags origin || die "git fetch failed"
-    git -C "$REPO" checkout "$remote" || die "git checkout $remote failed"
+    stash_live_changes "$remote" || exit 1
+
+    git -C "$REPO" fetch --tags origin || { restore_live_changes "$remote"; die "git fetch failed"; }
+    git -C "$REPO" checkout "$remote" || { restore_live_changes "$remote"; die "git checkout $remote failed"; }
     record_state "$before" "$remote"
     ok "now on $remote (previous: $before; rollback with: rice rollback)"
 
@@ -305,6 +379,7 @@ cmd_update() {
             "$REPO/install.sh" || warn "./install.sh reported an error; your checkout is still on $remote"
         fi
     fi
+    restore_live_changes "$remote"
     say "tip: rice prune lists files the new release retired (nothing is deleted without --apply)"
 }
 
@@ -324,7 +399,8 @@ cmd_rollback() {
         exit 0
     fi
     ask "go back to $prev and re-run ./install.sh?" || { skip "cancelled"; exit 0; }
-    git -C "$REPO" checkout "$prev" || die "git checkout $prev failed"
+    stash_live_changes "$prev" || exit 1
+    git -C "$REPO" checkout "$prev" || { restore_live_changes "$prev"; die "git checkout $prev failed"; }
     ok "now on $prev"
     if [ "$NO_REINSTALL" = 0 ] && [ -x "$REPO/install.sh" ]; then
         if [ "$ASSUME_YES" = 1 ]; then
@@ -333,6 +409,7 @@ cmd_rollback() {
             "$REPO/install.sh" || warn "./install.sh reported an error"
         fi
     fi
+    restore_live_changes "$prev"
 }
 
 # ------------------------------------------------------------------ prune
@@ -493,6 +570,7 @@ Commands:
   version             print the installed version
   status              version, checkout, last check, rollback ref
   check [--force]     ask GitHub for the newest stable tag (cached 24 h)
+  notify-login        desktop notice for a known pending update (login hook)
   update [--dry-run]  check out the newest stable tag and re-run install.sh
   rollback            return to the ref before the last update
   prune [--apply]     list (default) or trash files retired by the last update
@@ -530,7 +608,7 @@ while [ $# -gt 0 ]; do
         --channel=*) CHANNEL="${1#*=}" ;;
         --channel) shift; CHANNEL="${1:-}"; [ -n "$CHANNEL" ] || die "--channel needs a value" ;;
         -h|--help|help) usage; exit 0 ;;
-        version|status|check|update|rollback|prune) CMD="$1" ;;
+        version|status|check|notify-login|update|rollback|prune) CMD="$1" ;;
         *) die "unknown argument: $1 (try: rice --help)" ;;
     esac
     shift
@@ -541,6 +619,7 @@ case "$CMD" in
     version)  cmd_version ;;
     status)   cmd_status ;;
     check)    cmd_check ;;
+    notify-login) cmd_notify_login ;;
     update)   cmd_update ;;
     rollback) cmd_rollback ;;
     prune)    cmd_prune ;;

@@ -84,7 +84,14 @@ so already-running applications reload the XCursor.
 > terminal assistant, while the explicit subcommands remain suitable for automation.
 
 ```sh
-# Install the CLI from the current main branch (Go 1.27+)
+# Stable version (recommended) — prebuilt binary from GitHub Releases
+# Note: versioned `go install ...@vX.Y.Z` does not work for v2+ releases
+# because the module intentionally has no `/v2` suffix; use the binary.
+arch="$(uname -m)"; case "$arch" in x86_64) arch=amd64;; aarch64|arm64) arch=arm64;; esac
+curl -fL "https://github.com/eduardoaugustolb/umbra-noctis/releases/latest/download/rice-linux-$arch" -o ~/.local/bin/rice
+chmod +x ~/.local/bin/rice
+
+# Or install from the current main branch (Go 1.27+, development version)
 go install github.com/eduardoaugustolb/umbra-noctis/cmd/rice@main
 
 # Opens a guided terminal interface for first-time users
@@ -138,12 +145,18 @@ and notifies you on its own when a release lands on GitHub:
   resident process) transfers a few KB and writes
   `~/.cache/umbra-noctis/update.json`. The bar/notch shows a dot
   and `Settings > About` shows the version seen.
+- A login notice (`rice-update-notify.service`) reads only that cache file —
+  no network, exits in milliseconds — and shows one desktop notification per
+  release when an update is pending.
 - Updating is always your own act: `rice update --dry-run` shows the plan,
   `rice update` asks for confirmation, records the rollback point, and re-runs
-  the installer. `rice rollback` undoes it. `rice prune --apply` moves
+  the installer. Local changes are stashed automatically and restored
+  afterwards, so files the desktop rewrote on its own never block the update.
+  `rice rollback` undoes it. `rice prune --apply` moves
   leftovers to the Trash (with backup), never deletes directly — and never
   touches files you modified.
-- To turn off the notice: `systemctl --user disable rice-update-check.timer`.
+- To turn off the notices (the cache, the dot, and `rice status` keep working):
+  `systemctl --user disable rice-update-check.timer rice-update-notify.service`.
 Details and history in [CHANGELOG.md](CHANGELOG.md).
 
 ## Privacy and control

@@ -1,0 +1,31 @@
+[Unit]
+# Umbra Noctis login notice: surfaces a KNOWN pending update on login.
+#
+# This performs zero network: it only reads ~/.cache/umbra-noctis/update.json
+# (written by rice-update-check.timer) and exits in milliseconds. At most one
+# notice per release (tracked in update-notify.seen); with no pending update,
+# or with no notification daemon running, it exits silently.
+#
+# Opt out (stays off, check cache and bar dot keep working):
+#   systemctl --user disable rice-update-notify.service
+Description=Umbra Noctis update notice on graphical login (cache read only)
+Documentation=file://%h/.local/bin/rice
+PartOf=graphical-session.target
+After=graphical-session.target quickshell.service
+ConditionEnvironment=WAYLAND_DISPLAY
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/rice notify-login
+LockPersonality=yes
+NoNewPrivileges=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+Nice=19
+IOSchedulingClass=idle
+CPUSchedulingPolicy=idle
+MemoryMax=50M
+CPUQuota=20%
+
+[Install]
+WantedBy=graphical-session.target

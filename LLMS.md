@@ -94,10 +94,13 @@ replaces user configurations, although it creates a backup.
   `rice-update-check.timer` (enabled by the installer) transfers a few
   KB (`git ls-remote --tags` or a conditional GET against the GitHub
   releases API, with ETag) once a day and only writes
-  `~/.cache/umbra-noctis/update.json`. No telemetry, no identifiers,
-  no cached response body. To turn it off:
-  `systemctl --user disable rice-update-check.timer`. `rice update`,
-  `rice rollback`, and `rice prune --apply` never run on their own: they
+  `~/.cache/umbra-noctis/update.json`. A login notice
+  (`rice-update-notify.service`, also enabled by the installer) only reads
+  that cache file — no network, oneshot, exits in milliseconds — and shows
+  at most one desktop notification per release. No telemetry, no identifiers,
+  no cached response body. To turn them off:
+  `systemctl --user disable rice-update-check.timer rice-update-notify.service`.
+  `rice update`, `rice rollback`, and `rice prune --apply` never run on their own: they
   require the command (and confirmation, except for the user's explicit
   `--yes`).
 - Do not send complete diagnostic reports to external services; strip

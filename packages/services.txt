@@ -30,6 +30,10 @@ user		bt-agent.service
 # idle-priority oneshot, zero resident processes. Disable anytime with:
 #   systemctl --user disable rice-update-check.timer
 user		rice-update-check.timer
+# Login notice for a pending update. Cache-read only (no network), oneshot,
+# dies in milliseconds; at most one notice per release. Disable anytime with:
+#   systemctl --user disable rice-update-notify.service
+user		rice-update-notify.service
 # tailscaled es lo que hace falta para las dos reglas de Tailscale de
 # system/etc/nftables.conf. Va comentado porque el demonio solo, sin un
 # `tailscale up` con tu cuenta, no hace nada: enciendelo tu si vas a usarlo.

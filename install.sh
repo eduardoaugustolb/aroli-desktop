@@ -1817,6 +1817,23 @@ phase_final() {
         fi
     fi
 
+    # Reload the live compositor when there is one. During an update the
+    # checkout is rewritten under the running session, and Hyprland's watcher
+    # can catch a file mid-checkout and park an error banner (e.g. "cannot
+    # open hyprland.lua") that never clears on its own. `hyprctl reload` only
+    # re-parses the config: windows and the session stay untouched.
+    if [ "$DRY" = 1 ]; then
+        skip "would reload Hyprland when a session is reachable"
+    elif command -v hyprctl >/dev/null 2>&1 && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+        if hyprctl reload >/dev/null 2>&1; then
+            ok "Hyprland config reloaded"
+        else
+            warn "could not reload Hyprland; run 'hyprctl reload' in a terminal"
+        fi
+    else
+        skip "no live Hyprland session (takes effect on next login)"
+    fi
+
     if [ -d "$BACKUP" ]; then
         printf '\n  What was there before is saved in:\n    %s\n' "$BACKUP"
     fi

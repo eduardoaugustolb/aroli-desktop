@@ -10,6 +10,39 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [2.3.0] - 2026-09-20
+
+### Fixed
+
+- `rice update` and `rice rollback` no longer refuse to run over a dirty
+  checkout. Files the desktop rewrites on its own (`kdeglobals`, spicetify
+  colors) are reset — they rebuild on the next wallpaper/theme change — and
+  anything else is stashed automatically and restored after the checkout.
+  Changes that do not re-apply cleanly stay in the stash, never deleted.
+- The installer reloads a live Hyprland session at the end of the `final`
+  phase, so an update can no longer leave a stale config-error banner (e.g.
+  "cannot open hyprland.lua" caught mid-checkout) parked on screen.
+
+### Added
+
+- Login update notice (`rice-update-notify.service`, enabled by default):
+  reads only the update cache on graphical login — no network, oneshot,
+  idle priority — and shows one desktop notification per pending release.
+  Disable with `systemctl --user disable rice-update-notify.service`; the
+  daily check is now also nag-once-per-release instead of once per day.
+- The Omarchy mark (bar logo and Settings › About header) is tinted with
+  the wallpaper accent via `MultiEffect` colorization, so it follows the
+  palette like the Arch glyph already did. Untinted images stay untouched:
+  the tint only applies when `BarItem.imageTint` is set.
+
+### Changed
+
+- Faster terminal startup: the first-kitty detection is one `hyprctl`
+  call instead of two (workspace derived from `$PPID`, no `ps` fork),
+  sprite transcoding moved to the background on cache miss, and
+  OMZ/plugins/theme are byte-compiled (`zcompile`, refreshed only when
+  sources change).
+
 ## [2.2.0] - 2026-09-20
 
 ### Added

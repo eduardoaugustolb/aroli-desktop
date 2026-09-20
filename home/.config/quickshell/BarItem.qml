@@ -3,6 +3,7 @@
 // read the same over light and dark wallpapers. The only background that
 // appears is the hover highlight.
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 
 Item {
@@ -12,6 +13,10 @@ Item {
     property url iconSource: ""
     property string label: ""
     property color iconColor: Colors.fg
+    // Tint for the iconSource image (the Omarchy mark is a grayscale SVG, so
+    // without this it never follows the palette). Transparent = untinted,
+    // keeping full-color images safe if one is ever passed here.
+    property color imageTint: "#00000000"
     property color labelColor: Colors.fg
     property int iconSize: Appearance.fsM
     property int labelSize: Appearance.fsS
@@ -66,6 +71,11 @@ Item {
             height: root.iconSize
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
+            layer.enabled: root.imageTint.a > 0
+            layer.effect: MultiEffect {
+                colorization: 1.0
+                colorizationColor: root.imageTint
+            }
         }
         Text {
             visible: root.label.length > 0

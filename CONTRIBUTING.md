@@ -124,6 +124,7 @@ Fix stuff                                   # vague, capitalized
 | `home/` | Deployed configs, mirrored into `$HOME` by `install.sh` |
 | `home/.local/bin/rice` | Version/update/rollback/prune CLI |
 | `home/.config/systemd/user/rice-update-check.{service,timer}` | Daily release check (idle, oneshot) |
+| `home/.config/systemd/user/rice-update-notify.service` | Login update notice, cache-read only (idle, oneshot) |
 | `VERSION` / `CHANGELOG.md` | Single source of truth for the version + release history |
 | `install.sh` | Installer (symlink mode by default, `--copy` available) |
 | `diagnose` | Read-only system diagnostics |

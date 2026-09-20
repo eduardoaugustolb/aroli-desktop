@@ -285,6 +285,7 @@ Scope {
                         iconSource: Distro.markSource
                         iconSize: Appearance.fsL
                         iconColor: Colors.accent
+                        imageTint: Colors.accent
                         hpad: 7
                         onClicked: ShellState.togglePanel("launcher")
                         onScrolled: function (d) { ShellState.nudgeVolume(d); }

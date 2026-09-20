@@ -9,6 +9,7 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
 
 Flickable {
@@ -102,6 +103,13 @@ Flickable {
                 Layout.preferredWidth: 46
                 Layout.preferredHeight: 46
                 fillMode: Image.PreserveAspectFit
+                // The mark is a grayscale SVG: tint it like the bar logo so
+                // it follows the wallpaper palette.
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    colorization: 1.0
+                    colorizationColor: Colors.accent
+                }
             }
             ColumnLayout {
                 spacing: 2

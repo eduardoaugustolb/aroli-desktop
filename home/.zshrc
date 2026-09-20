@@ -138,6 +138,8 @@ export GLAMOUR_STYLE="$HOME/.cache/wal/colors-glamour.json"
 # ---- fastfetch solo en la primera kitty del workspace ----
 
 fastfetch_ws_if_first() {
+  # Guardas baratas primero: solo expansion de parametros, cero forks.
+  [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || return
   command -v hyprctl >/dev/null 2>&1 || return
   command -v jq >/dev/null 2>&1 || return
 
@@ -154,29 +156,20 @@ fastfetch_ws_if_first() {
   # HYPRLAND_INSTANCE_SIGNATURE la exporta Hyprland a todo lo que lanza (y uwsm
   # la propaga a la sesion), asi que existe dentro del escritorio y no existe en
   # una tty pelada, que es exactamente la distincion que hace falta.
-  [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || return
+  #
+  # UNA sola llamada a hyprctl: el workspace sale de la propia entrada de esta
+  # kitty (su PID es $PPID, sin fork a `ps`) y de ahi se cuentan las otras
+  # kittys del mismo workspace. Dos llamadas + dos jq era el coste fijo de
+  # CADA terminal nueva, incluso de las que no pintan nada.
+  local info
+  info=$(hyprctl clients -j 2>/dev/null | jq -r --argjson pid "$PPID" '
+    (map(select(.pid == $pid)) | .[0].workspace.id // empty) as $ws
+    | select($ws != null and $ws != "")
+    | "\($ws) \([.[] | select(.class == "kitty" and .workspace.id == $ws and .pid != $pid)] | length)"
+  ' 2>/dev/null) || return
+  [[ -n "$info" && "${info#* }" == 0 ]] || return
 
-  local ws
-  # jq tambien callado: si hyprctl responde una cosa rara, se vuelve sin ruido.
-  ws=$(hyprctl activeworkspace -j 2>/dev/null | jq -r '.id' 2>/dev/null) || return
-  [[ -z "$ws" || "$ws" == "null" ]] && return
-
-  local kitty_pid
-  kitty_pid=$(ps -o ppid= -p $$ --no-headers 2>/dev/null | tr -d ' ') || return
-  [[ -z "$kitty_pid" ]] && return
-
-  local others
-  others=$(hyprctl clients -j 2>/dev/null \
-    | jq --argjson ws "$ws" --argjson pid "$kitty_pid" '
-      [ .[]
-        | select(.class == "kitty" and .workspace.id == $ws and .pid != $pid)
-      ]
-      | length
-    ' 2>/dev/null) || return
-
-  if [ "${others:-0}" -eq 0 ]; then
-    pokefetch
-  fi
+  pokefetch
 }
 
 # ---- Run fastfetch AFTER prompt (Powerlevel10k safe) ----
@@ -275,16 +268,19 @@ pokefetch() {
     local play="$gif"
     local big="$adir/.box/${gif:t}"
     if [[ ! -f $big ]]; then
+      # Sin cache: pinta el original AHORA y transcodifica en 2o plano para la
+      # proxima (~0.2 s que antes bloqueaban la apertura de la terminal).
       mkdir -p "$adir/.box"
       if command -v ffmpeg >/dev/null 2>&1; then
         # frames de lienzo completo (-gifflags -offsetting) + dispose background (default ffmpeg)
-        # = sin fragmentos ni trails en kitten icat; nearest-neighbor = pixel art nitido; ~0.2s
-        ffmpeg -y -i "$gif" -filter_complex 'fps=15,scale=w=200:h=168:force_original_aspect_ratio=decrease:flags=neighbor,format=rgba,pad=200:ih:(200-iw)/2:0:color=#00000000,split[s0][s1];[s0]palettegen=reserve_transparent=1[p];[s1][p]paletteuse=alpha_threshold=128:diff_mode=none' -gifflags -offsetting "$big" >/dev/null 2>&1
+        # = sin fragmentos ni trails en kitten icat; nearest-neighbor = pixel art nitido
+        (ffmpeg -y -i "$gif" -filter_complex 'fps=15,scale=w=200:h=168:force_original_aspect_ratio=decrease:flags=neighbor,format=rgba,pad=200:ih:(200-iw)/2:0:color=#00000000,split[s0][s1];[s0]palettegen=reserve_transparent=1[p];[s1][p]paletteuse=alpha_threshold=128:diff_mode=none' -gifflags -offsetting "$big" >/dev/null 2>&1 &) 2>/dev/null
       elif command -v magick >/dev/null 2>&1; then
-        magick "$gif" -coalesce -filter point -resize 200x168 "$big" 2>/dev/null
+        (magick "$gif" -coalesce -filter point -resize 200x168 "$big" 2>/dev/null &) 2>/dev/null
       fi
+    else
+      play="$big"
     fi
-    [[ -f $big ]] && play="$big"
     local -a il=("${(@f)$(fastfetch --logo none 2>/dev/null)}")
     local n=${#il} indent=32 ln
     printf "\033[2J\033[H"                          # limpia el instant-prompt de p10k (evita prompt doble)
@@ -379,5 +375,33 @@ pokefa() {
   printf "\033[%d;1H" $(( row + H ))   # cursor debajo -> prompt limpio
 }
 
-# --- tooling moderno ---
+# ---- tooling moderno ---
 eval "$(zoxide init zsh)"        # z <dir> = salto inteligente; zi = con fzf
+
+# ---- Byte-compile de arranque (zcompile) ----
+# Parsear OMZ + plugins + tema en cada terminal cuesta decenas de ms; el .zwc
+# se usa automaticamente al hacer source solo cuando es mas nuevo que la
+# fuente. Aqui solo se comparan mtimes (stats baratos); la compilacion pasa
+# una vez tras cada update de OMZ/plugins/tema, nunca en cada terminal.
+zshrc_recompile() {
+  emulate -L zsh
+  local -a files=(
+    ~/.zshrc ~/.p10k.zsh(N) ~/.config/p10k/eduardo-theme.zsh(N)
+    $ZSH/oh-my-zsh.sh(N)
+    $ZSH/lib/*.zsh(N)
+    $ZSH/plugins/git/*.zsh(N)
+    $ZSH/custom/plugins/*/*.zsh(N)
+    $ZSH/custom/plugins/*/*/*.zsh(N)
+    $ZSH/custom/themes/powerlevel10k/*.zsh(N)
+    $ZSH/custom/themes/powerlevel10k/internal/*.zsh(N)
+  )
+  local f
+  for f in $files; do
+    # -nt solo no basta: si el .zwc aun no existe da falso y no compila nunca.
+    if [[ ! -f $f.zwc || $f -nt $f.zwc ]]; then
+      zcompile "$f" 2>/dev/null || true
+    fi
+  done
+}
+zshrc_recompile
+unfunction zshrc_recompile 2>/dev/null
