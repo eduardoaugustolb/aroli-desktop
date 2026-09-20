@@ -10,6 +10,16 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [2.3.1] - 2026-09-20
+
+### Fixed
+
+- `rice update` hands over to the target release's own updater (extracted
+  from git without touching the worktree), so updater fixes apply to the
+  very update that delivers them — an old backend can no longer block its
+  own replacement. Tags without a usable updater are refused, and an
+  unreachable remote falls back to the checkout's updater.
+
 ## [2.3.0] - 2026-09-20
 
 ### Fixed

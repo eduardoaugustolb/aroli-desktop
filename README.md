@@ -149,7 +149,8 @@ and notifies you on its own when a release lands on GitHub:
   no network, exits in milliseconds — and shows one desktop notification per
   release when an update is pending.
 - Updating is always your own act: `rice update --dry-run` shows the plan,
-  `rice update` asks for confirmation, records the rollback point, and re-runs
+  `rice update` asks for confirmation, hands over to the target release's
+  own updater, records the rollback point, and re-runs
   the installer. Local changes are stashed automatically and restored
   afterwards, so files the desktop rewrote on its own never block the update.
   `rice rollback` undoes it. `rice prune --apply` moves

@@ -325,6 +325,40 @@ restore_live_changes() {  # $1 = ref now checked out, for messages
     fi
 }
 
+# Hands the update over to the target tag's own backend (see cmd_update).
+# Returns 0 when there is nothing to hand over to (already that backend);
+# 1 when the hop is impossible (offline: fetch failed) — the caller then
+# falls back to this checkout's updater, i.e. today's behavior;
+# 2 when the tag has no usable backend — the caller must refuse, not check
+# out a release whose updater is missing.
+bootstrap_update_backend() {  # $1 = remote tag
+    local tag="$1" tmp args=()
+    git -C "$REPO" fetch --tags origin >/dev/null 2>&1 || return 1
+    tmp="$(mktemp "${TMPDIR:-/tmp}/rice-backend.XXXXXXXX")" || return 1
+    if ! git -C "$REPO" show "$tag:home/.local/bin/rice" > "$tmp" 2>/dev/null \
+        || [ ! -s "$tmp" ] || ! bash -n "$tmp" 2>/dev/null; then
+        rm -f "$tmp"
+        err "tag $tag has no usable updater; not checking it out"
+        return 2
+    fi
+    if [ -n "${BASH_SOURCE[0]:-}" ] && cmp -s "${BASH_SOURCE[0]}" "$tmp" 2>/dev/null; then
+        rm -f "$tmp"
+        return 0
+    fi
+    chmod +x "$tmp" 2>/dev/null || true
+    # Faithful flag forwarding, never consent escalation: the new backend
+    # asks its own confirmation unless the user already passed --yes.
+    [ "$ASSUME_YES" = 1 ] && args+=(--yes)
+    [ "$QUIET" = 1 ] && args+=(--quiet)
+    [ "$FORCE" = 1 ] && args+=(--force)
+    [ "$NO_REINSTALL" = 0 ] || args+=(--no-reinstall)
+    [ "$CHANNEL" = stable ] || args+=(--channel="$CHANNEL")
+    say "handing over to $tag's own updater"
+    RICE_BACKEND_BOOTSTRAPPED=1 exec bash "$tmp" update "${args[@]}"
+    rm -f "$tmp"
+    return 1
+}
+
 cmd_update() {
     [ -n "$REPO" ] || die "could not find the rice checkout (set UMBRA_RICE_REPO)"
     [ "$CHANNEL" = stable ] || die "only --channel=stable exists; main is never auto-applied"
@@ -348,6 +382,7 @@ cmd_update() {
     say "rice update: $before -> $remote"
     if [ "$DRY" = 1 ]; then
         git -C "$REPO" fetch --tags --dry-run origin 2>&1 | head -5 || true
+        say "would: hand over to $remote's own updater, then:"
         say "would: git fetch origin tag $remote && git checkout $remote"
         say "would: record rollback ref ($before) and re-run ./install.sh"
         git -C "$REPO" log --oneline "$before..$remote" 2>/dev/null | head -20 || \
@@ -363,6 +398,20 @@ cmd_update() {
         skip "cancelled; nothing changed"
         exit 0
     }
+
+    # Self-bootstrap: the updater itself is versioned, so this checkout's
+    # backend may predate the fixes the update needs. The target tag's
+    # backend runs the rest instead — extracted straight from git, without
+    # touching the worktree, so dirty trees are safe. RICE_BACKEND_BOOTSTRAPPED
+    # guards the hop against looping.
+    if [ "${RICE_BACKEND_BOOTSTRAPPED:-0}" != 1 ]; then
+        bootstrap_update_backend "$remote"
+        case "$?" in
+            0) ;;            # already that backend, or hop done (never returns)
+            2) exit 1 ;;     # corrupt tag: message already printed
+            *) warn "continuing with this checkout's updater instead" ;;
+        esac
+    fi
 
     stash_live_changes "$remote" || exit 1
 
