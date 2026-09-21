@@ -1,4 +1,4 @@
-// NetworkPanel.qml — network picker, unfolded FROM the notch.
+// NetworkPanel.qml - network picker, unfolded FROM the notch.
 //
 // Replaces the rofi menu (~/.config/rofi/scripts/network-menu.sh). Talks
 // directly to NetworkManager via Quickshell.Networking. Only WPA-Enterprise
@@ -90,7 +90,7 @@ Item {
             }
             Item { Layout.fillWidth: true }
 
-            // wifi switch — only with a radio to turn on
+            // wifi switch - only with a radio to turn on
             Rectangle {
                 visible: ShellState.hasWifi
                 implicitWidth: 42; implicitHeight: 23

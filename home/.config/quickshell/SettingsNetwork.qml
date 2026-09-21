@@ -1,4 +1,4 @@
-// SettingsNetwork.qml — Wi-Fi is a first-class Settings section, not a
+// SettingsNetwork.qml - Wi-Fi is a first-class Settings section, not a
 // relocated notch picker. Saved profiles can be connected or forgotten here.
 import Quickshell
 import QtQuick

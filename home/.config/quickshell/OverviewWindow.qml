@@ -1,4 +1,4 @@
-// OverviewWindow.qml — ONE window inside the overview grid.
+// OverviewWindow.qml - ONE window inside the overview grid.
 //
 // It is a LIVE thumbnail (ScreencopyView), not an icon: the workspace map is
 // only good for deciding if you know at a glance what sits on 4, and that

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# remote-mode — prepares the laptop for remote access with RustDesk.
+# remote-mode - prepares the laptop for remote access with RustDesk.
 #
 # Problem solved: hypridle turns the screen off after 7 minutes and suspends
 # the machine after 20. With the screen off, capture turns black, and it is

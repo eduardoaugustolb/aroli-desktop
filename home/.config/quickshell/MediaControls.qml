@@ -1,4 +1,4 @@
-// MediaControls.qml — floating player (MPRIS) with cover art, progress, and
+// MediaControls.qml - floating player (MPRIS) with cover art, progress, and
 // controls. Toggled by the "media" GlobalShortcut (bind in hyprland.conf) or
 // `hyprctl dispatch global quickshell:media`. Cover art provides the accent;
 // pywal stays as fallback when the player publishes none.

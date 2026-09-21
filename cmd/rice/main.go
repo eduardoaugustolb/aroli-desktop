@@ -622,7 +622,7 @@ func plugins(args []string) error {
 	if !*yes && !*dry {
 		fmt.Println("\nVocê escolheu:")
 		for _, item := range chosen {
-			fmt.Printf("  • %s — %s\n", item.name, item.description)
+			fmt.Printf("  • %s - %s\n", item.name, item.description)
 		}
 		if !confirm(bufio.NewReader(os.Stdin), "Instalar estes itens agora?") {
 			fmt.Println("Tudo bem, nada foi instalado.")

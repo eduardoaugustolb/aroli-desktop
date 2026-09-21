@@ -1,8 +1,8 @@
-// SettingsSystem.qml — los interruptores del sistema que hasta ahora solo
+// SettingsSystem.qml - los interruptores del sistema que hasta ahora solo
 // existían en el centro de control del notch (Super+D).
 //
 // POR QUÉ REPETIRLOS AQUÍ: el centro de control es para tocar y salir corriendo
-// — está pensado para un gesto. Ajustes es para cuando quieres LEER qué hace
+// - está pensado para un gesto. Ajustes es para cuando quieres LEER qué hace
 // cada cosa antes de tocarla (para eso está la franja del pie) y para lo que no
 // cabe en cuatro botones: el estado de la batería, qué red hay, cuántas
 // notificaciones tienes. Ninguno de estos ajustes se guarda en el JSON del

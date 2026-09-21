@@ -1,4 +1,4 @@
-// shell.qml — entrypoint. Instantiates the Quickshell system components.
+// shell.qml - entrypoint. Instantiates the Quickshell system components.
 // The dashboard/sidebar was removed: its content lives in the notch
 // control center (ControlPanel.qml). Super+N now toggles notch <-> island.
 //

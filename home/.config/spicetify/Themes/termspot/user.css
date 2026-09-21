@@ -1,12 +1,12 @@
 /*  ═══════════════════════════════════════
-    termspot — CRT phosphor terminal theme
-    by fdeox — https://github.com/fdeox
+    termspot - CRT phosphor terminal theme
+    by fdeox - https://github.com/fdeox
     structure inspired by the "text" theme (darkthemer, spicetify-themes, MIT)
     pairs with the Terminal Greeting extension
     ═══════════════════════════════════════ */
 
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
-/* DSEG: seven-segment VFD/LCD display font (OFL) — used for playback times */
+/* DSEG: seven-segment VFD/LCD display font (OFL) - used for playback times */
 @import url("https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css");
 
 /*  ── user knobs ─────────────────────────── */
@@ -17,7 +17,7 @@
     --line-height: 1.2;
     --font-size-lyrics: 14px;
 
-    /* CRT effects — set any to 'none' to disable */
+    /* CRT effects - set any to 'none' to disable */
     --crt-scanlines: block; /* none | block */
     --crt-vignette: block; /* none | block */
     --crt-glow: 6px; /* 0px disables the phosphor glow */
@@ -123,7 +123,7 @@ button[data-encore-id="buttonPrimary"] {
     transition: unset !important;
 }
 /* tracklist header: htop-style accent strip
-   (opaque composite — a transparent bg lets rows bleed through when sticky) */
+   (opaque composite - a transparent bg lets rows bleed through when sticky) */
 .main-trackList-trackListHeader,
 .main-trackList-trackListHeaderStuck.main-trackList-trackListHeader {
     background: linear-gradient(
@@ -331,7 +331,7 @@ textarea {
     background-color: var(--spice-main);
     transition: border-color var(--border-transition), box-shadow var(--border-transition);
 }
-/* the beloved edge glow — kept subtle */
+/* the beloved edge glow - kept subtle */
 .Root__globalNav:hover,
 .main-yourLibraryX-entryPoints:hover,
 .Root__main-view:hover,
@@ -376,7 +376,7 @@ textarea {
 }
 .main-globalNav-searchContainer form div:has(> .main-topBar-searchBar:focus)::before {
     content: "~/search";
-    /* chip text must stay dark on the accent chip — accent-on-accent was invisible */
+    /* chip text must stay dark on the accent chip - accent-on-accent was invisible */
     color: var(--spice-main) !important;
     background: var(--spice-accent-active);
 }
@@ -666,7 +666,7 @@ img[src*="equaliser"] {
 [data-testid="progress-bar"] {
     --fg-color: var(--spice-button-active);
     --mg-color: rgba(var(--spice-rgb-subtext), 0.35);
-    /* visible dim track — an invisible rail made the bar look broken */
+    /* visible dim track - an invisible rail made the bar look broken */
     --bg-color: rgba(var(--spice-rgb-subtext), 0.22);
 }
 .main-nowPlayingBar-container .playback-bar .progress-bar__slider,
@@ -849,7 +849,7 @@ button[data-testid="control-button-seek-forward-15"] > span:first-child::after {
 }
 
 /*  ================================================================
-    PARCHE LOCAL (Eduardo Augusto) — no viene de fdeox/termspot.
+    PARCHE LOCAL (Eduardo Augusto) - no viene de fdeox/termspot.
     Si actualizas el tema desde upstream, vuelve a añadir este bloque.
     ================================================================ */
 

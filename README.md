@@ -27,7 +27,7 @@
 **Aroli Desktop** is the ready-to-use Aroli workspace on top of the
 stable Omarchy base: the desktop product of the Aroli family
 (Aroli Themes, Aroli Pointer, Aroli Backdrops). The rice keeps the
-structure — notch, dark surfaces, cutouts, and luminance bands —
+structure - notch, dark surfaces, cutouts, and luminance bands -
 while each wallpaper sets the mood with Pywal.
 
 The dark foundation is fixed: depth, negative space, and contrast stay
@@ -45,8 +45,8 @@ your image without turning every application surface into its dominant colour.
 </p>
 
 <p align="center">
-  <img src="home/Pictures/wallpapers/aroli-ember-coast.png" alt="Ember Coast — bundled wallpaper" width="49%">
-  <img src="home/Pictures/wallpapers/aroli-obsidian-dunes.png" alt="Obsidian Dunes — bundled wallpaper" width="49%">
+  <img src="home/Pictures/wallpapers/aroli-ember-coast.png" alt="Ember Coast - bundled wallpaper" width="49%">
+  <img src="home/Pictures/wallpapers/aroli-obsidian-dunes.png" alt="Obsidian Dunes - bundled wallpaper" width="49%">
 </p>
 
 ## What ships with Aroli Desktop
@@ -86,7 +86,7 @@ so already-running applications reload the XCursor.
 > terminal assistant, while the explicit subcommands remain suitable for automation.
 
 ```sh
-# Stable version (recommended) — prebuilt binary from GitHub Releases
+# Stable version (recommended) - prebuilt binary from GitHub Releases
 # Note: versioned `go install ...@vX.Y.Z` does not work for v2+ releases
 # because the module intentionally has no `/v2` suffix; use the binary.
 arch="$(uname -m)"; case "$arch" in x86_64) arch=amd64;; aarch64|arm64) arch=arm64;; esac
@@ -140,15 +140,15 @@ Requires **Hyprland 0.56+**. This rice uses `hyprland.lua`, not
 
 ## Updates
 
-The rice follows **stable tags** (`vX.Y.Z`, SemVer) — never `main` —
+The rice follows **stable tags** (`vX.Y.Z`, SemVer) - never `main` -
 and notifies you on its own when a release lands on GitHub:
 
 - A daily timer (`rice-update-check.timer`, idle priority, no
   resident process) transfers a few KB and writes
   `~/.cache/aroli-desktop/update.json`. The bar/notch shows a dot
   and `Settings > About` shows the version seen.
-- A login notice (`rice-update-notify.service`) reads only that cache file —
-  no network, exits in milliseconds — and shows one desktop notification per
+- A login notice (`rice-update-notify.service`) reads only that cache file -
+  no network, exits in milliseconds - and shows one desktop notification per
   release when an update is pending.
 - Updating is always your own act: `rice update --dry-run` shows the plan,
   `rice update` asks for confirmation, hands over to the target release's
@@ -156,7 +156,7 @@ and notifies you on its own when a release lands on GitHub:
   the installer. Local changes are stashed automatically and restored
   afterwards, so files the desktop rewrote on its own never block the update.
   `rice rollback` undoes it. `rice prune --apply` moves
-  leftovers to the Trash (with backup), never deletes directly — and never
+  leftovers to the Trash (with backup), never deletes directly - and never
   touches files you modified.
 - To turn off the notices (the cache, the dot, and `rice status` keep working):
   `systemctl --user disable rice-update-check.timer rice-update-notify.service`.

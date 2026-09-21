@@ -23,7 +23,7 @@ Singleton {
 
     // SEMANTIC colors: fixed on purpose. c1..c5 come from pywal and change with
     // the wallpaper (color2 does not have to be green), so they cannot say
-    // "charging" or "critical" — with some wallpapers the charging battery came
+    // "charging" or "critical" - with some wallpapers the charging battery came
     // out red and looked like an alarm.
     readonly property color ok:   "#6dbd7a"
     readonly property color warn: "#e0a458"
@@ -39,7 +39,7 @@ Singleton {
     // ══════════════════════════════════════════════════════════════════════
     //  INK FOR WHAT FLOATS OVER THE WALLPAPER
     //
-    //  The bar has no surface of its own —the veil defaults to 0—, so
+    //  The bar has no surface of its own -the veil defaults to 0-, so
     //  its bodies paint DIRECTLY onto the wallpaper. And since
     //  pywal derives the palette from that same wallpaper, on a monochrome
     //  background the accent comes back tinted the same hue as the background
@@ -47,7 +47,7 @@ Singleton {
     //
     //  Measured on the workspace indicator with a blue wallpaper: the active
     //  pill (#366ca3) sat at 1.6:1 against the inactive dots, and the dots
-    //  —white at 50%— were the BRIGHTEST thing in the group. That is, the dim
+    //  -white at 50%- were the BRIGHTEST thing in the group. That is, the dim
     //  stood out more than the lit, and on top the pill came out darker
     //  than chunks of the wallpaper itself.
     //

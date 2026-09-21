@@ -26,8 +26,8 @@ Aquí manda otra idea:
 - **En reposo mide exactamente la banda reservada (32 px)**, así que no tapa
   nunca ninguna ventana. Solo sobresale cuando tú lo provocas.
 
-Las cuatro ampliaciones del 9-ago-2026 —modo lectura, salud de batería, acento
-de carátula y wifi empresarial— nacen de ideas de
+Las cuatro ampliaciones del 9-ago-2026 -modo lectura, salud de batería, acento
+de carátula y wifi empresarial- nacen de ideas de
 [`surface-dots`](https://github.com/snes19xx/surface-dots), pero están
 reimplementadas para este rice: sin rutas BAT hardcodeadas, sin un generador de
 paleta externo, sin contraseñas en `argv` y sin pisar el estado previo de
@@ -36,7 +36,7 @@ Hyprland. No se copió su shell ni su estética.
 ## Ajustes (`SettingsWindow.qml`)
 **No es un panel del notch, y es a propósito.** Los paneles del notch son
 transitorios: abres, haces una cosa, se cierran al pinchar fuera. Unos ajustes
-son lo contrario — exploras, tocas un slider y quieres mirar el terminal a ver
+son lo contrario - exploras, tocas un slider y quieres mirar el terminal a ver
 si funcionó. Cerrarse al pinchar fuera sería hostil, y anclado arriba taparía
 media pantalla. Así que es una **ventana flotante de verdad** (`FloatingWindow`,
 xdg-toplevel), con el mismo lenguaje visual que el notch y lanzada desde él.
@@ -83,7 +83,7 @@ volver al diseño anterior:
    de cada sección y salta a la primera que coincida. `↑`/`↓` recorren solo esas
    secciones, `Ctrl+F` recupera el foco y `Esc` vacía la búsqueda (y si ya está
    vacía, cierra la ventana). Cada tarjeta se esconde sola si no le queda ninguna
-   fila — y para eso las filas publican `matches` aparte de `visible`, porque en
+   fila - y para eso las filas publican `matches` aparte de `visible`, porque en
    QML `visible` es *efectiva* y una tarjeta oculta haría que sus filas dijeran
    `false` para siempre.
 4. **La cabecera no scrollea**: icono, título, descripción y acción de la sección
@@ -112,13 +112,13 @@ y hacen falta los dos:
   interruptor y no al reiniciar.
 - **`~/.config/hypr/efectos.lua`** lo deja escrito. `hyprland.lua` lo carga al
   final con un `pcall(dofile, ...)`, así que sobrevive a un `hyprctl reload`
-  —que releería la config y se llevaría por delante el `eval`— y a reiniciar la
+  -que releería la config y se llevaría por delante el `eval`- y a reiniciar la
   sesión.
 
 Es el mismo trato que `hyprlock.conf` le da a `language.conf`: los valores por
 defecto primero en la config versionada, y encima la capa que puede faltar. Si
-`efectos.lua` no existe —un clon recién instalado, o un arranque sin
-Quickshell— no pasa nada y mandan los valores de `hyprland.lua`. Por eso está
+`efectos.lua` no existe -un clon recién instalado, o un arranque sin
+Quickshell- no pasa nada y mandan los valores de `hyprland.lua`. Por eso está
 en el `.gitignore`: en modo `--link`, `~/.config/hypr` **es** el repo.
 
 El rebote de 180 ms vive en `Config.qml` y no en la interfaz porque el
@@ -126,15 +126,15 @@ deslizador de muestras emite en cada píxel del arrastre y no tiene señal de
 «soltado»; sin él, un arrastre lanza cien procesos.
 
 ## Arquitectura
-- **`ShellState.qml`** (singleton) — el hub: reloj, ventana activa, MPRIS,
+- **`ShellState.qml`** (singleton) - el hub: reloj, ventana activa, MPRIS,
   paleta de carátula, Pipewire (volumen), espectro de audio, brillo,
   batería/UPower/CPU/RAM, red,
   bluetooth, pacman, swaync, cafeína, **y la máquina de estados del notch**.
   UI cero.
-- **`TopShell.qml`** — la ventana única: la forma del notch, la máscara, el
+- **`TopShell.qml`** - la ventana única: la forma del notch, la máscara, el
   contenido de la barra, el manejo de pantalla completa.
-- **`NotchContent.qml`** — lo que se ve dentro del notch en cada modo.
-- **`Config.qml`** (singleton) — ajustes persistentes; lo que antes eran
+- **`NotchContent.qml`** - lo que se ve dentro del notch en cada modo.
+- **`Config.qml`** (singleton) - ajustes persistentes; lo que antes eran
   constantes cocidas.
 - **Componentes**: `MediaPanel`, `BarItem`, `NotchSlider`, `SettingsControls`,
   `StyledText`, `PillButton`, `Card`.
@@ -159,14 +159,14 @@ controles (red, bluetooth, notificaciones, cafeína, fondo, bloquear, apagar).
 **La barra izquierda**: launcher Arch (rueda = volumen) · workspaces en puntos
 (el activo se estira) · nombre de la app en negrita. Nada de esto está en el notch.
 
-**La barra derecha solo enseña excepciones** — lo que NO es normal. En un día
+**La barra derecha solo enseña excepciones** - lo que NO es normal. En un día
 tranquilo está vacía del todo:
 
 | elemento | cuándo aparece |
 |---|---|
 | systray | lo que registren las apps |
 | actualizaciones | solo si hay |
-| notificaciones | solo si hay (con el número) o hay DND — clic abre el centro de control, clic derecho conmuta DND |
+| notificaciones | solo si hay (con el número) o hay DND - clic abre el centro de control, clic derecho conmuta DND |
 | cafeína | solo si está activa |
 | bluetooth | solo si hay algo **conectado** (encendido-sin-nada es ruido) |
 | red | solo si **no** hay red (estar conectado es lo normal) |
@@ -188,7 +188,7 @@ tranquilo está vacía del todo:
 | `activity` | volumen o brillo | OSD icono + barra + % (1,8 s) | 330 × 42 |
 | `peek` | hover (con 240 ms de retardo) | lo mismo, creciendo: fecha con año | 380 × 44 |
 | `media` | hay música | carátula + hora + espectro real (8 bandas, cava) | 268 × **32** |
-| `idle` | — | **solo la hora**, centrada | 140 × **32** |
+| `idle` | - | **solo la hora**, centrada | 140 × **32** |
 
 Gestos: **rueda vertical** = volumen · **rueda horizontal** = cambiar de
 escritorio · **clic derecho** = play/pause · **clic** = centro de control.
@@ -225,7 +225,7 @@ Red o Bluetooth, y **tres dedos hacia abajo en el trackpad**, que es la misma
 postura del gesto de escritorios pero en el otro eje. El cuadro es la puerta que
 se ve; el gesto, la rápida.
 
-Se probó antes a abrirlo **pinchando el reloj** del notch —el gesto de macOS— y
+Se probó antes a abrirlo **pinchando el reloj** del notch -el gesto de macOS- y
 se retiró: ese clic ya abría el centro de control desde siempre, y quitarle a
 alguien un gesto que tiene en los dedos a cambio de una función nueva es un mal
 trato. El clic derecho tampoco vale: es el play/pause del reproductor.
@@ -272,7 +272,7 @@ pulsar `Super+Tab`.
    exigen. Sin el prefijo todos los dispatch contestan `moveWindow: no window` y
    el arrastre no hace nada, **en silencio**.
 2. `toplevel.workspace` lo mantiene Quickshell al día solo, pero
-   `toplevel.lastIpcObject` —de donde salen `at` y `size`— se queda **congelado**
+   `toplevel.lastIpcObject` -de donde salen `at` y `size`- se queda **congelado**
    hasta que alguien llama a `Hyprland.refreshToplevels()`. Medido. Por eso hay
    un temporizador que lo pide **solo mientras el overview está abierto**.
 3. La miniatura se ata al área de su celda (`Math.min(cellW - tw, …)`), y por eso
@@ -308,14 +308,14 @@ márgenes, actualiza la constante.
 **También es calculadora.** Si lo que escribes es una cuenta, aparece arriba una
 fila con el resultado y **Enter lo copia al portapapeles** (nativo, vía
 `Quickshell.clipboardText`, sin `wl-copy`). El notch confirma con un aviso breve
-—aquí sí hace falta, porque copiar no tiene ninguna otra señal de haber ocurrido.
+-aquí sí hace falta, porque copiar no tiene ninguna otra señal de haber ocurrido.
 Soporta `+ - * / ^ % ( )`, coma o punto decimal, `pi`, `e` y las funciones
 habituales (`sqrt`, `log`, `sin`…). `=` al principio fuerza el modo calculadora.
 
 Para que no salte con cualquier cosa hace falta que haya **un número y un
 operador**, y toda palabra tiene que estar en la lista blanca: así `7zip`,
 `firefox` o `code 2` no disparan la calculadora. Comprobado también que
-`0.1+0.2` da `0.3` y no `0.30000000000000004` — el resultado se redondea a 10
+`0.1+0.2` da `0.3` y no `0.30000000000000004` - el resultado se redondea a 10
 decimales antes de mostrarse.
 
 **Está pensado para el teclado, y el ratón no puede estorbar.** Al abrirse manda
@@ -333,7 +333,7 @@ Un guardado por tiempo no vale: el evento de entrada llega **después** de que l
 capa se reconfigure por el cambio de `keyboardFocus`, así que se cuela por
 detrás de cualquier ventana de armado razonable. La puntuación prioriza prefijo exacto del
 nombre, luego prefijo de palabra, luego subcadena, y como último recurso
-subsecuencia — escribir "kit" pone `kitty` el primero.
+subsecuencia - escribir "kit" pone `kitty` el primero.
 
 El **centro de control** (`ControlPanel.qml`) sustituye al de swaync **y al
 antiguo Sidebar/dashboard**. Izquierda: media, sliders de volumen y brillo, siete
@@ -355,10 +355,10 @@ mejor pegan con la paleta de pywal; apagada vuelve a salir uno al azar, que es
 como estaba antes. Es un interruptor sobre `~/.local/bin/poke-theme` (`on`/`off`
 /`is-on`, mismo trato que el modo remoto: el estado real lo dice el script, aquí
 no se adivina). El sesgo lo aplica `poke_theme_pick()` en `~/.zshrc`, que **solo
-elige el fichero** — el dibujado del sprite no se toca desde aquí.
+elige el fichero** - el dibujado del sprite no se toca desde aquí.
 
-Al retirar el Sidebar solo había dos cosas suyas que no estuvieran ya aquí —**el
-tiempo** (`wttr.in`, cada media hora) y el **uso de disco**— así que se migraron
+Al retirar el Sidebar solo había dos cosas suyas que no estuvieran ya aquí -**el
+tiempo** (`wttr.in`, cada media hora) y el **uso de disco**- así que se migraron
 a `ShellState` antes de quitarlo. El disco ya venía en `sysstats.sh`, solo faltaba
 leer el campo 9.
 
@@ -399,7 +399,7 @@ práctica las señales caen entre 30 y 60 y con el reparto de manual salían tod
 con el mismo icono.
 
 El **menú de encendido** (`PowerPanel.qml`) sustituye a wlogout, que tomaba la
-pantalla entera. Arranca siempre sobre "Bloquear" — lo menos destructivo — para
+pantalla entera. Arranca siempre sobre "Bloquear" - lo menos destructivo - para
 que un Enter accidental no te apague el portátil. ←/→ o Tab mueven, Enter
 confirma, Esc cierra.
 
@@ -447,7 +447,7 @@ queden clavadas durante el fundido.
 Antes esto era un `PwNodePeakMonitor` y **no funcionaba**: da UN número (el pico
 global del sink) que se iba desplazando por el array, así que todas las barras
 eran la misma señal repetida y, como el pico en lineal casi siempre roza 1, se
-quedaban pegadas al techo — un código de barras, no un visualizador. Encima
+quedaban pegadas al techo - un código de barras, no un visualizador. Encima
 `onPeakChanged` solo salta cuando el valor **cambia**: en un tramo comprimido
 dejaba de llegar señal y las barras se congelaban.
 
@@ -459,7 +459,7 @@ El reproductor vertical de Super+D reutiliza esas ocho bandas, pero las ensancha
 a 6 px y les da 58 px de recorrido para que funcionen como remate visual.
 
 Dos mandos para el tacto: `noise_reduction` en `cava.conf` (0 nervioso ↔ 100
-pastoso; ahora 70) y la gamma del parseo en `ShellState.qml` (0,6 — sin ella los
+pastoso; ahora 70) y la gamma del parseo en `ShellState.qml` (0,6 - sin ella los
 agudos son tan pequeños al lado de los graves que no se ven moverse en 18 px).
 **Nada de `Behavior on height`**: cava ya filtra la señal a 60 fps con su propia
 caída por gravedad, y una animación de 90 ms que nunca termina de correr solo
@@ -468,7 +468,7 @@ aplasta el recorrido. Si falta `cava` en el PATH las barras se quedan planas.
 ### El reloj
 En reposo el notch enseña **solo la hora**, centrada, en una píldora estrecha: es
 lo más minimalista posible sin dejarlo vacío. Al pasar el ratón crece y aparecen
-la fecha entera con año y la batería — no se pierde nada, solo se mueve a donde
+la fecha entera con año y la batería - no se pierde nada, solo se mueve a donde
 hace falta. Con música el reloj se aparta a la izquierda para dejar sitio a la
 carátula y a los picos.
 
@@ -478,7 +478,7 @@ el ancho **se adapta solo**: `Config.idleW` es el ancho para la hora sola, y
 ancho fijo, reactivar la fecha recortaría el contenido.
 
 **Dos familias tipográficas, a propósito**: `Appearance.font` (JetBrains Mono
-Nerd Font) para la barra y para TODO lo que pinte iconos — los glifos solo
+Nerd Font) para la barra y para TODO lo que pinte iconos - los glifos solo
 existen en esa familia. `Appearance.fontUI` (Adwaita Sans, base Inter) para el
 texto de dentro del notch. Una fecha en monoespaciada queda desmadejada: las
 letras se separan igual que los dígitos y parece salida de terminal. La hora usa
@@ -524,9 +524,9 @@ música; ahora se funden.
 ### Dos estilos: Notch e Isla
 `Config.notchStyle` cambia entre los dos, en vivo desde Ajustes › Apariencia:
 
-- **`notch`** — pegado al borde superior, con las esquinas superiores invertidas
+- **`notch`** - pegado al borde superior, con las esquinas superiores invertidas
   del MacBook. Es una ruta `Shape` con bézier.
-- **`island`** — píldora flotante despegada del borde y redondeada por los cuatro
+- **`island`** - píldora flotante despegada del borde y redondeada por los cuatro
   lados, como el Dynamic Island del iPhone. Aquí no hace falta `Shape`: es un
   `Rectangle` con `radius`. La separación (`Config.islandGap`) sale **de dentro
   de la banda reservada**, así que la isla tampoco tapa ventanas.
@@ -602,7 +602,7 @@ sitio, sin reiniciar nada.
 
 **Y por qué un `.js` y no otro singleton QML**: se probó con un
 `Translations.qml` que exponía `readonly property var en: ({…})` con las 402
-entradas dentro y en caliente llegaba **sin definir** —
+entradas dentro y en caliente llegaba **sin definir** -
 `TypeError: Cannot read property '...' of undefined`; antes de eso, sin un
 `import` explícito, `ReferenceError: Translations is not defined`. Un fichero JS
 con `.pragma library`, importado explícitamente
@@ -617,7 +617,7 @@ maneras:
 
 - al instalar, con `./install.sh --lang en` (sin la opción, el instalador
   pregunta);
-- en caliente, en **Ajustes › Apariencia › Idioma del shell** — el cambio es
+- en caliente, en **Ajustes › Apariencia › Idioma del shell** - el cambio es
   inmediato y no toca el idioma del sistema ni el de las aplicaciones, solo el
   del shell;
 - a mano, escribiendo `"language": "en"` en el JSON.
@@ -667,9 +667,9 @@ Comprueba las cuatro formas de romper esto: cadenas envueltas que no están en e
 diccionario (saldrían en castellano), entradas del diccionario que ya no usa
 nadie, huecos `{0}` que se pierden o se inventan en la traducción, y literales
 visibles (`text:`, `label:`, `hint:`…) que siguen sin envolver. Sale 0 si está
-todo bien y 1 si hay algo que mirar. Las excepciones a propósito —el título de
+todo bien y 1 si hay algo que mirar. Las excepciones a propósito -el título de
 ventana «Ajustes», que es con el que casa la `windowrule`, o los rótulos de
-idioma— van listadas dentro del script con su motivo.
+idioma- van listadas dentro del script con su motivo.
 
 ## Salud de batería
 
@@ -695,7 +695,7 @@ hay algo corriendo de fondo. Vive en `TopShell.qml` (dibujo) y `ShellState.qml`
 (`bubble*`, datos y prioridad).
 
 **Por qué un satélite y no otra cara del notch**: el notch en reposo mide
-exactamente la banda reservada y no puede crecer solo — esa es la regla que hace
+exactamente la banda reservada y no puede crecer solo - esa es la regla que hace
 que no tape ninguna ventana nunca. Una cuenta atrás dura minutos, así que no cabe
 ahí sin romperla. Un cuerpo aparte sí: nace detrás del borde, se queda **dentro**
 de la banda (28 de 32 px) y el notch sigue midiendo lo mismo.
@@ -712,8 +712,8 @@ Tres detalles que no se ven leyendo el código:
 
 1. **Se declara ANTES que el notch**, o sea que el notch la pinta encima. No es
    un descuido: cuando el notch crece (un OSD, un panel, el mapa de escritorios)
-   se traga la burbuja, y al encoger vuelve a asomar. Es la metáfora entera —
-   algo que estaba detrás — y sale gratis, sin una línea que esconda nada.
+   se traga la burbuja, y al encoger vuelve a asomar. Es la metáfora entera -
+   algo que estaba detrás - y sale gratis, sin una línea que esconda nada.
 2. **Su sitio se mide contra el notch EN REPOSO.** Si siguiera al borde vivo,
    abrir el mapa de escritorios (1396 px) la mandaría volando al otro extremo de
    la pantalla y de vuelta.
@@ -731,7 +731,7 @@ propio notch, y de paso queda en el historial del centro de control.
 Escribe una duración (`10m`, `25 min`, `1h`, `1h30`, `90s`) y la **misma fila
 destacada de la calculadora** propone la cuenta atrás; Enter la arranca. Va ahí y
 no en un atajo nuevo porque el lanzador ya es donde se escriben cosas que no son
-nombres de aplicación — la calculadora abrió esa puerta.
+nombres de aplicación - la calculadora abrió esa puerta.
 
 **Exige unidad a propósito**: un `5` suelto es una búsqueda. Si el lanzador
 propusiera una cuenta atrás con cualquier número se metería en medio de todas las
@@ -785,8 +785,8 @@ letra vuelve, y ahí sí significa algo.
 dedos y cada uno abre una ventana que se aprende por separado. Un prefijo se
 descubre solo, se corrige con un borrado, y sobre todo: la costumbre sigue
 siendo una sola, `Super+R` y escribir. Es además la puerta que abrió la
-calculadora — escribir `2+2` ya era escribir algo que no es un nombre de
-aplicación—, así que la calculadora y el temporizador siguen **sin prefijo**: no
+calculadora - escribir `2+2` ya era escribir algo que no es un nombre de
+aplicación-, así que la calculadora y el temporizador siguen **sin prefijo**: no
 son un modo, son lo que pasa cuando lo que escribes resulta ser una cuenta o una
 duración.
 
@@ -813,7 +813,7 @@ silencio. El script entrega TSV con `id`, tipo, ruta de miniatura y etiqueta.
   tardaba 0,56 s con las miniaturas ya cacheadas, y eso se ejecuta cada vez que
   abres el modo; con coincidencia de patrones de bash baja a **0,06 s**. Tampoco
   usa `cliphist list | head`: con la tubería, `head` cierra el grifo, cliphist
-  muere de SIGPIPE y el script termina en 141 por `pipefail` — un fallo de
+  muere de SIGPIPE y el script termina en 141 por `pipefail` - un fallo de
   mentira que tarde o temprano se interpreta como uno de verdad.
 
 ### `>` acciones
@@ -825,8 +825,8 @@ externo: «Wifi» abría `kitty -e impala` y ahora abre `NetworkPanel`; «Apagar
 abría `wlogout` y ahora abre `PowerPanel`. Lanzar una terminal para tocar el
 wifi teniendo el panel al lado era el resto de una época anterior.
 
-También vive aquí **Modo lectura**: busca `>lectura`. No estrena atajo —`Super+D`
-sigue siendo el centro de control— y también se puede conmutar en Ajustes ›
+También vive aquí **Modo lectura**: busca `>lectura`. No estrena atajo -`Super+D`
+sigue siendo el centro de control- y también se puede conmutar en Ajustes ›
 Sistema. `reading-mode.sh` captura antes el shader, animaciones, blur y sombras
 reales de Hyprland; al salir restaura esos mismos valores. El shader lleva papel
 cálido, tinta, grano estático y dither mínimo. Fondo, pywal y brillo quedan fuera
@@ -861,7 +861,7 @@ fila). No es teórico: `mode` es un enlace declarado arriba del fichero y los
 resultados los recarga un `Connections` declarado más abajo, así que al cambiar
 de modo Qt actualiza primero el enlace y después el manejador. En ese hueco de un
 fotograma la lista se repintaba con el delegado **nuevo** y los datos **viejos**
-—el delegado de ventanas recibía aplicaciones y pedía campos que no existen— y
+-el delegado de ventanas recibía aplicaciones y pedía campos que no existen- y
 salían cinco `TypeError` en el log por cada `@` que escribías. Preguntándoselo a
 la primera fila eso no puede pasar, porque la respuesta cambia exactamente a la
 vez que los datos.
@@ -908,7 +908,7 @@ pero **no sabe contestar** a lo que BlueZ pregunta a mitad del emparejamiento:
 ```
 
 Eso no son señales: BlueZ llama a métodos de un objeto D-Bus que el escritorio
-tiene que **exportar**, y desde QML no se puede exportar un objeto D-Bus — la
+tiene que **exportar**, y desde QML no se puede exportar un objeto D-Bus - la
 API de Bluetooth de Quickshell no tiene ningún callback de agente. Sin nada que
 conteste, los auriculares emparejan igual (no preguntan nada) pero **un teclado
 o un mando falla en silencio**: sin error, sin aviso, simplemente no empareja.
@@ -934,7 +934,7 @@ caducidad al otro lado de la cual hay un aparato esperando. Detrás del panel qu
 tuvieras abierto, el emparejamiento vencería sin que llegaras a verla.
 
 Dos formas: **`confirm`/`authorize`** traen dos botones (Sí / No), y
-**`display`** no trae ninguno — BlueZ inventa el código y lo tecleas tú en el
+**`display`** no trae ninguno - BlueZ inventa el código y lo tecleas tú en el
 teclado; la barrita de progreso sube con cada tecla, y es la única señal de que
 el teclado está hablando de verdad con el equipo.
 
@@ -1007,7 +1007,7 @@ estabas mirando.
 - 2026-08-19: **fuera el último menú de rofi con tecla propia**. `Super+K` ya no
   llama a `~/.config/hypr/list_keybinds.sh`: abre Ajustes directamente en
   «Atajos» (`global, quickshell:keybinds`), que es la MISMA lista leída del
-  mismo `hyprland.conf` — eran dos vistas del mismo parseo y solo coincidían
+  mismo `hyprland.conf` - eran dos vistas del mismo parseo y solo coincidían
   mientras nadie tocara ninguna. Se estrenan `ShellState.openSettingsAt(id)`,
   `SettingsWindow.openAt(id)`, `qs ipc call notch keys` y la acción «Atajos de
   teclado» del menú de comandos. Los siete scripts de rofi que ya no llamaba
@@ -1018,7 +1018,7 @@ estabas mirando.
 
   Ese mismo día, un poco después: **rofi se ha ido entero**. El único
   superviviente era `hypr/scripts/webapp-install.sh` (`Super+Ctrl+W`), dos
-  preguntas de texto encadenadas que el lanzador del notch no sabe hacer — y que
+  preguntas de texto encadenadas que el lanzador del notch no sabe hacer - y que
   no hacía falta que aprendiera, porque `~/.local/share/webapps/` no llegó a
   existir nunca: el atajo no se usó ni una vez. Retirado él, rofi se quedaba sin
   un solo uso vivo, así que se van con él `~/.config/rofi/` (112 ficheros de
@@ -1063,7 +1063,7 @@ estabas mirando.
   su fila en el centro de control invoca la acción y abre la foto en satty
   (`screenshot-edit.sh`, guarda la anotada aparte). El aviso del notch ahora
   invoca la primera acción si la notificación trae alguna, y solo abre el
-  centro de control cuando no hay ninguna — o sea que cualquier app con
+  centro de control cuando no hay ninguna - o sea que cualquier app con
   acciones se beneficia, no solo las capturas.
 - 2026-08-07: capturas de región sobre pantalla CONGELADA. `Super+Shift+S` ya
   no llama a `hyprshot -m region`, sino a `screenshot-region.sh`, que se apoya
@@ -1141,7 +1141,7 @@ Lo que faltaba era el indicador de escritorio: pintaba la lista ENTERA y marcaba
 el activo con `Hyprland.focusedWorkspace`, que es global. En la pantalla sin foco
 eso es una píldora señalando un escritorio que está en la otra. Ahora cada barra
 filtra por `ws.monitor.name` y marca el `activeWorkspace` de SU monitor
-(`win.hlMon`, buscado por nombre en `Hyprland.monitors` — no con `monitorFor()`,
+(`win.hlMon`, buscado por nombre en `Hyprland.monitors` - no con `monitorFor()`,
 que es un método y no reevalúa el binding al enchufar o quitar una salida). Si
 todavía no se sabe de quién es cada escritorio, se pintan todos: con una sola
 pantalla el resultado es idéntico al de antes.

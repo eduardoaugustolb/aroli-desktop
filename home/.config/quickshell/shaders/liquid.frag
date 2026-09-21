@@ -1,4 +1,4 @@
-// liquid.frag — el indicador de escritorio como un FLUIDO.
+// liquid.frag - el indicador de escritorio como un FLUIDO.
 //
 // No se dibujan figuras y se mueven unas por delante de otras: se resuelve UN
 // SOLO campo de distancia con todos los cuerpos dentro, unidos con smin(). Por

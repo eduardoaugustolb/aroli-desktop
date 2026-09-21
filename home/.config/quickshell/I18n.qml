@@ -1,4 +1,4 @@
-// I18n.qml — the shell language layer.
+// I18n.qml - the shell language layer.
 //
 // ENGLISH (EN-US) IS THE CODE. Strings stay written in English inside each
 // .qml, wrapped in I18n.tr(...). In English tr() returns its argument as-is:

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# wall-triage — reviews wallpapers one by one and sets aside those you discard.
+# wall-triage - reviews wallpapers one by one and sets aside those you discard.
 #
 #   g / space  keep             d  discard
 #   u          undo             q  quit (resumes where you left off)

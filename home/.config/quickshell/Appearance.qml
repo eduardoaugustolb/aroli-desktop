@@ -1,7 +1,7 @@
 pragma Singleton
 import Quickshell
 
-// Shared design system — like end-4 and caelestia's Appearance/Config.
+// Shared design system - like end-4 and caelestia's Appearance/Config.
 // Everything (bar, dashboard, OSD, notifications...) uses these tokens => it looks cohesive.
 Singleton {
     id: root
@@ -34,7 +34,7 @@ Singleton {
     readonly property int pad:  16
 
     // ══════════════════════════════════════════════════════════════════════
-    //  MOTION — the full scale lives in ~/.config/motion-language.md
+    //  MOTION - the full scale lives in ~/.config/motion-language.md
     //  Hyprland uses those same four numbers (in deciseconds) for
     //  windows and workspaces. If something moves and is not here, it is a bug.
     //
@@ -55,7 +55,7 @@ Singleton {
     readonly property int mOutShape: 220     // SHAPE leaving
 
     // Aliases from the first batch of tokens. They existed alongside the m*
-    // ones with nearly equal numbers (120/220/320) — two vocabularies for the
+    // ones with nearly equal numbers (120/220/320) - two vocabularies for the
     // same thing was exactly what kept nothing quite fitting. Now they point
     // at the good scale; kept so code still using them does not break.
     readonly property int animFast: mQuick
@@ -65,7 +65,7 @@ Singleton {
     // ─── Curves ───
     // Bounce is banned in TRANSLATIONS: something sliding past its stop shows
     // the screen edge and gives away the trick. But in SCALES there is nothing
-    // to show — something inflating a hair past its size just feels alive.
+    // to show - something inflating a hair past its size just feels alive.
     // That is where the character goes.
     // (Fixed 2026-08-05: law 5 banned both and left the system
     // coherent but bland. See ~/.config/motion-language.md)
@@ -85,7 +85,7 @@ Singleton {
     readonly property int mStagger: 110      // = mOut
 
     // ══════════════════════════════════════════════════════════════════════
-    //  SPRINGS — the category difference, not a tweak
+    //  SPRINGS - the category difference, not a tweak
     //
     //  A bezier curve has fixed duration: it does not know where it is, only
     //  how much is left. If you change its destination mid-animation it must

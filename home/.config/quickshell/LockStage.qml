@@ -1,4 +1,4 @@
-// LockStage.qml — the lock screen visuals without the session-lock protocol.
+// LockStage.qml - the lock screen visuals without the session-lock protocol.
 //
 // LockSurface (WlSessionLockSurface) embeds this for the real session; the
 // visual test harness embeds it in a plain window. Single source of truth:
@@ -6,7 +6,7 @@
 //
 // A single floating card, Caelestia-placed and Aroli-dressed: stable dark
 // surface, wallpaper only as blurred mood behind it, one accent tab keeping
-// the threshold DNA. The card is the whole dialog — nothing floats outside
+// the threshold DNA. The card is the whole dialog - nothing floats outside
 // it, so multi-monitor and fractional scales cannot strand content.
 import Quickshell
 import QtQuick
@@ -108,7 +108,7 @@ Item {
             root.unlocking = true;
             // Sequenced exit: content morphs back first, the background
             // follows 120 ms later (180 ms fade), release lands at ~350 ms.
-            // Fading everything at once — or releasing with bg painted —
+            // Fading everything at once - or releasing with bg painted -
             // reads as a cut, not a transition.
             center.playOutro();
             unlockFade.restart();

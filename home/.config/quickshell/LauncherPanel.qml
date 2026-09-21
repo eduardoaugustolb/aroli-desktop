@@ -1,4 +1,4 @@
-// LauncherPanel.qml — el centro de comandos, desplegado DESDE el notch.
+// LauncherPanel.qml - el centro de comandos, desplegado DESDE el notch.
 //
 // Se abre con Super+R o pulsando el logo de Arch, y el notch se estira hasta
 // convertirse en él. Teclado: escribir filtra, ↑/↓ (o Ctrl+J/K) mueve, Enter

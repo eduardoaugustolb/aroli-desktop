@@ -3,7 +3,7 @@
 # install.sh symlinks this file to ~/.gitconfig, so whatever identity is written
 # here becomes the identity of whoever installs these dotfiles: their commits
 # would go out signed with someone else's name and address. Same reasoning for
-# the credential helper — how you store your tokens is your business, and
+# the credential helper - how you store your tokens is your business, and
 # `store` writes them to disk in the clear.
 #
 # Both live in ~/.gitconfig.local, which is never in the repo. install.sh

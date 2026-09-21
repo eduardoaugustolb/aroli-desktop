@@ -1,4 +1,4 @@
-// SettingsShortcuts.qml — los atajos de teclado, leídos en vivo de
+// SettingsShortcuts.qml - los atajos de teclado, leídos en vivo de
 // ~/.config/hypr/hyprland.conf MÁS ~/.config/hypr/user.conf (tus overrides,
 // que el installer crea una vez y los updates no tocan).
 //
@@ -15,7 +15,7 @@
 //
 // De momento es SOLO LECTURA: reasignar teclas implicaría reescribir el .conf
 // con el riesgo de destrozar comentarios y orden, y ese fichero es la fuente de
-// verdad del rice. Tus binds personales van en user.conf — aparecen aquí
+// verdad del rice. Tus binds personales van en user.conf - aparecen aquí
 // igual, sin tocar los defaults versionados.
 import Quickshell
 import Quickshell.Io

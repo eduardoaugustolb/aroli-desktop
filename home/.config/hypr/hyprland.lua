@@ -121,7 +121,7 @@ end
 hl.config({
     general = {
         -- Law 8 -- a single gap across the content layer. 3/6 default: between
-        -- two windows 6 px (3 + 3) and to the screen edge 6 more — THE SAME
+        -- two windows 6 px (3 + 3) and to the screen edge 6 more - THE SAME
         -- gap. Settings > Appearance > Windows flips it live (effects.lua,
         -- which wins over this block by loading last).
         gaps_in  = 3,
@@ -369,8 +369,8 @@ hl.animation({ leaf = "zoomFactor", enabled = true, speed = 1.3, bezier = "respu
 -- The bar no longer lies about this: each screen paints ONLY its workspaces and
 -- marks its own active one (see TopShell.qml, the ws.monitor filter).
 --
--- If the tower should split them by hand —say 1 and 2 on the primary
--- and 3 on the secondary— the monitor joins the rule, with whatever names
+-- If the tower should split them by hand -say 1 and 2 on the primary
+-- and 3 on the secondary- the monitor joins the rule, with whatever names
 -- `hyprctl monitors` reports:
 --
 --   hl.workspace_rule({ workspace = "1", persistent = true, monitor = "DP-4" })

@@ -1,4 +1,4 @@
-// SettingsAudio.qml — audio output and input (native Pipewire, no pavucontrol).
+// SettingsAudio.qml - audio output and input (native Pipewire, no pavucontrol).
 //
 // THE BUG THIS VERSION FIXES: this laptop's four output devices are all
 // literally called:
@@ -10,7 +10,7 @@
 // What tells them apart sits AT THE END, so the list showed four identical
 // rows cut at the same spot and picking was impossible. Now:
 //   1) if the node carries a `nickname` (node.nick: "Speaker", "HDMI 1"), use it;
-//   2) else strip the prefix common to every device, computed live — so it
+//   2) else strip the prefix common to every device, computed live - so it
 //      works with any card, not just this one;
 //   3) and translate the same four terms to the shell language.
 // The full name is never lost: it shows in the footer strip hovering the row.

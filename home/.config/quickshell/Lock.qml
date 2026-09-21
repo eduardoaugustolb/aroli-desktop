@@ -1,4 +1,4 @@
-// Lock.qml — Aroli lock screen entrypoint (notch band + central auth).
+// Lock.qml - Aroli lock screen entrypoint (notch band + central auth).
 //
 // Inspired by caelestia's morphing lock (badge -> auth surface, PAM states)
 // painted with Aroli rules: the full-width notch band stays the surface,

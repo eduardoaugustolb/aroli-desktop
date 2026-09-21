@@ -26,8 +26,8 @@ idea is in charge:
 - **At rest it measures exactly the reserved band (32 px)**, so it never covers
   a window. It only sticks out when you ask it to.
 
-The four additions of 9 Aug 2026 —reading mode, battery health, cover-art
-accent and enterprise wifi— come from ideas in
+The four additions of 9 Aug 2026 -reading mode, battery health, cover-art
+accent and enterprise wifi- come from ideas in
 [`surface-dots`](https://github.com/snes19xx/surface-dots), but they are
 reimplemented for this rice: no hardcoded BAT paths, no external palette
 generator, no passwords in `argv` and no trampling of Hyprland's previous
@@ -36,7 +36,7 @@ state. Neither its shell nor its looks were copied.
 ## Settings (`SettingsWindow.qml`)
 **It is not a notch panel, and that is deliberate.** The notch panels are
 transient: you open one, you do one thing, it closes when you click outside.
-A settings window is the opposite — you explore, you drag a slider and you want
+A settings window is the opposite - you explore, you drag a slider and you want
 to look at the terminal to see whether it worked. Closing on a click outside
 would be hostile, and anchored at the top it would cover half the screen. So it
 is a **real floating window** (`FloatingWindow`, xdg-toplevel), with the same
@@ -85,7 +85,7 @@ the previous design:
    of results in each section and jumps to the first one that matches. `↑`/`↓`
    walk only those sections, `Ctrl+F` gets the focus back and `Esc` empties the
    search (and if it is already empty, closes the window). Each card hides
-   itself if it has no rows left — and for that the rows publish `matches` apart
+   itself if it has no rows left - and for that the rows publish `matches` apart
    from `visible`, because in QML `visible` is *effective* and a hidden card
    would make its rows say `false` for ever.
 4. **The header does not scroll**: icon, title, description and the section's
@@ -114,11 +114,11 @@ commands **Hyprland**, which has no idea `quickshell-rice.json` exists. So
   switch and not when you reboot.
 - **`~/.config/hypr/efectos.lua`** writes it down. `hyprland.lua` loads that file
   last with a `pcall(dofile, ...)`, so the setting survives a `hyprctl reload`
-  — which would re-read the config and wipe out the `eval` — and a fresh session.
+  - which would re-read the config and wipe out the `eval` - and a fresh session.
 
 It's the same deal `hyprlock.conf` gives `language.conf`: defaults first in the
 versioned config, then the layer that may be missing on top. If `efectos.lua`
-isn't there — a fresh clone, or a boot without Quickshell — nothing breaks and
+isn't there - a fresh clone, or a boot without Quickshell - nothing breaks and
 `hyprland.lua`'s values win. That's also why it's in `.gitignore`: in `--link`
 mode, `~/.config/hypr` **is** the repo.
 
@@ -127,15 +127,15 @@ samples slider emits on every pixel of the drag and has no "released" signal;
 without it, one drag spawns a hundred processes.
 
 ## Architecture
-- **`ShellState.qml`** (singleton) — the hub: clock, active window, MPRIS,
+- **`ShellState.qml`** (singleton) - the hub: clock, active window, MPRIS,
   cover-art palette, Pipewire (volume), audio spectrum, brightness,
   battery/UPower/CPU/RAM, network,
   bluetooth, pacman, swaync, caffeine, **and the notch's state machine**.
   Zero UI.
-- **`TopShell.qml`** — the single window: the notch shape, the mask, the bar
+- **`TopShell.qml`** - the single window: the notch shape, the mask, the bar
   contents, fullscreen handling.
-- **`NotchContent.qml`** — what you see inside the notch in each mode.
-- **`Config.qml`** (singleton) — persistent settings; what used to be baked-in
+- **`NotchContent.qml`** - what you see inside the notch in each mode.
+- **`Config.qml`** (singleton) - persistent settings; what used to be baked-in
   constants.
 - **Components**: `MediaPanel`, `BarItem`, `NotchSlider`, `SettingsControls`,
   `StyledText`, `PillButton`, `Card`.
@@ -162,14 +162,14 @@ down).
 **The left bar**: Arch launcher (wheel = volume) · workspaces as dots (the
 active one stretches) · app name in bold. None of this is in the notch.
 
-**The right bar only shows exceptions** — what is NOT normal. On a quiet day it
+**The right bar only shows exceptions** - what is NOT normal. On a quiet day it
 is completely empty:
 
 | item | when it shows up |
 |---|---|
 | systray | whatever the apps register |
 | updates | only if there are any |
-| notifications | only if there are any (with the count) or DND is on — click opens the Control Centre, right-click toggles DND |
+| notifications | only if there are any (with the count) or DND is on - click opens the Control Centre, right-click toggles DND |
 | caffeine | only while it is on |
 | bluetooth | only if something is **connected** (on-with-nothing is noise) |
 | network | only if there is **no** network (being connected is the normal state) |
@@ -191,7 +191,7 @@ is completely empty:
 | `activity` | volume or brightness | OSD icon + bar + % (1.8 s) | 330 × 42 |
 | `peek` | hover (with a 240 ms delay) | the same, growing: date with the year | 380 × 44 |
 | `media` | there is music | cover + time + real spectrum (8 bands, cava) | 268 × **32** |
-| `idle` | — | **just the time**, centred | 140 × **32** |
+| `idle` | - | **just the time**, centred | 140 × **32** |
 
 Gestures: **vertical wheel** = volume · **horizontal wheel** = change workspace
 · **right-click** = play/pause · **click** = Control Centre.
@@ -229,7 +229,7 @@ Network or Bluetooth, and **three fingers down on the trackpad**, the same hand
 posture as the workspace gesture on the other axis. The tile is the door you can
 see; the gesture is the quick one.
 
-Opening it by clicking the notch clock — the macOS gesture — was tried first and
+Opening it by clicking the notch clock - the macOS gesture - was tried first and
 taken back out: that click had always opened the control centre, and taking a
 gesture people already have in their fingers in exchange for a new feature is a
 bad trade. Right-click is no good either: it is the player's play/pause.
@@ -277,7 +277,7 @@ press `Super+Tab`.
    demand it. Without the prefix every dispatch answers `moveWindow: no window`
    and the drag does nothing, **silently**.
 2. `toplevel.workspace` is kept up to date by Quickshell on its own, but
-   `toplevel.lastIpcObject` —where `at` and `size` come from— stays **frozen**
+   `toplevel.lastIpcObject` -where `at` and `size` come from- stays **frozen**
    until somebody calls `Hyprland.refreshToplevels()`. Measured. That is why
    there is a timer that asks for it **only while the overview is open**.
 3. The thumbnail is tied to the area of its cell (`Math.min(cellW - tw, …)`),
@@ -313,7 +313,7 @@ last one showed up clipped**. If you touch those margins, update the constant.
 **It is a calculator too.** If what you type is a sum, a row with the result
 appears at the top and **Enter copies it to the clipboard** (native, through
 `Quickshell.clipboardText`, no `wl-copy`). The notch confirms with a brief
-toast —here it is needed, because copying has no other sign of having happened.
+toast -here it is needed, because copying has no other sign of having happened.
 It supports `+ - * / ^ % ( )`, comma or full stop for decimals, `pi`, `e` and
 the usual functions (`sqrt`, `log`, `sin`…). A leading `=` forces calculator
 mode.
@@ -321,7 +321,7 @@ mode.
 So that it does not fire at just anything, there has to be **a number and an
 operator**, and every word has to be in the whitelist: that way `7zip`,
 `firefox` or `code 2` do not trigger the calculator. Also checked that
-`0.1+0.2` gives `0.3` and not `0.30000000000000004` — the result is rounded to
+`0.1+0.2` gives `0.3` and not `0.30000000000000004` - the result is rounded to
 10 decimal places before it is shown.
 
 **It is built for the keyboard, and the mouse must not get in the way.** When it
@@ -338,7 +338,7 @@ row. The only criterion for the mouse to take over is that the **pointer moves**
 A time-based guard is no good: the enter event arrives **after** the layer is
 reconfigured by the `keyboardFocus` change, so it slips in behind any reasonable
 arming window. The scoring favours an exact prefix of the name, then a word
-prefix, then a substring, and as a last resort a subsequence — typing "kit" puts
+prefix, then a substring, and as a last resort a subsequence - typing "kit" puts
 `kitty` first.
 
 The **Control Centre** (`ControlPanel.qml`) replaces swaync's **and the old
@@ -361,10 +361,10 @@ with the pywal palette; off, you get a random one again, which is how it used to
 be. It is a switch over `~/.local/bin/poke-theme` (`on`/`off`/`is-on`, same
 treatment as remote mode: the real state is whatever the script says, nothing is
 guessed here). The bias is applied by `poke_theme_pick()` in `~/.zshrc`, which
-**only picks the file** — drawing the sprite is not touched from here.
+**only picks the file** - drawing the sprite is not touched from here.
 
 When the Sidebar was retired there were only two things of its own that were not
-already here —**the weather** (`wttr.in`, every half hour) and **disk usage**—
+already here -**the weather** (`wttr.in`, every half hour) and **disk usage**-
 so they were migrated to `ShellState` before removing it. The disk already came
 in `sysstats.sh`, it was only a matter of reading field 9.
 
@@ -404,7 +404,7 @@ in practice the signals fall between 30 and 60 and with the textbook split they
 all came out with the same icon.
 
 The **power menu** (`PowerPanel.qml`) replaces wlogout, which took the whole
-screen. It always starts on "Lock" — the least destructive one — so that an
+screen. It always starts on "Lock" - the least destructive one - so that an
 accidental Enter does not shut your laptop down. ←/→ or Tab move, Enter
 confirms, Esc closes.
 
@@ -453,7 +453,7 @@ fade.
 This used to be a `PwNodePeakMonitor` and **it did not work**: it gives ONE
 number (the sink's global peak) that was shifted along the array, so all the
 bars were the same signal repeated and, since the linear peak nearly always
-brushes 1, they stayed glued to the ceiling — a barcode, not a visualiser. On
+brushes 1, they stayed glued to the ceiling - a barcode, not a visualiser. On
 top of that `onPeakChanged` only fires when the value **changes**: in a
 compressed passage the signal stopped arriving and the bars froze.
 
@@ -465,7 +465,7 @@ number. The vertical player of Super+D reuses those eight bands, but widens them
 to 6 px and gives them 58 px of travel so they work as a visual finish.
 
 Two knobs for the feel: `noise_reduction` in `cava.conf` (0 jittery ↔ 100
-mushy; 70 right now) and the parsing gamma in `ShellState.qml` (0.6 — without it
+mushy; 70 right now) and the parsing gamma in `ShellState.qml` (0.6 - without it
 the treble is so small next to the bass that you cannot see it move in 18 px).
 **No `Behavior on height`**: cava already filters the signal at 60 fps with its
 own gravity fall, and a 90 ms animation that never gets to finish only flattens
@@ -474,7 +474,7 @@ the travel. If `cava` is missing from the PATH the bars stay flat.
 ### The clock
 At rest the notch shows **just the time**, centred, in a narrow pill: it is as
 minimal as it gets without leaving it empty. On hover it grows and the full date
-with the year and the battery appear — nothing is lost, it only moves to where
+with the year and the battery appear - nothing is lost, it only moves to where
 it is needed. With music the clock steps aside to the left to make room for the
 cover and the peaks.
 
@@ -484,7 +484,7 @@ alone, and `ShellState.idleW` adds room for each element you switch on. If it
 were a fixed width, turning the date back on would clip the content.
 
 **Two type families, on purpose**: `Appearance.font` (JetBrains Mono Nerd Font)
-for the bar and for EVERYTHING that draws icons — the glyphs only exist in that
+for the bar and for EVERYTHING that draws icons - the glyphs only exist in that
 family. `Appearance.fontUI` (Adwaita Sans, based on Inter) for the text inside
 the notch. A date in monospace looks unravelled: the letters are spaced like the
 digits and it looks like it came out of a terminal. The clock uses
@@ -530,9 +530,9 @@ music started playing; now they fade.
 ### Two styles: Notch and Island
 `Config.notchStyle` switches between the two, live from Settings › Appearance:
 
-- **`notch`** — stuck to the top edge, with the MacBook's inverted top corners.
+- **`notch`** - stuck to the top edge, with the MacBook's inverted top corners.
   It is a `Shape` path with béziers.
-- **`island`** — a floating pill detached from the edge and rounded on all four
+- **`island`** - a floating pill detached from the edge and rounded on all four
   sides, like the iPhone's Dynamic Island. Here no `Shape` is needed: it is a
   `Rectangle` with `radius`. The gap (`Config.islandGap`) comes **out of the
   reserved band**, so the island does not cover windows either.
@@ -613,7 +613,7 @@ without restarting anything.
 
 **And why a `.js` and not another QML singleton**: it was tried with a
 `Translations.qml` exposing `readonly property var en: ({…})` with the 402
-entries inside, and at runtime it arrived **undefined** —
+entries inside, and at runtime it arrived **undefined** -
 `TypeError: Cannot read property '...' of undefined`; before that, with no
 explicit import, `ReferenceError: Translations is not defined`. A JS file with
 `.pragma library`, imported explicitly (`import "translations-en.js" as Dict`),
@@ -628,7 +628,7 @@ chosen in three ways:
 
 - when installing, with `./install.sh --lang en` (without the option the
   installer asks);
-- live, in **Settings › Appearance › Shell language** — the change is immediate
+- live, in **Settings › Appearance › Shell language** - the change is immediate
   and it touches neither the language of the system nor that of the
   applications, only the shell;
 - by hand, writing `"language": "en"` into the JSON.
@@ -682,8 +682,8 @@ dictionary (they would come out in Spanish), dictionary entries nobody uses any
 more, `{0}` placeholders that get lost or invented in the translation, and
 visible literals (`text:`, `label:`, `hint:`…) that are still not wrapped. It
 exits 0 if everything is fine and 1 if there is something to look at. The
-deliberate exceptions —the window title “Ajustes”, which is what the
-`windowrule` matches, or the language labels— are listed inside the script with
+deliberate exceptions -the window title “Ajustes”, which is what the
+`windowrule` matches, or the language labels- are listed inside the script with
 their reason.
 
 ## Battery health
@@ -711,7 +711,7 @@ there is something running in the background. It lives in `TopShell.qml` (the
 drawing) and `ShellState.qml` (`bubble*`, data and priority).
 
 **Why a satellite and not another face of the notch**: at rest the notch
-measures exactly the reserved band and cannot grow by itself — that is the rule
+measures exactly the reserved band and cannot grow by itself - that is the rule
 that keeps it from ever covering a window. A countdown lasts minutes, so it does
 not fit in there without breaking it. A separate body does: it is born behind
 the edge, it stays **inside** the band (28 of 32 px) and the notch goes on
@@ -730,7 +730,7 @@ Three details that do not show when you read the code:
 1. **It is declared BEFORE the notch**, which means the notch paints over it. It
    is not an oversight: when the notch grows (an OSD, a panel, the workspace
    map) it swallows the bubble, and when it shrinks the bubble peeks out again.
-   That is the whole metaphor — something that was behind — and it comes for
+   That is the whole metaphor - something that was behind - and it comes for
    free, without a single line hiding anything.
 2. **Its place is measured against the notch AT REST.** If it followed the live
    edge, opening the workspace map (1396 px) would send it flying to the other
@@ -750,7 +750,7 @@ notch, and on the way it stays in the Control Centre's history.
 Type a duration (`10m`, `25 min`, `1h`, `1h30`, `90s`) and the **same
 highlighted row as the calculator** offers the countdown; Enter starts it. It
 goes there and not in a new shortcut because the launcher is already where you
-type things that are not application names — the calculator opened that door.
+type things that are not application names - the calculator opened that door.
 
 **It demands a unit on purpose**: a bare `5` is a search. If the launcher
 offered a countdown with any number it would get in the way of every search that
@@ -805,8 +805,8 @@ it comes back, and there it does mean something.
 the fingers and each one opens a window that is learned separately. A prefix
 discovers itself, it is corrected with a backspace, and above all: the habit
 stays a single one, `Super+R` and type. It is also the door the calculator
-opened — typing `2+2` was already typing something that is not an application
-name —, so the calculator and the timer stay **without a prefix**: they are not
+opened - typing `2+2` was already typing something that is not an application
+name -, so the calculator and the timer stay **without a prefix**: they are not
 a mode, they are what happens when what you type turns out to be a sum or a
 duration.
 
@@ -834,7 +834,7 @@ silently. The script delivers TSV with `id`, type, thumbnail path and label.
   time you open the mode; with bash pattern matching it drops to **0.06 s**. It
   does not use `cliphist list | head` either: with the pipe, `head` closes the
   tap, cliphist dies of SIGPIPE and the script ends in 141 because of
-  `pipefail` — a fake failure that sooner or later gets read as a real one.
+  `pipefail` - a fake failure that sooner or later gets read as a real one.
 
 ### `>` actions
 
@@ -847,7 +847,7 @@ Launching a terminal to touch the wifi with the panel right there was a leftover
 from an earlier era.
 
 **Reading mode** lives here too: search for `>reading`. It gets no new shortcut
-—`Super+D` is still the Control Centre— and it can also be toggled in Settings ›
+-`Super+D` is still the Control Centre- and it can also be toggled in Settings ›
 System. `reading-mode.sh` first captures Hyprland's real shader, animations,
 blur and shadows; on the way out it restores those same values. The shader
 carries warm paper, ink, static grain and minimal dither. Wallpaper, pywal and
@@ -885,8 +885,8 @@ first row). It is not theoretical: `mode` is a binding declared at the top of
 the file and the results are reloaded by a `Connections` declared further down,
 so when the mode changes Qt updates the binding first and the handler
 afterwards. In that one-frame gap the list repainted with the **new** delegate
-and the **old** data —the window delegate got applications and asked for fields
-that do not exist— and five `TypeError`s came out in the log for every `@` you
+and the **old** data -the window delegate got applications and asked for fields
+that do not exist- and five `TypeError`s came out in the log for every `@` you
 typed. By asking the first row, that cannot happen, because the answer changes
 at exactly the same time as the data.
 
@@ -934,7 +934,7 @@ the pairing:
 ```
 
 Those are not signals: BlueZ calls methods on a D-Bus object that the desktop
-has to **export**, and from QML a D-Bus object cannot be exported — Quickshell's
+has to **export**, and from QML a D-Bus object cannot be exported - Quickshell's
 Bluetooth API has no agent callback at all. With nothing to answer, headphones
 pair all the same (they ask nothing) but **a keyboard or a gamepad fails
 silently**: no error, no warning, it simply does not pair.
@@ -961,7 +961,7 @@ Behind whatever panel you had open, the pairing would expire without you ever
 getting to see it.
 
 Two shapes: **`confirm`/`authorize`** bring two buttons (Yes / No), and
-**`display`** brings none — BlueZ makes the code up and you type it on the
+**`display`** brings none - BlueZ makes the code up and you type it on the
 keyboard; the little progress bar goes up with each key, and it is the only sign
 that the keyboard is really talking to the machine.
 
@@ -1037,7 +1037,7 @@ you were looking at.
 - 2026-08-19: **out goes the last rofi menu with a key of its own**. `Super+K`
   no longer calls `~/.config/hypr/list_keybinds.sh`: it opens Settings straight
   on “Shortcuts” (`global, quickshell:keybinds`), which is the SAME list read
-  from the same `hyprland.conf` — they were two views of the same parsing and
+  from the same `hyprland.conf` - they were two views of the same parsing and
   they only agreed while nobody touched either of them. New:
   `ShellState.openSettingsAt(id)`, `SettingsWindow.openAt(id)`,
   `qs ipc call notch keys` and the “Keyboard shortcuts” action in the command
@@ -1049,7 +1049,7 @@ you were looking at.
 
   That same day, a little later: **rofi is gone entirely**. The only survivor
   was `hypr/scripts/webapp-install.sh` (`Super+Ctrl+W`), two chained text
-  prompts that the notch launcher does not know how to do — and did not need to
+  prompts that the notch launcher does not know how to do - and did not need to
   learn, because `~/.local/share/webapps/` never came to exist: the shortcut was
   not used once. With that retired, rofi was left without a single live use, so
   with it go `~/.config/rofi/` (112 theme files), the
@@ -1096,7 +1096,7 @@ you were looking at.
   action and opens the photo in satty (`screenshot-edit.sh`, which saves the
   annotated one separately). The notch notice now invokes the first action if
   the notification brings any, and only opens the Control Centre when there is
-  none — which means any app with actions benefits, not just the screenshots.
+  none - which means any app with actions benefits, not just the screenshots.
 - 2026-08-07: region screenshots over a FROZEN screen. `Super+Shift+S` no longer
   calls `hyprshot -m region`, but `screenshot-region.sh`, which leans on
   `capture-region.sh` (hyprpicker freezes → slurp chooses over the photo →
@@ -1174,7 +1174,7 @@ What was missing was the workspace indicator: it painted the WHOLE list and
 marked the active one with `Hyprland.focusedWorkspace`, which is global. On the
 screen without focus that is a pill pointing at a workspace that is on the other
 one. Now each bar filters by `ws.monitor.name` and marks the `activeWorkspace`
-of ITS monitor (`win.hlMon`, looked up by name in `Hyprland.monitors` — not with
+of ITS monitor (`win.hlMon`, looked up by name in `Hyprland.monitors` - not with
 `monitorFor()`, which is a method and does not re-evaluate the binding when you
 plug in or unplug an output). If it is not known yet whose each workspace is,
 they are all painted: with a single screen the result is identical to before.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# cliphist-tool.sh — el puente entre cliphist y el modo "#" del lanzador.
+# cliphist-tool.sh - el puente entre cliphist y el modo "#" del lanzador.
 #
 # Sustituye a ~/.config/rofi/cliphist-menu.sh + cliphist-paste.sh. La diferencia
 # no es solo que ahora pinta QML: aquel par de scripts ERA el menú (rofi elegía y
@@ -11,8 +11,8 @@
 #   copy   <id>     deja esa entrada en el portapapeles (texto O imagen)
 #   delete <id>     la borra del historial
 #
-# Por qué TSV y no JSON: el portapapeles guarda texto arbitrario —comillas,
-# barras, líneas sueltas— y escapar todo eso a mano en bash es justo donde se
+# Por qué TSV y no JSON: el portapapeles guarda texto arbitrario -comillas,
+# barras, líneas sueltas- y escapar todo eso a mano en bash es justo donde se
 # rompen estas cosas. Aquí la etiqueta se limpia de tabuladores y saltos y ya no
 # hay ningún carácter que pueda mentir sobre dónde acaba un campo.
 set -uo pipefail

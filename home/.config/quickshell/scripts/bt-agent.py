@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""bt-agent.py — agente de emparejamiento Bluetooth para el notch.
+"""bt-agent.py - agente de emparejamiento Bluetooth para el notch.
 
 POR QUÉ EXISTE
 --------------
@@ -201,7 +201,7 @@ class Agent(dbus.service.Object):
     @dbus.service.method(AGENT_IFACE, in_signature="ouq", out_signature="")
     def DisplayPasskey(self, device, passkey, entered):
         # El caso del teclado: BlueZ inventa el código y lo tecleas TÚ allí.
-        # Se llama varias veces, una por tecla, con `entered` subiendo — de ahí
+        # Se llama varias veces, una por tecla, con `entered` subiendo - de ahí
         # la barrita de progreso del notch, que es la única señal de que el
         # teclado está hablando de verdad con el equipo.
         code = "%06u" % passkey
@@ -225,14 +225,14 @@ class Agent(dbus.service.Object):
         # otra cosa. Se rechaza con un aviso visible en vez de fallar callando,
         # que es justo el problema que este agente viene a resolver.
         log("RequestPasskey no soportado", device)
-        notch("btask", "authorize", device_name(device) + " — pide un código a mano", "", -1)
+        notch("btask", "authorize", device_name(device) + " - pide un código a mano", "", -1)
         GLib.timeout_add_seconds(6, lambda: (notch("btclear"), False)[1])
         raise Rejected("este agente no pide códigos a mano")
 
     @dbus.service.method(AGENT_IFACE, in_signature="o", out_signature="s")
     def RequestPinCode(self, device):
         log("RequestPinCode no soportado", device)
-        notch("btask", "authorize", device_name(device) + " — pide un PIN a mano", "", -1)
+        notch("btask", "authorize", device_name(device) + " - pide un PIN a mano", "", -1)
         GLib.timeout_add_seconds(6, lambda: (notch("btclear"), False)[1])
         raise Rejected("este agente no pide PIN a mano")
 

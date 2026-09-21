@@ -1,4 +1,4 @@
-# Operating guide for AI agents — Aroli Desktop
+# Operating guide for AI agents - Aroli Desktop
 
 This document defines how agents should install, audit, and fix
 Aroli Desktop without taking control away from the user. Safety and privacy take
@@ -96,7 +96,7 @@ replaces user configurations, although it creates a backup.
   releases API, with ETag) once a day and only writes
   `~/.cache/aroli-desktop/update.json`. A login notice
   (`rice-update-notify.service`, also enabled by the installer) only reads
-  that cache file — no network, oneshot, exits in milliseconds — and shows
+  that cache file - no network, oneshot, exits in milliseconds - and shows
   at most one desktop notification per release. No telemetry, no identifiers,
   no cached response body. To turn them off:
   `systemctl --user disable rice-update-check.timer rice-update-notify.service`.

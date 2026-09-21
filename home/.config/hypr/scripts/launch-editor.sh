@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# launch-editor.sh — abre o editor de texto padrão.
+# launch-editor.sh - abre o editor de texto padrão.
 # Ordem: .desktop default de text/plain (xdg-mime) → $VISUAL/$EDITOR
 # gráficos → VS Code → editores gráficos comuns → $EDITOR de terminal
 # (ou nvim) dentro do terminal padrão.

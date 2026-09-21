@@ -1,4 +1,4 @@
-// SettingsAbout.qml — system information. A single shell pass, not a
+// SettingsAbout.qml - system information. A single shell pass, not a
 // poll: this does not change while you look at the window (except uptime,
 // which refreshes when you re-enter the section).
 //

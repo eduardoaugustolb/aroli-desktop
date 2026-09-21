@@ -14,7 +14,7 @@ print_info() {
     info "\e[32m " term
     info "\e[36m " shell
 
-    # Opcional — si usas reproductor
+    # Opcional - si usas reproductor
     # info "\e[35m " song
     # [[ "$player" ]] && prin "\e[35m󰎈 " "$player"
 

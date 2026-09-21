@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# wall-thumbs.sh — mantiene ~/.cache/wallpaper-thumbs sincronizado con
+# wall-thumbs.sh - mantiene ~/.cache/wallpaper-thumbs sincronizado con
 # ~/Pictures/wallpapers para que el picker no tenga que descomprimir los
 # originales (hasta 6 MB cada uno) solo para pintar una carta.
 #
-# Cada miniatura se llama <fichero original>.jpg — p. ej. "dl-1785759993.png.jpg".
+# Cada miniatura se llama <fichero original>.jpg - p. ej. "dl-1785759993.png.jpg".
 # Conservar la extensión original dentro del nombre permite al picker recuperar
 # la ruta real quitando el ".jpg" final, sin ambigüedad entre un .png y un .jpg
 # que se llamen igual, y mantiene el mismo orden alfabético que los originales.

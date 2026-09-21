@@ -1,4 +1,4 @@
-// NotchLayer.qml — one notch "face" (resting, hover, OSD, panel...).
+// NotchLayer.qml - one notch "face" (resting, hover, OSD, panel...).
 //
 // This decides how EVERYTHING living inside the notch enters and leaves: eleven
 // faces all pass through this file. Changing this changes the whole shell.
@@ -20,7 +20,7 @@
 //
 // Opacity stays on bezier on purpose: a spring on opacity would overshoot past
 // 1 and flash. And it keeps the stagger (mStagger) that avoids the smear of two
-// faces visible at once — the new starts entering once the old has left.
+// faces visible at once - the new starts entering once the old has left.
 import QtQuick
 
 Item {

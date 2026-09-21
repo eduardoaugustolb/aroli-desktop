@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# game-mode — a reversible desktop-performance layer for a game session.
+# game-mode - a reversible desktop-performance layer for a game session.
 #
 # This intentionally does not change CPU governors, GPU clocks, services, or
 # power profiles. GameMode itself owns those per-process optimisations when a

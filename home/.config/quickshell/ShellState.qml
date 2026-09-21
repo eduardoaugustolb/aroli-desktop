@@ -1,4 +1,4 @@
-// ShellState.qml — hub de datos y de estado de la superficie superior.
+// ShellState.qml - hub de datos y de estado de la superficie superior.
 //
 // Al estilo de caelestia (services/): toda la lógica y los datos viven aquí, y
 // TopShell.qml se queda siendo UI pura. Así la barra y el notch leen EXACTAMENTE
@@ -241,7 +241,7 @@ Singleton {
         // borde con `height: nh - gap`, así que el contenido recibe islandGap menos
         // de lo que pide este cálculo. Sin sumarlo aquí, la lista (fillHeight) se
         // come el déficit y recorta la última fila justo por sus esquinas
-        // redondeadas — se ve sobre todo con un único resultado.
+        // redondeadas - se ve sobre todo con un único resultado.
         return root.launcherChrome + calc + favs + rows + vacio + root.notchTopGap;
     }
 
@@ -276,7 +276,7 @@ Singleton {
     // La rejilla del overview (OverviewPanel.qml) se dimensiona SOLA a partir
     // del monitor: cada celda es el área útil de la pantalla a escala. Está aquí
     // y no en el panel porque el notch tiene que saber cuánto va a medir ANTES
-    // de que el panel exista — el morfeo de la forma empieza en el mismo
+    // de que el panel exista - el morfeo de la forma empieza en el mismo
     // fotograma que la capa.
     //
     // 5x2 no es un número bonito: son exactamente los diez escritorios que tiene
@@ -488,7 +488,7 @@ Singleton {
     // overlays salen solo en esta. Nombre de la salida, p. ej. "eDP-1".
     //
     // NO se usa Hyprland.focusedMonitor: en Quickshell 0.3.0 esa propiedad nace
-    // vacía —igual que focusedWorkspace y que monitor.focused— y solo se rellena
+    // vacía -igual que focusedWorkspace y que monitor.focused- y solo se rellena
     // cuando llega el primer evento. Recién arrancada la shell no sabría dónde
     // está el foco hasta que cambiases de monitor a mano, y hasta entonces los
     // paneles no aparecerían en ninguna parte. Comprobado con instancias de
@@ -539,8 +539,8 @@ Singleton {
     // ─────────────── espectro de audio (cava) ───────────────
     // Las barritas del notch. Antes esto era un PwNodePeakMonitor: UN solo
     // número (el pico global del sink) que se iba desplazando por el array. Eso
-    // no es un espectro, es la misma señal repetida 14 veces —todas las barras
-    // subían y bajaban juntas— y como el pico en lineal casi siempre roza 1, se
+    // no es un espectro, es la misma señal repetida 14 veces -todas las barras
+    // subían y bajaban juntas- y como el pico en lineal casi siempre roza 1, se
     // quedaban clavadas al techo (efecto código de barras). Peor: onPeakChanged
     // solo salta cuando el valor CAMBIA, así que en un tramo comprimido dejaba
     // de llegar señal y las barras se CONGELABAN.
@@ -557,7 +557,7 @@ Singleton {
     // POR QUÉ NO SE PINTA EL VALOR DE CAVA TAL CUAL. Porque los valores de cava
     // PEGAN SALTOS: una misma banda va de 2 a 1000 y vuelve en un puñado de
     // fotogramas. Pintar eso directamente no es un ecualizador, es un
-    // estroboscopio — y era exactamente el temblor que se veía. Medido grabando
+    // estroboscopio - y era exactamente el temblor que se veía. Medido grabando
     // el notch a 60 fps y midiendo las barras PINTADAS:
     //
     //                            salto máximo   tirones
@@ -571,7 +571,7 @@ Singleton {
     // arquitectura de esta barra.
     //
     // Exponencial a propósito: avanzar una FRACCIÓN de lo que falta no da saltos
-    // ni frenazos —la velocidad es continua— y al ir ligado al tiempo real da
+    // ni frenazos -la velocidad es continua- y al ir ligado al tiempo real da
     // igual que se pierda un fotograma: la barra está siempre donde le toca.
     //
     // Lo que NO funciona, probado y medido: suavizar en cava (noise_reduction),
@@ -582,7 +582,7 @@ Singleton {
     // los dos sentidos la barra se DESPLOMA tan deprisa como sube: a tau 35 se
     // come el 38% de lo que le falta en cada fotograma, así que un pico se
     // deshace en tres fotogramas (~50 ms). Eso no se lee como una barra que
-    // baja, se lee como una barra que se apaga — un parpadeo.
+    // baja, se lee como una barra que se apaga - un parpadeo.
     //
     // Separando ataque y caída, el golpe sigue llegando igual de seco (es lo que
     // marca el ritmo) pero el regreso es un deslizamiento de ~1/3 de segundo,
@@ -635,7 +635,7 @@ Singleton {
     // Aquí NO se pone `running: root.mediaLive`, que es lo natural y estuvo así
     // hasta el 7-ago-2026: cuando el proceso muere (se cae, o alguien lo mata),
     // quickshell escribe running=false, y esa escritura ROMPE el binding. A
-    // partir de ahí cava no vuelve a arrancar nunca —ni recargando la config— y
+    // partir de ahí cava no vuelve a arrancar nunca -ni recargando la config- y
     // el visualizador se queda con las ocho barras planas aunque suene música.
     // Se gobierna a mano: el temporizador reafirma el estado cada 3 s, así que
     // como mucho tarda eso en levantarse solo. triggeredOnStart = arranca ya al
@@ -889,7 +889,7 @@ Singleton {
     // hay algo corriendo de fondo.
     //
     // Por qué un satélite y no una cara más: el notch en reposo mide exactamente
-    // la banda reservada y no puede crecer solo — esa es la regla que hace que
+    // la banda reservada y no puede crecer solo - esa es la regla que hace que
     // no tape ninguna ventana nunca. Una cuenta atrás dura minutos, así que no
     // cabe ahí sin romperla. Un cuerpo aparte sí: nace detrás del borde, se
     // queda DENTRO de la banda, y el notch sigue siendo del mismo tamaño.
@@ -1224,8 +1224,8 @@ Singleton {
     // Y ojo al detalle de por qué SOLO se colgaba éste y no sysstats.sh, que es
     // el mismo patrón: sysstats escribe en stdout cada 1,5 s, así que en cuanto
     // se cierra la tubería recibe SIGPIPE y se muere solo. Aquí el que escribía
-    // era el script de dentro; el bucle de fuera no escribía nunca —solo
-    // dormía—, así que el SIGPIPE que lo habría matado no le llegaba jamás.
+    // era el script de dentro; el bucle de fuera no escribía nunca -solo
+    // dormía-, así que el SIGPIPE que lo habría matado no le llegaba jamás.
     //
     // Ahora el proceso es de UN SOLO disparo: dura lo que dura la consulta y se
     // acaba. Aunque qs muera de la peor manera posible, lo más que puede quedar
@@ -1260,7 +1260,7 @@ Singleton {
     // ═══════════════════════ rice releases ═══════════════════════
     // Zero-cost by design: this is a FileView (inotify) on the cache file the
     // systemd timer writes once a day. No Timer, no Process, no network in
-    // QML — the file changes at most once per day, so this wakes up at most
+    // QML - the file changes at most once per day, so this wakes up at most
     // once per day. Opening Settings > About re-reads it explicitly.
     property string riceLocal: ""
     property string riceRemote: ""
@@ -1524,8 +1524,8 @@ Singleton {
     //
     // Timer + proceso de un disparo, por el mismo motivo que las
     // actualizaciones de arriba: un `while true` en bash sobrevive a quickshell
-    // si éste se muere de golpe. Éste no llegaba a ser inmortal —al escribir en
-    // stdout cada media hora acababa comiéndose un SIGPIPE y muriendo—, pero
+    // si éste se muere de golpe. Éste no llegaba a ser inmortal -al escribir en
+    // stdout cada media hora acababa comiéndose un SIGPIPE y muriendo-, pero
     // hasta que le tocaba escribir se quedaba hasta 30 min suelto haciendo una
     // petición de red por nadie. Era el último sitio con este patrón.
     property string weather: "…"
@@ -1613,7 +1613,7 @@ Singleton {
     // los dedos y cada uno abre una ventana distinta que hay que aprender por
     // separado. Un prefijo se descubre solo (están escritos en el propio panel
     // cuando está vacío), se corrige con un borrado, y sobre todo: la costumbre
-    // es una sola —Super+R y escribir—, que es exactamente la que ya había.
+    // es una sola -Super+R y escribir-, que es exactamente la que ya había.
     //
     // ES LA MISMA PUERTA QUE ABRIÓ LA CALCULADORA. Escribir "2+2" en el lanzador
     // ya era escribir algo que no es un nombre de aplicación; esto solo termina
@@ -1666,8 +1666,8 @@ Singleton {
     // El alto de arranque. Sin esto el panel nace con el alto de la BÚSQUEDA
     // ANTERIOR y corrige en el fotograma siguiente: se ve un doble movimiento.
     // En "clip" no se sabe cuántas filas habrá hasta que conteste el proceso, así
-    // que se pide el máximo y el panel encoge —hacia arriba, que es su gesto
-    // natural— durante la propia animación de apertura.
+    // que se pide el máximo y el panel encoge -hacia arriba, que es su gesto
+    // natural- durante la propia animación de apertura.
     function launcherPreload(mode) {
         root.launcherCalc = false;
         root.launcherFavs = mode === "apps" && root.favApps.length > 0;
@@ -1986,7 +1986,7 @@ Singleton {
     // el panel se suelta el HyprlandFocusGrab y Hyprland devuelve el foco a la
     // ventana que lo tenía antes; si nuestra petición va en el mismo instante no
     // está garantizado quién llega el último, y si llega la devolución te quedas
-    // donde estabas — justo lo que acabas de pedir que no pase. Es el mismo
+    // donde estabas - justo lo que acabas de pedir que no pase. Es el mismo
     // remedio (y la misma cifra) que usa OverviewPanel al saltar a una ventana.
     property string winPending: ""
     Timer {

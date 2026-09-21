@@ -1,4 +1,4 @@
-// HistoryGraph.qml — compact time curve for floor..ceiling metrics.
+// HistoryGraph.qml - compact time curve for floor..ceiling metrics.
 // Canvas is used here on purpose: a series changing every 1.5 s does not
 // deserve sixty Rectangles or a delegate model. Fill, floor, and live dot come
 // from the same geometry, so they never drift apart.
@@ -6,10 +6,10 @@
 // MARK SPEC (not taste, the measurements that make a chart read calm instead
 // of shouting):
 //   · 2 px stroke, with round joins and caps;
-//   · area fill at ~10% of the hue — a veil, NEVER a saturated block.
+//   · area fill at ~10% of the hue - a veil, NEVER a saturated block.
 //     It sat at 24% and that is why the memory band looked like a brick: a
 //     big opaque fill is what separates a chart from a poster;
-//   · 8 px end dot (r 4) — below that it is not a mark, it is a speck;
+//   · 8 px end dot (r 4) - below that it is not a mark, it is a speck;
 //   · 2 px SURFACE ring around the dot, so it reads where it crosses its own
 //     line. Done by punching the hole (destination-out) instead of painting a
 //     border: a border is ink that is not data, and here it would not even
@@ -150,7 +150,7 @@ Canvas {
 
         // One mark with its ring: punch (destination-out) the surface gap
         // and then set the dot inside. This used to be a halo of the hue
-        // itself over an r 2.3 speck — that is, more series ink on top of the
+        // itself over an r 2.3 speck - that is, more series ink on top of the
         // series, exactly what the ring avoids.
         function dot(x, y) {
             ctx.globalCompositeOperation = "destination-out";

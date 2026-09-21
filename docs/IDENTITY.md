@@ -2,8 +2,8 @@
 
 Aroli Desktop is the desktop product of the Aroli family: the ready-to-use
 workspace (Hyprland + Quickshell + installer) built on Aroli Themes,
-Aroli Pointer, and Aroli Backdrops. It follows the Aroli direction —
-“Tudo encontra seu lugar” — without adding a product logo of its own.
+Aroli Pointer, and Aroli Backdrops. It follows the Aroli direction -
+“Tudo encontra seu lugar” - without adding a product logo of its own.
 
 ## Concept
 
@@ -44,7 +44,7 @@ Aroli's. Every element justifies itself:
 | Avatar | Answers "whose password?" before asking. Click focuses the field. |
 | Time | Reassurance, not hero: tabular numerals, no layout shift. |
 | Date | Rice language, never the process locale. |
-| Pill | The only raised surface. Accent at rest, ok while checking, crit on failure — state is colour and text, never colour alone. |
+| Pill | The only raised surface. Accent at rest, ok while checking, crit on failure - state is colour and text, never colour alone. |
 | Status | Attempt count and PAM errors. Fixed height so nothing reflows. |
 | Caps/num | Warn tone: a wrong-password mystery is usually this. |
 | User | Identity anchor in mono, like the bar. Click focuses the field. |
@@ -55,4 +55,4 @@ The Quickshell session lock (`Lock.qml`, `LockStage.qml`, `LockCenter.qml`,
 scripts, and its language files are gone; the `hyprlock` binary stays in
 `packages/pacman.txt` for the remote/RustDesk profile only
 (`hypridle.d/remote.conf`). `hypridle.conf` is generated and
-gitignored — the shipped profile lives in `hypridle.d/normal.conf`.
+gitignored - the shipped profile lives in `hypridle.d/normal.conf`.

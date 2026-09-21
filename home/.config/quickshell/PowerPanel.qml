@@ -1,4 +1,4 @@
-// PowerPanel.qml — power menu unfolded FROM the notch.
+// PowerPanel.qml - power menu unfolded FROM the notch.
 // Replaces wlogout, which took the whole screen. Here it is a row of
 // five buttons inside the notch: ←/→ or Tab to move, Enter confirms,
 // Esc closes. TopShell provides keyboard focus.

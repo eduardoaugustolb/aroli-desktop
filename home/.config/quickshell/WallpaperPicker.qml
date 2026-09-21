@@ -1,4 +1,4 @@
-// WallpaperPicker.qml — ilyamiro coverflow (parallelogram / skew cards)
+// WallpaperPicker.qml - ilyamiro coverflow (parallelogram / skew cards)
 // over an IMMERSIVE BACKGROUND: the selected wallpaper, blurred and dimmed,
 // fills the screen and crossfades while navigating. So the picker never fights
 // the desktop/terminal behind and cards stand out clean.

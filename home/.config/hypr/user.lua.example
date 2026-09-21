@@ -1,5 +1,5 @@
 -- ###########################################################################
---  USER OVERRIDES — YOUR FILE. UPDATES NEVER TOUCH IT.
+--  USER OVERRIDES - YOUR FILE. UPDATES NEVER TOUCH IT.
 --
 --  This is a TEMPLATE (user.lua.example is versioned; user.lua is not).
 --  The installer copies this file to ~/.config/hypr/user.lua ONCE, only when
@@ -7,7 +7,7 @@
 --  `rice update` (a tag checkout + ./install.sh) can neither overwrite nor
 --  conflict with it.
 --
---  RULE: never edit hyprland.lua for personal tweaks — put them here.
+--  RULE: never edit hyprland.lua for personal tweaks - put them here.
 --  This file loads LAST, so everything here wins over the rice defaults.
 --  mainMod, terminal and fileManager are published here by hyprland.lua,
 --  so they read exactly like they do there.

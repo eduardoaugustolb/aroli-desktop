@@ -1,4 +1,4 @@
-// OverviewPanel.qml — el mapa de escritorios, desplegado DESDE el notch.
+// OverviewPanel.qml - el mapa de escritorios, desplegado DESDE el notch.
 //
 // Sustituye al Overview.qml antiguo, que tomaba la pantalla entera y enseñaba
 // las ventanas en una parrilla suelta. El problema de aquello no era estético:
@@ -17,8 +17,8 @@
 //
 // 1. EL ESCRITORIO DE CADA VENTANA SE LEE DE `toplevel.workspace`, PERO SU
 //    POSICIÓN DE `lastIpcObject`. Medido: Quickshell mantiene `workspace` al día
-//    solo (escucha los sucesos de Hyprland), pero `lastIpcObject` — que es de
-//    donde salen `at` y `size` — se queda CONGELADO hasta que alguien llama a
+//    solo (escucha los sucesos de Hyprland), pero `lastIpcObject` - que es de
+//    donde salen `at` y `size` - se queda CONGELADO hasta que alguien llama a
 //    refreshToplevels(). Por eso hay un temporizador que lo pide mientras el
 //    overview está abierto, y solo mientras lo está.
 //
@@ -106,7 +106,7 @@ Item {
     // palabra. Es el mismo remedio que usa Tide-island (allí, 50 ms).
     //
     // HONESTIDAD sobre cómo se llegó aquí: esto se escribió creyendo haber visto
-    // la carrera en vivo, y la prueba estaba viciada — la sesión estaba en el
+    // la carrera en vivo, y la prueba estaba viciada - la sesión estaba en el
     // estado "lockscreen crashed" de Hyprland, donde NINGUNA ventana puede coger
     // el foco y `focuswindow` contesta `ok` sin hacer nada. O sea que la carrera
     // es real por construcción pero NO está observada. Se deja porque cuesta
