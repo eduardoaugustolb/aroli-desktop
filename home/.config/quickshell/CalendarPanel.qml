@@ -1,4 +1,4 @@
-// CalendarPanel.qml - calendar face unfolded FROM the notch.
+// CalendarPanel.qml, calendar face unfolded FROM the notch.
 //
 // One month and nothing more: header with month/year plus navigation, weekday
 // initials per locale (ShellState.loc.firstDayOfWeek), and a fixed 6-row × 7-

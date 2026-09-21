@@ -87,7 +87,7 @@ def dynamic_keys():
     report them as dead entries and someone would end up deleting them.
     """
     # FIRST the hyprland.conf next to this script, and only when it is missing
-    # the one in $HOME. The other way around - which is how it was - reviewed
+    # the one in $HOME. The other way around, which is how it was, reviewed
     # the repo against the system's OLD live config before installing: the
     # shortcuts you just added showed up as dead entries and the ones you
     # removed never showed.
@@ -176,12 +176,12 @@ def main():
           f"{len(es)} Spanish · {len(pt)} Portuguese")
 
     if missing_es:
-        print(f"\n  UNTRANSLATED TO SPANISH ({len(missing_es)}) - "
+        print(f"\n  UNTRANSLATED TO SPANISH ({len(missing_es)}), "
               f"they would show up in English:")
         for s in missing_es:
             print(f'    {sorted(used[s])[0]:24} "{s}"')
     if missing_pt:
-        print(f"\n  UNTRANSLATED TO PORTUGUESE ({len(missing_pt)}) - "
+        print(f"\n  UNTRANSLATED TO PORTUGUESE ({len(missing_pt)}), "
               f"they would show up in English:")
         for s in missing_pt:
             print(f'    {sorted(used[s])[0]:24} "{s}"')
@@ -206,11 +206,11 @@ def main():
         for s in sorted(set(pt_doubles)):
             print(f'    "{s}"')
     if dead_es:
-        print(f"\n  DEAD ENTRIES, es ({len(dead_es)}) - nobody uses them:")
+        print(f"\n  DEAD ENTRIES, es ({len(dead_es)}), nobody uses them:")
         for s in dead_es:
             print(f'    "{s}"')
     if dead_pt:
-        print(f"\n  DEAD ENTRIES, pt-BR ({len(dead_pt)}) - nobody uses them:")
+        print(f"\n  DEAD ENTRIES, pt-BR ({len(dead_pt)}), nobody uses them:")
         for s in dead_pt:
             print(f'    "{s}"')
     if unwrapped:

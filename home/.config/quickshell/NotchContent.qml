@@ -1,4 +1,4 @@
-// NotchContent.qml - lo que se ve DENTRO del notch, según el modo.
+// NotchContent.qml, lo que se ve DENTRO del notch, según el modo.
 // Recibe el rectángulo completo del notch (franja de barra + bulto); cada modo
 // es una capa que aparece/desaparece con opacidad, así el morfeo lo hace la
 // forma de TopShell y el contenido solo se funde.
@@ -139,7 +139,7 @@ Item {
             // barra se centraba respecto a ese Row. O sea: cada vez que la barra
             // más alta cambiaba, cambiaba el cajón, y con él la posición
             // vertical de LAS OCHO a la vez. Un golpe de bombo movía toda la
-            // tira, no solo su barra - el temblor de conjunto que se veía por
+            // tira, no solo su barra, el temblor de conjunto que se veía por
             // encima del movimiento de cada barra.
             //
             // Aquí el cajón mide 18 px pase lo que pase, y cada barra vive en su

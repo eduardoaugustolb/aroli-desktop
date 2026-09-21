@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# launch-terminal.sh - abre o terminal padrão.
+# launch-terminal.sh, abre o terminal padrão.
 # Honra xdg-terminal-exec (o default do sistema) e cai para o terminal
 # do rice (kitty) e outros comuns se ele não existir.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pywal-normalize.py - reassigns pywal's chromatic slots by hue and applies
+# pywal-normalize.py, reassigns pywal's chromatic slots by hue and applies
 # the selected surface intensity.
 #
 # pywal clusters the wallpaper and fills the ANSI slots by lightness/order,

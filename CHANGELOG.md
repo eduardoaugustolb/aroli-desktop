@@ -1,4 +1,4 @@
-# Changelog - Aroli Desktop
+# Changelog, Aroli Desktop
 
 All notable changes to this rice are documented here, newest first.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -56,7 +56,7 @@ Historical entries below keep the Umbra Noctis name as published.
   `~/go/bin`, `~/.cargo/bin`, mise shims last like upstream Omarchy),
   `zsh`/`bash` activate mise when present, and personal overrides live in
   `~/.zshrc.local` / `~/.bashrc.local` / `~/.zprofile.local` /
-  `~/.profile.local` - seeded once by the installer, never touched by
+  `~/.profile.local`, seeded once by the installer, never touched by
   updates. `install.sh` also rescues surviving tool-PATH lines from a
   replaced rc file into its `*.local` counterpart instead of dropping them.
 
@@ -66,7 +66,7 @@ Historical entries below keep the Umbra Noctis name as published.
 
 - `rice update` hands over to the target release's own updater (extracted
   from git without touching the worktree), so updater fixes apply to the
-  very update that delivers them - an old backend can no longer block its
+  very update that delivers them, an old backend can no longer block its
   own replacement. Tags without a usable updater are refused, and an
   unreachable remote falls back to the checkout's updater.
 
@@ -76,7 +76,7 @@ Historical entries below keep the Umbra Noctis name as published.
 
 - `rice update` and `rice rollback` no longer refuse to run over a dirty
   checkout. Files the desktop rewrites on its own (`kdeglobals`, spicetify
-  colors) are reset - they rebuild on the next wallpaper/theme change - and
+  colors) are reset, they rebuild on the next wallpaper/theme change, and
   anything else is stashed automatically and restored after the checkout.
   Changes that do not re-apply cleanly stay in the stash, never deleted.
 - The installer reloads a live Hyprland session at the end of the `final`
@@ -86,8 +86,8 @@ Historical entries below keep the Umbra Noctis name as published.
 ### Added
 
 - Login update notice (`rice-update-notify.service`, enabled by default):
-  reads only the update cache on graphical login - no network, oneshot,
-  idle priority - and shows one desktop notification per pending release.
+  reads only the update cache on graphical login, no network, oneshot,
+  idle priority, and shows one desktop notification per pending release.
   Disable with `systemctl --user disable rice-update-notify.service`; the
   daily check is now also nag-once-per-release instead of once per day.
 - The Omarchy mark (bar logo and Settings › About header) is tinted with

@@ -1,4 +1,4 @@
-// LockCenter.qml - the authentication column inside the floating card.
+// LockCenter.qml, the authentication column inside the floating card.
 //
 // Caelestia's idea (a morphing badge that becomes the auth surface) painted
 // with Aroli rules. Every element justifies itself:
@@ -152,7 +152,7 @@ Item {
 
         // ── avatar / badge ──
         // Identity, not decoration: answers "whose password?" before asking.
-        // Click focuses the field - the biggest target on the card.
+        // Click focuses the field, the biggest target on the card.
         Item {
             Layout.alignment: Qt.AlignHCenter
             implicitWidth: 72; implicitHeight: 72

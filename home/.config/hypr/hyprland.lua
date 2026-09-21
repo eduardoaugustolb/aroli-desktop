@@ -121,7 +121,7 @@ end
 hl.config({
     general = {
         -- Law 8 -- a single gap across the content layer. 3/6 default: between
-        -- two windows 6 px (3 + 3) and to the screen edge 6 more - THE SAME
+        -- two windows 6 px (3 + 3) and to the screen edge 6 more, THE SAME
         -- gap. Settings > Appearance > Windows flips it live (effects.lua,
         -- which wins over this block by loading last).
         gaps_in  = 3,

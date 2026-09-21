@@ -757,7 +757,7 @@ choose_optional_manifest() {
     while IFS=$'\t' read -r pkg description; do
         [[ "$pkg" =~ ^[[:space:]]*(#|$) ]] && continue
         [ -n "$description" ] || description="optional application"
-        if ask "Install optional: $pkg - $description?"; then
+        if ask "Install optional: $pkg, $description?"; then
             selected+=("$pkg")
         fi
     done < "$manifest"
@@ -1054,7 +1054,7 @@ phase_config() {
 # [credential]
 #	helper = cache --timeout=3600
 EOF
-        ok ".gitconfig.local created - put your name and email in it"
+        ok ".gitconfig.local created, put your name and email in it"
     elif [ -e "$HOME/.gitconfig.local" ]; then
         skip ".gitconfig.local already there (your git identity is yours)"
     fi
@@ -1152,7 +1152,7 @@ EOF
     fi
 
     # 7c) personal overrides: user.lua / user.conf are gitignored and seeded
-    #     ONCE from their .example templates - "defaults for what is missing".
+    #     ONCE from their .example templates, "defaults for what is missing".
     #     Updates never rewrite them; they load last and win over the rice.
     #     At $HOME and not at $root on purpose, same as 7b: in --link mode
     #     both paths are the same file anyway.
@@ -1802,7 +1802,7 @@ phase_spicetify() {
     fi
 
     # spicetify refuses to do anything without ~/.config/spotify/prefs, and that
-    # file does not exist until Spotify has been launched once - which on a
+    # file does not exist until Spotify has been launched once, which on a
     # fresh install nobody has done yet. Creating it empty is enough: spicetify
     # only needs the path to resolve, and Spotify fills it in on first run.
     # Without this the phase fails on EVERY new machine with

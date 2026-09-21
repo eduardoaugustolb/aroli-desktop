@@ -1,4 +1,4 @@
-// SettingsControls.qml - los controles de la app de Ajustes.
+// SettingsControls.qml, los controles de la app de Ajustes.
 // Se usan como tipos desde las secciones: `SettingsControls.Card_ { ... }`.
 //
 // DOS DECISIONES QUE EXPLICAN TODO LO DEMÁS:
@@ -96,7 +96,7 @@ QtObject {
 
         Layout.fillWidth: true
         // 42 px es el SUELO, no el alto. Estaba cocido, y el selector de fuentes
-        // -siete opciones en un Flow de 270 px- parte en tres líneas: esas
+        // siete opciones en un Flow de 270 px, parte en tres líneas: esas
         // líneas se salían de la fila y se pintaban ENCIMA del ajuste de abajo y
         // del borde de la tarjeta (el slider de "Tamaño de la hora" quedaba
         // tachado por las pastillas). Un control que crece tiene que empujar la

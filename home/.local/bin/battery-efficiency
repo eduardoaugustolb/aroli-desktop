@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# battery-efficiency - Power Profiles Daemon selector for portable systems.
+# battery-efficiency, Power Profiles Daemon selector for portable systems.
 # Other desktop environments can change the profile too, so status always
 # reads the daemon instead of retaining a private toggle state.
 

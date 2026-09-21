@@ -1,4 +1,4 @@
-// BluetoothPanel.qml - bluetooth devices, unfolded FROM the notch.
+// BluetoothPanel.qml, bluetooth devices, unfolded FROM the notch.
 // Sibling of NetworkPanel: same skeleton (header + switch + list) and
 // same treatment from the control center. Talks to BlueZ via
 // Quickshell.Bluetooth, no scripts. Discovery only runs while this

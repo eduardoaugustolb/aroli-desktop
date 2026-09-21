@@ -1,12 +1,12 @@
-// PerformancePanel.qml - «Tu equipo», desplegado DESDE el notch.
+// PerformancePanel.qml, «Tu equipo», desplegado DESDE el notch.
 //
 // Hermano de NetworkPanel y BluetoothPanel, y construido igual que ellos:
 // cabecera (icono · título · subtítulo · un control a la derecha), filete de
 // 1 px en #1e1e1e, y cuerpo. Nada más.
 //
 // La cara anterior se salía de eso por todos lados y por eso cantaba tanto:
-// colaba el wallpaper de fondo con un degradado negro encima -era el único
-// sitio del shell con superficie propia-, se inventaba una escala de grises
+// colaba el wallpaper de fondo con un degradado negro encima, era el único
+// sitio del shell con superficie propia, se inventaba una escala de grises
 // entera (#f2f2f2, #efefef, #bcbcbc, #a8a8a8, #858585, #747474, #686868,
 // #555555) que no usa nadie más, titulaba en minúsculas («actividad
 // reciente», «ahora mismo») mientras el resto del notch dice «Red» o
@@ -34,7 +34,7 @@
 //   · EL TECHO SE ANUNCIA, arriba a la izquierda de cada banda. Un eje que se
 //     mueve solo y no lo dice es un eje que miente.
 //   · LAS MARCAS SON FINAS (ver la cabecera de HistoryGraph.qml): trazo de 2 px,
-//     relleno al 10 % -velo, no bloque-, punto de 8 px con anillo de superficie
+//     relleno al 10 %, velo, no bloque, punto de 8 px con anillo de superficie
 //     y ni una rejilla. Eso es lo que separa un gráfico tranquilo de un panel de
 //     monitorización, y no es cuestión de gusto: son medidas.
 import QtQuick
@@ -91,8 +91,8 @@ Item {
     //  además dejan de invitar a comparar dos cosas que no se comparan (un 20 %
     //  de RAM y un 20 % de CPU no significan ni de lejos lo mismo).
     // ══════════════════════════════════════════════════════════════════════
-    //  La escalera baja hasta 5 a propósito. Con el primer peldaño en 25 -que
-    //  es lo que parece razonable al escribirlo- un procesador en reposo al 4 %
+    //  La escalera baja hasta 5 a propósito. Con el primer peldaño en 25, que
+    //  es lo que parece razonable al escribirlo, un procesador en reposo al 4 %
     //  seguía siendo una raya a un tercio de altura: se había cambiado el eje
     //  pero no el problema. Los peldaños son números que se leen de un vistazo
     //  (5·10·20·30·50·75·100), y el 1,25 es aire por arriba: sin él la serie se
@@ -113,7 +113,7 @@ Item {
     }
 
     // La temperatura no tiene escala redonda que valga: entre 38 y 44 °C hay
-    // seis grados de recorrido real y en 0..100 -o incluso en 35..95- eso es
+    // seis grados de recorrido real y en 0..100, o incluso en 35..95, eso es
     // una raya recta. Aquí la ventana se ciñe a lo que ha pasado en el último
     // minuto y medio, con un mínimo de 10 grados para que dos décimas de nada
     // no se vean como una montaña. El grado exacto lo canta la cifra grande;
@@ -158,7 +158,7 @@ Item {
     //
     //  El acento sale de pywal, o sea del fondo de pantalla, y con un fondo
     //  oscuro vuelve oscuro: sobre la superficie de la tarjeta (casi negra) una
-    //  curva así se pierde. Aquí no vale «suele verse bien» - un trazo de 2 px
+    //  curva así se pierde. Aquí no vale «suele verse bien», un trazo de 2 px
     //  es un elemento gráfico y pide 3:1 contra su fondo. Se sube la
     //  luminosidad del acento, y SOLO la luminosidad, hasta llegar a ese 3:1:
     //  el tono sigue siendo el de pywal, así que el retematizado se conserva
@@ -199,7 +199,7 @@ Item {
     // ─────────────── una tarjeta de las de la casa ───────────────
     // La misma cascada que los conmutadores del centro de control: es el gesto
     // propio de este shell y no había razón para que aquí no lo hubiera. Como
-    // allí, NO se toca la opacidad - de eso ya se encarga el NotchLayer, y dos
+    // allí, NO se toca la opacidad, de eso ya se encarga el NotchLayer, y dos
     // fundidos encadenados se multiplican.
     component Card: Rectangle {
         id: card
@@ -313,7 +313,7 @@ Item {
                 markIndex: lane.hover
             }
 
-            // acceptedButtons: NoButton - este ratón solo escucha. Si aceptara
+            // acceptedButtons: NoButton, este ratón solo escucha. Si aceptara
             // clics se comería el que cierra el panel, que lo atiende el
             // MouseArea de la raíz.
             MouseArea {
@@ -457,7 +457,7 @@ Item {
                     // alto que necesita para que se le vea la forma.
                     // (Alto clavado por los tres lados por lo mismo que la
                     // columna derecha: Lane es un ColumnLayout, y un layout
-                    // dentro de otro se rellena por defecto - con solo
+                    // dentro de otro se rellena por defecto, con solo
                     // preferredHeight se quedaba con la carta entera y dejaba
                     // al procesador en una rendija.)
                     Lane {
@@ -532,7 +532,7 @@ Item {
                             Text {
                                 text: tempCard.reading
                                     ? Math.round(ShellState.tempHistory[tempCard.hover]) + " °C"
-                                    : ShellState.cpuTemp >= 0 ? Math.round(ShellState.cpuTemp) + " °C" : "-"
+                                    : ShellState.cpuTemp >= 0 ? Math.round(ShellState.cpuTemp) + " °C" : "n/a"
                                 color: "#ffffff"
                                 font.family: Appearance.fontUI; font.pixelSize: 18
                                 font.weight: Font.DemiBold

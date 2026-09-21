@@ -1,4 +1,4 @@
-// TopShell.qml - la superficie superior: notch protagonista + barra mínima.
+// TopShell.qml, la superficie superior: notch protagonista + barra mínima.
 //
 // Filosofía:
 //   · El notch es la ÚNICA forma de la pantalla. Isla negra suelta, pegada al
@@ -66,8 +66,8 @@ Scope {
     GlobalShortcut { name: "notch"; description: I18n.tr("Control Centre"); onPressed: ShellState.togglePanel("control") }
     GlobalShortcut { name: "launcher"; description: I18n.tr("Application launcher"); onPressed: ShellState.togglePanel("launcher") }
     // El lanzador abierto directamente en un modo. Tienen atajo propio los dos
-    // que YA lo tenían cuando eran menús de rofi -Super+Shift+V para el
-    // portapapeles y Super+Alt+Space para el menú de comandos-: cambiar por
+    // que YA lo tenían cuando eran menús de rofi, Super+Shift+V para el
+    // portapapeles y Super+Alt+Space para el menú de comandos: cambiar por
     // dentro cómo se pintan no es motivo para quitarle a nadie una tecla que ya
     // tiene aprendida. Las ventanas no estrenan atajo: se llega escribiendo "@",
     // que es la costumbre nueva que interesa enseñar.
@@ -295,7 +295,7 @@ Scope {
                     //
                     // Antes cada punto animaba su propio ancho por su cuenta: al
                     // saltar del 1 al 3, uno encogía y otro crecía a la vez y no
-                    // había ningún gesto que los uniera - dos animaciones sueltas
+                    // había ningún gesto que los uniera, dos animaciones sueltas
                     // ocurriendo cerca, no un recorrido.
                     //
                     // Ahora hay UNA sola píldora que se estira hacia el destino y
@@ -350,7 +350,7 @@ Scope {
                                 // escritorios llegan antes que los monitores, así
                                 // que `ws.monitor` es null durante un instante y
                                 // sin él la fila de puntos parpadearía vacía. Si
-                                // ninguno se sabe de quién es, se pintan todos -
+                                // ninguno se sabe de quién es, se pintan todos,
                                 // que es exactamente lo que había con una sola
                                 // pantalla.
                                 model: ScriptModel {
@@ -420,7 +420,7 @@ Scope {
                             // Dos seguidores del MISMO destino a velocidades
                             // distintas: el borde de delante llega en mIn y el de
                             // detrás en mInScale, rebotando. Mientras uno espera al
-                            // otro la píldora está estirada - ese estiramiento ES
+                            // otro la píldora está estirada, ese estiramiento ES
                             // el efecto. Un solo destino, dos tiempos.
                             property real lead: 0
                             property real trail: 0
@@ -539,8 +539,8 @@ Scope {
                         // Va con margen (m) porque el cuello ABULTA fuera de la caja
                         // de los cuerpos; sin aire alrededor se recortaria justo la
                         // parte que hace el efecto.
-                        // SOMBRA, que no es lo mismo que CERCO. El shader avisa -con
-                        // razon- de que un halo CLARO pegado al borde es lo que hace
+                        // SOMBRA, que no es lo mismo que CERCO. El shader avisa, con
+                        // razon, de que un halo CLARO pegado al borde es lo que hace
                         // que algo se vea sucio. Una sombra oscura por DETRAS es lo
                         // contrario: sobre fondo oscuro no existe (negro sobre
                         // negro) y solo asoma donde el wallpaper es claro, que es
@@ -795,7 +795,7 @@ Scope {
                 // 1. SE DECLARA ANTES QUE EL NOTCH, o sea que el notch la PINTA
                 //    ENCIMA. No es un descuido: cuando el notch crece (un OSD, un
                 //    panel) se traga la burbuja, y al encogerse la burbuja vuelve a
-                //    asomar. Es exactamente la metáfora - algo que estaba detrás -
+                //    asomar. Es exactamente la metáfora, algo que estaba detrás,
                 //    y sale gratis, sin una sola línea que esconda nada.
                 //
                 // 2. SU SITIO SE MIDE CONTRA EL NOTCH EN REPOSO, no contra el notch

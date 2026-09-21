@@ -1,4 +1,4 @@
-// BarItem.qml - bar cell: icon + optional text.
+// BarItem.qml, bar cell: icon + optional text.
 // The bar has no background, so glyphs carry a very soft dark outline to
 // read the same over light and dark wallpapers. The only background that
 // appears is the hover highlight.

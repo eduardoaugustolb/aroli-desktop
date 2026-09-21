@@ -1,7 +1,7 @@
 pragma Singleton
 import Quickshell
 
-// Nerd Font icons (Material Design Icons) - codepoints validated against the font.
+// Nerd Font icons (Material Design Icons), codepoints validated against the font.
 Singleton {
     readonly property string volHigh: "󰕾"
     readonly property string volMed: "󰖀"

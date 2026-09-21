@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rice - version, update and cleanup dispatcher for Aroli Desktop.
+# rice, version, update and cleanup dispatcher for Aroli Desktop.
 #
 #   rice version              print the installed version
 #   rice status               version + update check state + backups
@@ -158,7 +158,7 @@ record_state() {  # $1=previous_ref $2=new_ref
 }
 
 # Notify at most once per remote tag. Both the daily check and the login
-# notifier funnel here, so a pending update nags once per release - never
+# notifier funnel here, so a pending update nags once per release, never
 # once per day. The seen mark is only written when notify-send reports
 # success: with no notification daemon running, the next login retries
 # instead of swallowing the notice.
@@ -333,9 +333,9 @@ restore_live_changes() {  # $1 = ref now checked out, for messages
 
 # Hands the update over to the target tag's own backend (see cmd_update).
 # Returns 0 when there is nothing to hand over to (already that backend);
-# 1 when the hop is impossible (offline: fetch failed) - the caller then
+# 1 when the hop is impossible (offline: fetch failed), the caller then
 # falls back to this checkout's updater, i.e. today's behavior;
-# 2 when the tag has no usable backend - the caller must refuse, not check
+# 2 when the tag has no usable backend, the caller must refuse, not check
 # out a release whose updater is missing.
 bootstrap_update_backend() {  # $1 = remote tag
     local tag="$1" tmp args=()
@@ -407,7 +407,7 @@ cmd_update() {
 
     # Self-bootstrap: the updater itself is versioned, so this checkout's
     # backend may predate the fixes the update needs. The target tag's
-    # backend runs the rest instead - extracted straight from git, without
+    # backend runs the rest instead, extracted straight from git, without
     # touching the worktree, so dirty trees are safe. RICE_BACKEND_BOOTSTRAPPED
     # guards the hop against looping.
     if [ "${RICE_BACKEND_BOOTSTRAPPED:-0}" != 1 ]; then
@@ -474,7 +474,7 @@ cmd_rollback() {
 # still honored by hyprland.lua as a fallback, so it is protected too.
 # user.lua / user.conf are yours (gitignored overrides seeded once by
 # install.sh): they are never tracked, so they can never be diff-filter=D
-# candidates - listed here anyway so no future refactor can trash them.
+# candidates, listed here anyway so no future refactor can trash them.
 is_protected() {
     case "$1" in
         home/.config/hypr/hypridle.conf|home/.config/hypr/language.conf|\

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# poke-sprites - fills the pokemon sprite cache that pokefetch, pokeanim and
+# poke-sprites, fills the pokemon sprite cache that pokefetch, pokeanim and
 # pokemon-popup (Super+O) all read from.
 #
 # THEY ARE NOT IN THE REPO ON PURPOSE: about 270 MB. They are pulled from

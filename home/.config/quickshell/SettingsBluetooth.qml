@@ -1,9 +1,9 @@
-// SettingsBluetooth.qml - dispositivos bluetooth vía Quickshell.Bluetooth (Bluez),
+// SettingsBluetooth.qml, dispositivos bluetooth vía Quickshell.Bluetooth (Bluez),
 // sustituyendo al menú de rofi. Emparejar, conectar, desconectar y olvidar.
 //
 // LO QUE ARREGLA ESTA VERSIÓN: si el adaptador está bloqueado por rfkill (que
 // es como está normalmente este portátil, por batería), la pantalla decía
-// "Bluetooth apagado, enciéndelo con el interruptor" - y el interruptor no
+// "Bluetooth apagado, enciéndelo con el interruptor", y el interruptor no
 // hacía absolutamente nada, porque con un soft-block Bluez ignora el `enabled`.
 // Ahora se dice claro, el interruptor se apaga para no mentir, y hay un botón
 // que hace el `rfkill unblock` (el usuario tiene ACL sobre /dev/rfkill, así que

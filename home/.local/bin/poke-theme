@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""poke-theme - ranks Pokemon sprites by how well they match the pywal theme.
+"""poke-theme, ranks Pokemon sprites by how well they match the pywal theme.
 
 It does NOT render anything: it only decides WHICH sprite should appear. Rendering
 (kitten icat / chafa) remains the responsibility of pokefetch() in ~/.zshrc.

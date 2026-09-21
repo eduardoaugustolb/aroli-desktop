@@ -1,4 +1,4 @@
-// LockSurface.qml - one lock surface per screen.
+// LockSurface.qml, one lock surface per screen.
 //
 // Thin protocol wrapper around LockStage (the visuals, shared with the test
 // harness). Owns the PAM lifecycle: only the primary screen drives the

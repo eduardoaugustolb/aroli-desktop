@@ -1,5 +1,5 @@
 # ###########################################################################
-#  USER OVERRIDES - YOUR FILE. UPDATES NEVER TOUCH IT.
+#  USER OVERRIDES, YOUR FILE. UPDATES NEVER TOUCH IT.
 #
 #  This is a TEMPLATE (user.conf.example is versioned; user.conf is not).
 #  The installer copies this file to ~/.config/hypr/user.conf ONCE, only when
@@ -8,7 +8,7 @@
 #  conflict with it. This file is sourced LAST, so everything here wins over
 #  the rice defaults.
 #
-#  RULE: never edit hyprland.conf for personal tweaks - put them here.
+#  RULE: never edit hyprland.conf for personal tweaks, put them here.
 #  Bonus: binds defined here DO show in Settings > Shortcuts (Super+K),
 #  because that list parses hyprland.conf AND this file.
 #

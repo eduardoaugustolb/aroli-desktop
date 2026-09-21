@@ -65,7 +65,7 @@ while true; do
   # que pinta el estado electrico exige `bat >= 0`, pero es un dato FALSO
   # esperando a que alguien lo lea. Si no hay bateria, la corriente es un hecho.
   [ "$bat" -lt 0 ] && ac=1
-  # Volumen/mute y luz nocturna: placeholders fijos. Nadie los lee de aqui -
+  # Volumen/mute y luz nocturna: placeholders fijos. Nadie los lee de aqui,
   # el volumen y el mute salen del binding nativo de Pipewire en ShellState y
   # la luz nocturna de su propio toggle. Se conservan las columnas para no
   # descolocar p[8..16]. (Antes eran un wpctl + un pgrep por tick, tirados.)

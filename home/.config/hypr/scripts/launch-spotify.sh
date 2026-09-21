@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# launch-spotify.sh - abre o Spotify.
+# launch-spotify.sh, abre o Spotify.
 # Ordem: cliente nativo → flatpak.
 
 if command -v spotify >/dev/null 2>&1; then

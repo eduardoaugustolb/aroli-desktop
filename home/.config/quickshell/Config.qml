@@ -1,4 +1,4 @@
-// Config.qml - persistent rice settings.
+// Config.qml, persistent rice settings.
 //
 // Everything that used to be hardcoded constants in TopShell/ShellState lives
 // here and is saved to ~/.config/quickshell-rice.json. The Settings app writes
@@ -78,7 +78,7 @@ Singleton {
     // ───────── compositor effects ─────────
     // These two are not the shell's: they belong to Hyprland. They are stored
     // here like the rest so Settings stays a single place, but reaching
-    // Hyprland is another matter - see applyEffects() below.
+    // Hyprland is another matter, see applyEffects() below.
     property alias motionBlur: opts.motionBlur
     property alias motionBlurSamples: opts.motionBlurSamples
 
@@ -162,8 +162,8 @@ Singleton {
     //                   the switch and not at reboot.
     //   effects.lua     writes it down. hyprland.lua loads it last with a
     //                   guarded dofile, so it survives `hyprctl reload`
-    //                   -which would reread the config and wipe the
-    //                   eval- and session restarts.
+    //                   which would reread the config and wipe the
+    //                   eval, and session restarts.
     //
     // The file is ALWAYS written, even if the eval fails: if Hyprland is not
     // listening, the setting is not lost, it just waits until the next
@@ -171,7 +171,7 @@ Singleton {
     // The debounce lives here and not in the UI on purpose: the samples
     // slider fires on EVERY pixel of the drag with no "released" signal,
     // so without this one drag would launch a hundred processes and a hundred
-    // file rewrites. Callers need not know - just call.
+    // file rewrites. Callers need not know, just call.
     function applyEffects() { debounce.restart(); }
 
     Timer {
@@ -199,8 +199,8 @@ Singleton {
     Process { id: fx }
 
     // On shell startup there is nothing to apply: hyprland.lua has already read
-    // effects.lua. This is only for when the JSON is touched from outside -by
-    // hand, or by the installer- and the two files have drifted apart.
+    // effects.lua. This is only for when the JSON is touched from outside, by
+    // hand, or by the installer, and the two files have drifted apart.
     Component.onCompleted: root.applyEffects()
 
     function reset() {
@@ -302,7 +302,7 @@ Singleton {
             // Window corner rounding (0 = square). 12 is the default: reads
             // as "floating" without turning pill-shaped. Border 0 = focus by
             // light/shadow alone. Gaps 3/6: 6 px between two windows (3 + 3)
-            // and 6 more to the screen edge - the same gap.
+            // and 6 more to the screen edge, the same gap.
             property int windowRounding: 12
             property int windowBorderSize: 0
             property int windowGapsIn: 3

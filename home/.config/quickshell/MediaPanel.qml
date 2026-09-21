@@ -1,4 +1,4 @@
-// MediaPanel.qml - vertical player inside the control center (Super+D).
+// MediaPanel.qml, vertical player inside the control center (Super+D).
 //
 // The layout follows a single column: hero cover art, title and
 // artist, progress, controls, and the spectrum. That way the player reads not

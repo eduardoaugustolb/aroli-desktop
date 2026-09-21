@@ -1,4 +1,4 @@
-// SettingsAppearance.qml - what used to require editing QML by hand.
+// SettingsAppearance.qml, what used to require editing QML by hand.
 // Everything writes to Config.qml and saves itself to
 // ~/.config/quickshell-rice.json; the bar and notch react live as you drag
 // the sliders.
@@ -249,7 +249,7 @@ Flickable {
         // ─────────────────── compositor effects ───────────────────
         // The only card on the page ruling nothing the shell paints: this is
         // Hyprland's. So the setting also goes to ~/.config/hypr/effects.lua
-        // and not just the JSON the footer announces - the why of both paths
+        // and not just the JSON the footer announces, the why of both paths
         // lives in Config.applyEffects().
         SettingsControls.Card_ {
             id: cFx
@@ -277,7 +277,7 @@ Flickable {
 
         // ─────────────────── windows ───────────────────
         // Like EFFECTS: this is Hyprland's, not the shell's. It also goes to
-        // ~/.config/hypr/effects.lua via Config.applyEffects() - see Config.
+        // ~/.config/hypr/effects.lua via Config.applyEffects(), see Config.
         SettingsControls.Card_ {
             id: cWin
             title: I18n.tr("WINDOWS")
@@ -421,8 +421,8 @@ Flickable {
                 hint: I18n.tr("Opens the picker: your own wallpapers and a web search. Apply one and pywal recolours the whole desktop.")
                 icon: Icons.image
                 value: "Super+Shift+W"
-                // This button already broke TWICE for the same reason -the
-                // text sent is not what Hyprland expects- and both times it
+                // This button already broke TWICE for the same reason, the
+                // text sent is not what Hyprland expects, and both times it
                 // failed silently, doing NOTHING when pressed. Worth leaving
                 // both written down, because the symptom is identical:
                 //

@@ -1,4 +1,4 @@
-// termspot theme.js - ASCII album art, ASCII progress bar, track-load log,
+// termspot theme.js, ASCII album art, ASCII progress bar, track-load log,
 // monochrome phosphor covers, live CRT settings and a hidden command terminal.
 // Press ":" anywhere (outside a text field) to open the terminal. Try `help`.
 (function termspot() {
@@ -153,7 +153,7 @@
     }
 
     /* ---- shared css ---------------------------------------------------- */
-    // note: the now-playing sidebar cover is deliberately NOT in this list -
+    // note: the now-playing sidebar cover is deliberately NOT in this list,
     // that spot belongs to the ASCII art
     const COVERS =
         "img.main-image-image:not(.main-nowPlayingView-coverArt img)," +
@@ -185,7 +185,7 @@
         ".termspot-ascii-on .main-nowPlayingView-coverArt:hover #termspot-ascii { opacity: 0; }",
         // monochrome phosphor covers, hover restores the original colors
         // (hover must sit on the clickable container: overlays swallow img:hover)
-        // the filter itself follows the active accent - see updateMonoFilter()
+        // the filter itself follows the active accent, see updateMonoFilter()
         ".termspot-mono :is(" + COVERS + ") {",
         "  filter: var(--termspot-mono-filter, grayscale(1) sepia(1) hue-rotate(80deg) brightness(0.8));",
         "  transition: filter 0.25s ease;",
@@ -501,7 +501,7 @@
     let lastResults = [];
 
     async function searchTracks(q) {
-        // 1) the client's own search query - works on all modern builds
+        // 1) the client's own search query, works on all modern builds
         try {
             const r = await Spicetify.GraphQL.Request(
                 Spicetify.GraphQL.Definitions.searchModalResults,
@@ -561,7 +561,7 @@
     }
 
     const fmtTrack = (t) => {
-        let s = t.name + " - " + (t.artists || []).map((a) => a.name).join(", ");
+        let s = t.name + ", " + (t.artists || []).map((a) => a.name).join(", ");
         if (t.duration_ms) {
             s +=
                 " (" + Math.floor(t.duration_ms / 60000) + ":" +
@@ -666,7 +666,7 @@
                 const item = currentItem();
                 const meta = item && item.metadata;
                 if (!meta || !meta.title) { tprint("nothing playing", "t-dim"); break; }
-                tprint("now playing: " + meta.title + (meta.artist_name ? " - " + meta.artist_name : ""), "t-acc");
+                tprint("now playing: " + meta.title + (meta.artist_name ? ", " + meta.artist_name : ""), "t-acc");
                 break;
             }
             case "shuffle":
@@ -723,7 +723,7 @@
                 tprint("today: " + (hh ? hh + "h " : "") + mm + "m of music", "t-acc");
                 const top = Object.entries(stats.plays).sort((a, b) => b[1] - a[1]).slice(0, 5);
                 if (!top.length) {
-                    tprint("no plays logged yet today - go press play", "t-dim");
+                    tprint("no plays logged yet today, go press play", "t-dim");
                     break;
                 }
                 const max = top[0][1];
@@ -737,7 +737,7 @@
                 let text = arg;
                 if (!text) {
                     const meta = currentItem() && currentItem().metadata;
-                    text = meta && meta.title ? meta.title + " - " + (meta.artist_name || "") : "moo";
+                    text = meta && meta.title ? meta.title + ", " + (meta.artist_name || "") : "moo";
                 }
                 text = text.slice(0, 44);
                 const border = "-".repeat(text.length + 2);
@@ -776,7 +776,7 @@
             case "theme":
                 if (!arg || arg === "list") {
                     tprint("schemes: " + Object.keys(SCHEMES).join(", "));
-                    tprint("note: live preview only - permanent switch: spicetify config color_scheme <name>", "t-dim");
+                    tprint("note: live preview only, permanent switch: spicetify config color_scheme <name>", "t-dim");
                 } else if (arg === "reset") {
                     resetScheme();
                     tprint("scheme reset to the applied one", "t-acc");
@@ -804,8 +804,8 @@
                 toggleSetting("vignette", "vignette");
                 break;
             case "about":
-                tprint("termspot - CRT phosphor terminal theme for Spotify", "t-acc");
-                tprint("by fdeox - github.com/fdeox/termspot\npairs with the Terminal Greeting extension");
+                tprint("termspot, CRT phosphor terminal theme for Spotify", "t-acc");
+                tprint("by fdeox, github.com/fdeox/termspot\npairs with the Terminal Greeting extension");
                 break;
             case "coffee":
                 tprint("   ( (\n    ) )\n  ........\n  |      |]\n  \\      /\n   `----'", "t-acc");
@@ -866,7 +866,7 @@
         if (termEl.style.display !== "flex") {
             termEl.style.display = "flex";
             if (!termOut.childElementCount) {
-                tprint("termspot terminal - type `help` for commands, Esc to close", "t-dim");
+                tprint("termspot terminal, type `help` for commands, Esc to close", "t-dim");
             }
         }
         setTimeout(() => termIn.focus(), 0);

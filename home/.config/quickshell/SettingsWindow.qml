@@ -1,22 +1,22 @@
-// SettingsWindow.qml - la app de Ajustes del sistema.
+// SettingsWindow.qml, la app de Ajustes del sistema.
 //
 // POR QUÉ NO ES UN PANEL DEL NOTCH: todos los paneles del notch son
 // transitorios (abres, haces una cosa, se cierran al pinchar fuera). Unos
 // ajustes son lo contrario: exploras, tocas un slider y quieres mirar el
 // terminal a ver si funcionó. Que se cerrase al pinchar fuera sería hostil, y
 // anclado arriba del todo taparía media pantalla. Así que es una ventana
-// flotante de verdad (xdg-toplevel) - pero con el mismo lenguaje visual que el
+// flotante de verdad (xdg-toplevel), pero con el mismo lenguaje visual que el
 // notch, y se lanza desde él.
 //
 // ANATOMÍA (y el porqué de cada pieza):
-//   · barra lateral  - identidad + buscador + secciones. El buscador está aquí
+//   · barra lateral, identidad + buscador + secciones. El buscador está aquí
 //     y no sobre el contenido porque es lo primero que recibe el foco al abrir:
 //     abres y escribes.
-//   · cabecera fija  - el título de la sección NO scrollea. Antes cada sección
+//   · cabecera fija, el título de la sección NO scrollea. Antes cada sección
 //     pintaba su propio título dentro del scroll y al volver a una sección con
 //     el scroll a medias te recibía un texto cortado por arriba.
-//   · contenido      - tarjetas (SettingsControls.Card_).
-//   · pie            - la descripción del ajuste que tienes debajo del ratón.
+//   · contenido, tarjetas (SettingsControls.Card_).
+//   · pie, la descripción del ajuste que tienes debajo del ratón.
 //     Ver el comentario largo de SettingsControls.qml: es lo que permite que
 //     las filas midan 42 px en vez de tres líneas.
 //
@@ -135,8 +135,8 @@ Scope {
     }
 
     // La ventana nace SIN FOCO de forma intermitente: aparece, pero el teclado
-    // se queda en la ventana de antes, así que el buscador -que se lleva el foco
-    // al abrir para que «abras y escribas»- no recibía ni una tecla, y Esc
+    // se queda en la ventana de antes, así que el buscador, que se lleva el foco
+    // al abrir para que «abras y escribas», no recibía ni una tecla, y Esc
     // tampoco cerraba. Solo se salvaba cuando el puntero caía dentro y el
     // follow_mouse de Hyprland le daba el foco de rebote.
     //
@@ -163,7 +163,7 @@ Scope {
     // ver si el slider ha hecho algo. Tampoco valen las otras dos vías, las dos
     // probadas: un bind sobre el botón izquierdo sin modificadores se registra
     // pero no dispara nunca (en 0.56 los binds de ratón necesitan modificador),
-    // y `hl.config` deja apagar follow_mouse en caliente solo de boquilla -
+    // y `hl.config` deja apagar follow_mouse en caliente solo de boquilla,
     // `getoption` dice 0 y el foco sigue yéndose con el ratón.
     //
     // El retardo al armarlo es por lo mismo que en TopShell: recién mapeada la

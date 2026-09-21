@@ -1,4 +1,4 @@
-// hyprisland - SDDM theme replicating the hyprlock island.
+// hyprisland, SDDM theme replicating the hyprlock island.
 //
 // Goal: the boot login screen is INDISTINGUISHABLE from the lock
 // the notch throws. Every number here comes from ~/.config/hypr/hyprlock.conf;
@@ -15,7 +15,7 @@ Item {
     id: root
 
     // Focus is critical: if the field never gets it, there is no way in.
-    // forceActiveFocus() in Component.onCompleted is NOT enough - the item is
+    // forceActiveFocus() in Component.onCompleted is NOT enough, the item is
     // not yet hung under the window and the call is silently lost. Hence
     // focus: true here, the Timer retry, and key forwarding.
     focus: true
@@ -567,7 +567,7 @@ Item {
     }
 
     // Self-healing focus. Measured: neither Component.onCompleted nor a single
-    // deferred retry grabs focus - the window activates later and Qt gives it
+    // deferred retry grabs focus, the window activates later and Qt gives it
     // to nobody, so the field stays mute until you click. This timer insists
     // while the field does NOT have focus and switches itself off as soon as
     // it gets it, so it also recovers it if lost.

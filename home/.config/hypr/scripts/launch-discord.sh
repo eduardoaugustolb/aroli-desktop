@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# launch-discord.sh - abre o Discord.
+# launch-discord.sh, abre o Discord.
 # Ordem: vesktop (cliente do rice) → discord oficial → .desktop
 # Discord do Omarchy (webapp) → web no navegador padrão.
 

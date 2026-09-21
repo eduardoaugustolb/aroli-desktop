@@ -1,13 +1,13 @@
 // NAME: Terminal Greeting
 // AUTHOR: fdeox
-// DESCRIPTION: Terminal-style prompt on your home page - time-of-day greeting, live clock, blinking cursor, now-playing ticker, playing-track marker, optional night accent shift and a fake boot screen.
+// DESCRIPTION: Terminal-style prompt on your home page, time-of-day greeting, live clock, blinking cursor, now-playing ticker, playing-track marker, optional night accent shift and a fake boot screen.
 
 (function terminalGreeting() {
     /* ---- settings (plain localStorage: usable before Spicetify is ready) ---- */
     const STORAGE_KEY = "terminal-greeting:settings";
     const DEFAULTS = {
         name: "",          // empty -> resolved from the Spotify display name
-        host: "termspot",  // the part after the @ in the prompt - change it to anything
+        host: "termspot", // the part after the @ in the prompt, change it to anything
         nowPlaying: true,  // rotate the prompt with the current track
         trackMarker: true, // mark the playing track green in tracklists
         nightShift: false, // amber accents between 22:00 and 05:00
@@ -25,7 +25,7 @@
         try {
             window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
         } catch (e) {
-            /* storage unavailable - keep going with in-memory settings */
+            /* storage unavailable, keep going with in-memory settings */
         }
     }
 
@@ -102,7 +102,7 @@
 
     /* ---- everything else waits for the Spicetify APIs ---- */
     (function waitSpicetify() {
-        // Menu.Item needs Spicetify.ReactJSX internally, so wait for React too -
+        // Menu.Item needs Spicetify.ReactJSX internally, so wait for React too,
         // registering before it loads throws "Cannot read properties of undefined (reading 'jsx')"
         if (
             !(
@@ -211,7 +211,7 @@
                 const meta = item && item.metadata;
                 if (!meta || !meta.title) return null;
                 let text = "now playing: " + meta.title;
-                if (meta.artist_name) text += " - " + meta.artist_name;
+                if (meta.artist_name) text += ", " + meta.artist_name;
                 if (text.length > 70) text = text.slice(0, 67) + "...";
                 return text;
             } catch (e) {

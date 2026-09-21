@@ -1,4 +1,4 @@
-// ControlPanel.qml - the control center, unfolded FROM the notch.
+// ControlPanel.qml, the control center, unfolded FROM the notch.
 //
 // Replaces swaync's "control center" (a GTK window of its own, hence
 // impossible to fit in here). Left: vertical player. Center: sliders and
@@ -352,7 +352,7 @@ Item {
             //     gap.
             //
             // With a single MouseArea above the list one owner holds "what sits
-            // under the pointer". And -this is what fixes the third- that owner
+            // under the pointer". And, this is what fixes the third, that owner
             // can look again when the list changes, without waiting for the hand
             // to move.
             Item {
