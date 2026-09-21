@@ -192,9 +192,45 @@ alias matrix='unimatrix -n -s 96 -l 'o''
 
 
 
-export PATH="$HOME/.local/bin:$PATH"
-# Evita duplicados al combinar .profile, uv y recargas manuales de .zshrc.
+# ---- PATH: ferramentas do usuario (sobrevive ao rice) ----
+# ~/.zshrc e um symlink para o repo: qualquer linha que um instalador
+# (bun, rustup, uv, go) acrescentar AQUI vai parar dentro do repo e se perde
+# no proximo `install.sh config` / `rice update` -- e esse era o bug que fazia
+# `bun`, `cargo` etc. sumirem do zsh a cada instalacao do rice.
+# Por isso o PATH das ferramentas padrao e montado aqui, com guardas
+# (diretorio ausente = ignorado, sem erro em maquina limpa), e o que for
+# particular fica em ~/.zshrc.local (seu; updates nunca tocam nele).
+for _rice_bin in "$HOME/.local/bin" "$HOME/.bun/bin" "${BUN_INSTALL:-$HOME/.bun}/bin" "$HOME/go/bin" "$HOME/.cargo/bin"; do
+  [[ -d $_rice_bin ]] || continue
+  case ":$PATH:" in
+    *":$_rice_bin:"*) ;;
+    *) PATH="$_rice_bin:$PATH" ;;
+  esac
+done
+unset _rice_bin
+# mise (go, node, etc. via shims) no fim, como o omarchy faz em
+# /usr/share/omarchy/default/bash/env-bootstrap: os binarios do sistema
+# mantem precedencia. Cobre os shells interativos que NAO leem /etc/profile
+# (kitty abre `zsh` puro, sem login): sem isto, `go`/`node` so existiam por
+# heranca da sessao uwsm e sumiam conforme a ordem do login.
+if [[ -d $HOME/.local/share/mise/shims ]]; then
+  case ":$PATH:" in
+    *":$HOME/.local/share/mise/shims:"*) ;;
+    *) PATH="$PATH:$HOME/.local/share/mise/shims" ;;
+  esac
+fi
+# Evita duplicados ao combinar .profile, uv e recargas manuales de .zshrc.
 typeset -U path PATH
+export PATH
+
+# uv poe seu env aqui; com guarda para nao cuspir erro em maquina limpa.
+[[ -r $HOME/.local/bin/env ]] && source "$HOME/.local/bin/env"
+
+# Ativa o mise (shims + `mise shell`) quando ele existe. Sem mise, sem erro
+# a cada terminal nova.
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
 
 # BEGIN YAZI Y WRAPPER
 function y() {
@@ -405,3 +441,10 @@ zshrc_recompile() {
 }
 zshrc_recompile
 unfunction zshrc_recompile 2>/dev/null
+
+# ---- Overrides pessoais (sobrevivem ao rice) ----
+# ~/.zshrc e um symlink para o repo, entao NAO edite este arquivo para
+# por PATH/exports/aliases seus: a proxima instalacao pode levar embora.
+# Ponha em ~/.zshrc.local (carregado por ultimo, ganha de tudo aqui).
+# Updates nunca tocam nele -- mesmo padrao de user.lua / user.conf.
+[[ -r $HOME/.zshrc.local ]] && source "$HOME/.zshrc.local"

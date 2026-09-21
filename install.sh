@@ -920,6 +920,70 @@ EOF
     ok "Umbra Cursor installed from the latest main revision"
 }
 
+# Personal shell overrides: ~/.zshrc.local, ~/.bashrc.local and friends.
+# Same "seeded once, then yours" pattern as user.lua / user.conf (7c): the rc
+# files the rice deploys are symlinks into this repo, so anything personal
+# (PATH, exports, aliases) written directly into them is one install away
+# from being lost. The repo owns the standard tool PATHs itself (bun, go,
+# cargo, mise -- see home/.zshrc) and loads the *.local file last; these stay
+# in $HOME as regular files, and updates never touch them.
+seed_shell_locals() {
+    local base rc
+    for base in .zshrc.local .bashrc.local .zprofile.local .profile.local; do
+        rc="$HOME/$base"
+        if [ -e "$rc" ]; then
+            skip "$base already yours (kept)"
+        elif [ "$DRY" = 1 ]; then
+            skip "would seed $base (yours; updates never touch it)"
+        else
+            cat > "$rc" <<'EOF'
+# Seus overrides do shell. O rice instala .zshrc/.bashrc/.zprofile/.profile
+# como symlinks para o repo -- nao edite aqueles para por PATH/exports/aliases
+# seus; ponha aqui. Updates nunca tocam neste arquivo.
+EOF
+            ok "$base seeded (yours; updates never touch it)"
+        fi
+    done
+}
+
+# Moves tool-installer PATH lines out of an rc file that is about to be
+# replaced by a repo symlink, into its *.local counterpart.
+#
+# WHY THIS EXISTS. Installers (bun, rustup, mise) persist themselves by
+# appending `export PATH=...` to ~/.zshrc. With --link that file is this
+# repo's home/.zshrc, so the lines landed in the repo and the next
+# `install.sh config` / `rice update` dropped them; with --copy (or a
+# hand-unlinked rc) place() backed the whole file up and replaced it. Either
+# way `bun` stopped being found after every rice install. Now the repo sets
+# the standard tool PATHs itself, and whatever personal lines are still in a
+# regular file being replaced are rescued here instead of being lost.
+rescue_shell_path() {
+    local dest="$1" local_rc="$2" line rescued=0
+    # Only a regular file holds something replaceable: symlinks already
+    # pointing at the repo are skipped by place(), and anything else is the
+    # user's own link to keep.
+    [ -f "$dest" ] && [ ! -L "$dest" ] || return 0
+    while IFS= read -r line || [ -n "${line:-}" ]; do
+        case "$line" in
+            *BUN_INSTALL*|*.bun/bin*|*/go/bin*|*.cargo/bin*|*mise\ activate*|*mise/shims*)
+                if [ -f "$local_rc" ] && grep -qxF -- "$line" "$local_rc" 2>/dev/null; then
+                    continue
+                fi
+                if [ "$DRY" = 1 ]; then
+                    skip "would rescue into $(basename "$local_rc"): $line"
+                else
+                    printf '%s\n' "$line" >> "$local_rc"
+                fi
+                rescued=1
+                ;;
+        esac
+    done < "$dest"
+    if [ "$rescued" = 1 ] && [ "$DRY" = 0 ]; then
+        ok "rescued tool PATH lines into $(basename "$local_rc") (yours; updates never touch it)"
+    fi
+    return 0
+}
+
 # ----------------------------------------------------------------- phase: config
 
 phase_config() {
@@ -932,6 +996,12 @@ phase_config() {
     # spelled out. This has to happen BEFORE anything is laid down, because the
     # phases that come after (system, services, sddm) read these same files.
     adapt_home_paths
+
+    # 0) shell overrides: seed first, rescue second, so rescued lines land
+    #    below the header of a brand-new *.local file.
+    seed_shell_locals
+    rescue_shell_path "$HOME/.zshrc" "$HOME/.zshrc.local"
+    rescue_shell_path "$HOME/.bashrc" "$HOME/.bashrc.local"
 
     # 1) loose dotfiles at the root of $HOME
     local f

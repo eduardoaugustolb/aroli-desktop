@@ -39,6 +39,14 @@
 
 **/.gitconfig.local
 
+# Personal shell overrides seeded once by install.sh (seed_shell_locals).
+# The deployed rcs are symlinks into the repo and load these last; because
+# they are untracked, `install.sh config` and `rice update` never touch them.
+home/.zshrc.local
+home/.bashrc.local
+home/.zprofile.local
+home/.profile.local
+
 home/.config/spotify/prefs
 home/.config/gh/
 **/sessionData/

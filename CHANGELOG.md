@@ -10,6 +10,23 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [2.3.2] - 2026-09-21
+
+### Fixed
+
+- Shell tool PATHs no longer vanish on every rice install (`bun: command
+  not found`). The deployed rcs only carried `~/.local/bin`, and being
+  symlinks into the repo, any `export PATH` an installer (bun, rustup,
+  mise) appended to them was lost on the next `install.sh config` /
+  `rice update`. `.zshrc`, `.profile`, `.bashrc` and `.zprofile` now build
+  the standard tool PATHs themselves (`~/.bun/bin` honoring `$BUN_INSTALL`,
+  `~/go/bin`, `~/.cargo/bin`, mise shims last like upstream Omarchy),
+  `zsh`/`bash` activate mise when present, and personal overrides live in
+  `~/.zshrc.local` / `~/.bashrc.local` / `~/.zprofile.local` /
+  `~/.profile.local` — seeded once by the installer, never touched by
+  updates. `install.sh` also rescues surviving tool-PATH lines from a
+  replaced rc file into its `*.local` counterpart instead of dropping them.
+
 ## [2.3.1] - 2026-09-20
 
 ### Fixed

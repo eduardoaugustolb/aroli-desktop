@@ -73,7 +73,31 @@ if uwsm check may-start; then
     unset _zp_arrancar
 fi
 
+# PATH das ferramentas do usuario (login shells zsh).
+# Mesmo motivo do bloco em ~/.zshrc: este arquivo e um symlink para o repo,
+# entao instaladores nao podem persistir PATH aqui. Com guardas: diretorio
+# ausente = ignorado.
+for _rice_bin in "$HOME/.local/bin" "$HOME/.bun/bin" "${BUN_INSTALL:-$HOME/.bun}/bin" "$HOME/go/bin" "$HOME/.cargo/bin"; do
+  [[ -d $_rice_bin ]] || continue
+  case ":$PATH:" in
+    *":$_rice_bin:"*) ;;
+    *) PATH="$_rice_bin:$PATH" ;;
+  esac
+done
+unset _rice_bin
+if [[ -d $HOME/.local/share/mise/shims ]]; then
+  case ":$PATH:" in
+    *":$HOME/.local/share/mise/shims:"*) ;;
+    *) PATH="$PATH:$HOME/.local/share/mise/shims" ;;
+  esac
+fi
+export PATH
+
 # Lo pone el instalador de uv. Con guarda: si uv no esta instalado el fichero
 # no existe y el shell escupe "No such file or directory" en CADA arranque de
 # sesion; se veia en una maquina limpia antes de instalar nada.
 [ -r "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+# Overrides pessoais (sobrevivem ao rice): este arquivo e symlink para o
+# repo, nao o edite para por PATH/exports seus.
+[[ -r $HOME/.zprofile.local ]] && source "$HOME/.zprofile.local"

@@ -5,6 +5,30 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+# PATH das ferramentas do usuario. Mesmo motivo do bloco em ~/.zshrc: este
+# arquivo e um symlink para o repo, entao instaladores (bun, rustup, uv) nao
+# podem persistir PATH aqui. O que for particular vai em ~/.bashrc.local
+# (seu; updates nunca tocam nele; carregado no fim deste arquivo).
+for _rice_bin in "$HOME/.local/bin" "$HOME/.bun/bin" "${BUN_INSTALL:-$HOME/.bun}/bin" "$HOME/go/bin" "$HOME/.cargo/bin"; do
+    [[ -d $_rice_bin ]] || continue
+    case ":$PATH:" in
+        *":$_rice_bin:"*) ;;
+        *) PATH="$_rice_bin:$PATH" ;;
+    esac
+done
+unset _rice_bin
+if [[ -d $HOME/.local/share/mise/shims ]]; then
+    case ":$PATH:" in
+        *":$HOME/.local/share/mise/shims:"*) ;;
+        *) PATH="$PATH:$HOME/.local/share/mise/shims" ;;
+    esac
+fi
+export PATH
+
+if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)"
+fi
+
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 PS1='[\u@\h \W]\$ '
@@ -48,3 +72,7 @@ fastfetch_ws_if_first() {
 fastfetch_ws_if_first
 
 alias cls='clear'
+
+# Overrides pessoais (sobrevivem ao rice): ~/.bashrc e symlink para o repo,
+# nao edite este arquivo para PATH/exports/aliases seus.
+[[ -r $HOME/.bashrc.local ]] && . "$HOME/.bashrc.local"
