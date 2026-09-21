@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Reapply the selected surface policy to the current pywal palette. Used by
-# Settings when switching between Umbra's stable dark surfaces and legacy
+# Settings when switching between Aroli's stable dark surfaces and legacy
 # wallpaper-derived surfaces; it never changes the wallpaper itself.
 set -uo pipefail
 

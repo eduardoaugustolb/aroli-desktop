@@ -1,24 +1,7 @@
 #!/usr/bin/env bash
+# Deprecated shim: umbra-cursor-size is now aroli-cursor-size
+# (Umbra Cursor -> Aroli Pointer rename). Kept so old keybindings,
+# docs and muscle memory keep working.
 set -euo pipefail
-
-size="${1:-}"
-if [[ ! "$size" =~ ^[0-9]+$ ]] || (( size < 16 || size > 96 )); then
-    printf 'Usage: umbra-cursor-size 16..96\n' >&2
-    exit 2
-fi
-
-home_dir="${HOME:?HOME is not set}"
-
-replace_size() {
-    local file="$1" pattern="$2"
-    [[ -f "$file" ]] || return 0
-    sed -i -E "s/${pattern}/${size}/" "$file"
-}
-
-replace_size "$home_dir/.config/hypr/hyprland.lua" 'hl\.env\("XCURSOR_SIZE",[[:space:]]*"[0-9]+"\)'
-replace_size "$home_dir/.config/hypr/hyprland.conf" 'env = XCURSOR_SIZE,[0-9]+'
-replace_size "$home_dir/.config/gtk-3.0/settings.ini" '^gtk-cursor-theme-size=[0-9]+'
-replace_size "$home_dir/.config/gtk-4.0/settings.ini" '^gtk-cursor-theme-size=[0-9]+'
-replace_size "$home_dir/.gtkrc-2.0" '^gtk-cursor-theme-size=[0-9]+'
-
-printf 'Umbra cursor size set to %s. Relog to apply it everywhere.\n' "$size"
+printf 'Deprecated: use aroli-cursor-size instead.\n' >&2
+exec "$(dirname -- "${BASH_SOURCE[0]}")/aroli-cursor-size" "$@"

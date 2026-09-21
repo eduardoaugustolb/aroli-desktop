@@ -1,4 +1,4 @@
-<h1 align="center">Umbra Noctis</h1>
+<h1 align="center">Aroli Desktop</h1>
 
 <p align="center">
   A premium visual layer for <strong>Omarchy</strong>, Arch Linux, Hyprland, and Quickshell.<br>
@@ -6,15 +6,15 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/eduardoaugustolb/umbra-noctis/stargazers"><img src="https://img.shields.io/github/stars/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff&label=stars" alt="GitHub stars"></a>
-  <a href="https://github.com/eduardoaugustolb/umbra-noctis/releases"><img src="https://img.shields.io/github/v/release/eduardoaugustolb/umbra-noctis?display_name=tag&style=flat-square&color=8b7cff&label=release" alt="Latest release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff" alt="GPL-3.0 license"></a>
-  <a href="https://github.com/eduardoaugustolb/umbra-noctis/actions"><img src="https://img.shields.io/github/actions/workflow/status/eduardoaugustolb/umbra-noctis/release.yml?style=flat-square&label=build" alt="Build status"></a>
+  <a href="https://github.com/eduardoaugustolb/aroli-desktop/stargazers"><img src="https://img.shields.io/github/stars/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff&label=stars" alt="GitHub stars"></a>
+  <a href="https://github.com/eduardoaugustolb/aroli-desktop/releases"><img src="https://img.shields.io/github/v/release/eduardoaugustolb/aroli-desktop?display_name=tag&style=flat-square&color=8b7cff&label=release" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff" alt="GPL-3.0 license"></a>
+  <a href="https://github.com/eduardoaugustolb/aroli-desktop/actions"><img src="https://img.shields.io/github/actions/workflow/status/eduardoaugustolb/aroli-desktop/release.yml?style=flat-square&label=build" alt="Build status"></a>
 </p>
 
 <p align="center">
   <a href="#installation">Install</a> ·
-  <a href="#the-threshold">The threshold</a> ·
+  <a href="#aroli-desktop">Aroli Desktop</a> ·
   <a href="#privacy-and-control">Privacy</a> ·
   <a href="OMARCHY.md">Omarchy</a> ·
   <a href="LLMS.md">LLMS</a>
@@ -22,48 +22,50 @@
 
 ---
 
-## The threshold
+## Aroli Desktop
 
-**Umbra Noctis** is the visual layer of the Umbra workspace on top of the
-stable Omarchy base. “Noctis” evokes its nocturnal, premium visual language:
-the rice keeps the structure — notch, dark surfaces, cutouts, and luminance
-bands — while each wallpaper sets the mood with Pywal.
+**Aroli Desktop** is the ready-to-use Aroli workspace on top of the
+stable Omarchy base: the desktop product of the Aroli family
+(Aroli Themes, Aroli Pointer, Aroli Backdrops). The rice keeps the
+structure — notch, dark surfaces, cutouts, and luminance bands —
+while each wallpaper sets the mood with Pywal.
 
-The dark foundation is fixed: depth, negative space, and contrast remain
-Umbra. Your wallpaper supplies the accent palette, so the result changes with
+The dark foundation is fixed: depth, negative space, and contrast stay
+Aroli Dark. Your wallpaper supplies the accent palette, so the result changes with
 your image without turning every application surface into its dominant colour.
 
-| Base | Umbra surface | Your choice |
+| Base | Aroli surface | Your choice |
 | --- | --- | --- |
 | Omarchy · Arch · Hyprland | Quickshell, notch, and dynamic palette | Wallpaper, language, and optionals |
 
 <p align="center">
-  <a href="https://github.com/eduardoaugustolb/umbra-noctis/commits/main"><img src="https://img.shields.io/github/commit-activity/m/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff&label=community%20activity" alt="Monthly commit activity"></a>
-  <a href="https://github.com/eduardoaugustolb/umbra-noctis/issues"><img src="https://img.shields.io/github/issues/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff&label=issues" alt="Open issues"></a>
-  <a href="https://github.com/eduardoaugustolb/umbra-noctis/network/members"><img src="https://img.shields.io/github/forks/eduardoaugustolb/umbra-noctis?style=flat-square&color=8b7cff&label=forks" alt="GitHub forks"></a>
+  <a href="https://github.com/eduardoaugustolb/aroli-desktop/commits/main"><img src="https://img.shields.io/github/commit-activity/m/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff&label=community%20activity" alt="Monthly commit activity"></a>
+  <a href="https://github.com/eduardoaugustolb/aroli-desktop/issues"><img src="https://img.shields.io/github/issues/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff&label=issues" alt="Open issues"></a>
+  <a href="https://github.com/eduardoaugustolb/aroli-desktop/network/members"><img src="https://img.shields.io/github/forks/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff&label=forks" alt="GitHub forks"></a>
 </p>
 
 <p align="center">
-  <img src="home/Pictures/wallpapers/umbra-ember-coast.png" alt="Ember Coast — bundled wallpaper" width="49%">
-  <img src="home/Pictures/wallpapers/umbra-obsidian-dunes.png" alt="Obsidian Dunes — bundled wallpaper" width="49%">
+  <img src="home/Pictures/wallpapers/aroli-ember-coast.png" alt="Ember Coast — bundled wallpaper" width="49%">
+  <img src="home/Pictures/wallpapers/aroli-obsidian-dunes.png" alt="Obsidian Dunes — bundled wallpaper" width="49%">
 </p>
 
-## What ships with Noctis
+## What ships with Aroli Desktop
 
 - Complete Quickshell interface, with notch, launcher, panels, and overview.
 - Interface translation in **Brazilian Portuguese** and ABNT2 keyboard layout.
-- **Umbra** cursor and visual identification of the active platform: Omarchy on
+- **Aroli Pointer** cursor and visual identification of the active platform: Omarchy on
   Omarchy, Arch on Arch.
 - Pywal accents extracted from the current wallpaper, applied over stable dark
-  Umbra surfaces. Settings › Appearance › Colour system can restore the legacy
+  Aroli Dark surfaces. Settings › Appearance › Colour system can restore the legacy
   mode where the wallpaper also tints application backgrounds.
-- Four Umbra wallpapers installed with the rice: Ember Coast, Silent
-  Threshold, Obsidian Dunes, and Ink Mountains.
+- Four Aroli Backdrops installed with the rice: Ember Coast, Silent
+  Threshold, Obsidian Dunes, and Black Mountains.
 - Assisted migration for installs coming from the previous fork.
 
 Change the cursor size consistently across Hyprland and GTK with
-`umbra-cursor-size 40`. Values from 16 to 96 are accepted; relog afterwards
+`aroli-cursor-size 40`. Values from 16 to 96 are accepted; relog afterwards
 so already-running applications reload the XCursor.
+(`umbra-cursor-size` remains as a deprecated alias.)
 
 <details>
 <summary><strong>See the rice in motion</strong></summary>
@@ -88,11 +90,11 @@ so already-running applications reload the XCursor.
 # Note: versioned `go install ...@vX.Y.Z` does not work for v2+ releases
 # because the module intentionally has no `/v2` suffix; use the binary.
 arch="$(uname -m)"; case "$arch" in x86_64) arch=amd64;; aarch64|arm64) arch=arm64;; esac
-curl -fL "https://github.com/eduardoaugustolb/umbra-noctis/releases/latest/download/rice-linux-$arch" -o ~/.local/bin/rice
+curl -fL "https://github.com/eduardoaugustolb/aroli-desktop/releases/latest/download/rice-linux-$arch" -o ~/.local/bin/rice
 chmod +x ~/.local/bin/rice
 
 # Or install from the current main branch (Go 1.27+, development version)
-go install github.com/eduardoaugustolb/umbra-noctis/cmd/rice@main
+go install github.com/eduardoaugustolb/aroli-desktop/cmd/rice@main
 
 # Opens a guided terminal interface for first-time users
 rice
@@ -119,14 +121,14 @@ Requires **Hyprland 0.56+**. This rice uses `hyprland.lua`, not
 | `rice snapshot create before-tweaks` | Saves the supported visual configuration paths locally. |
 | `rice snapshot restore before-tweaks` | Restores a configuration snapshot while retaining the current files as backups. |
 | `rice wallpaper list` | Lists bundled and imported wallpapers. |
-| `rice wallpaper set umbra-ember-coast.png` | Applies a wallpaper and its dynamic Pywal palette. |
+| `rice wallpaper set aroli-ember-coast.png` | Applies a wallpaper and its dynamic Pywal palette. |
 | `rice gaming on` | Temporarily disables expensive compositor effects, preserving their exact previous state. |
 | `rice gaming launch steam` | Runs a game under GameMode when the optional `gamemode` package is installed. |
 | `rice battery set power-saver` | Selects the Power Profiles Daemon energy-saver profile. |
 | `rice battery balanced` | Selects the balanced profile; `performance` is available when supported by the hardware. |
 | `rice session apply laptop` | Applies a coordinated daily-use profile. |
 | `rice recover --snapshot latest` | Recovers stuck modes and can restore the newest local snapshot. |
-| `rice export ~/umbra-preferences` | Exports portable visual preferences without credentials or personal data. |
+| `rice export ~/aroli-preferences` | Exports portable visual preferences without credentials or personal data. |
 | `rice update --dry-run` | Shows the update plan without changing anything. |
 | `rice prune` | Lists files retired by the latest release (nothing is deleted without `--apply`). |
 | `rice plugins list` | Lists optional applications and tools that can be installed later. |
@@ -143,7 +145,7 @@ and notifies you on its own when a release lands on GitHub:
 
 - A daily timer (`rice-update-check.timer`, idle priority, no
   resident process) transfers a few KB and writes
-  `~/.cache/umbra-noctis/update.json`. The bar/notch shows a dot
+  `~/.cache/aroli-desktop/update.json`. The bar/notch shows a dot
   and `Settings > About` shows the version seen.
 - A login notice (`rice-update-notify.service`) reads only that cache file —
   no network, exits in milliseconds — and shows one desktop notification per
@@ -162,7 +164,7 @@ Details and history in [CHANGELOG.md](CHANGELOG.md).
 
 ## Privacy and control
 
-Noctis does not decide your desktop for you.
+Aroli Desktop does not decide your desktop for you.
 
 - Extra apps never come by default: each item in
   `packages/optional-*.txt` requires individual confirmation.
@@ -170,7 +172,7 @@ Noctis does not decide your desktop for you.
   optionals**; named items and documented profiles remain explicit choices.
 - The project adds no telemetry, analytics, or remote services.
 - The installer preserves backups of replaced configurations.
-- Snapshots are stored locally in `~/.local/share/umbra-noctis/snapshots` and
+- Snapshots are stored locally in `~/.local/share/aroli-desktop/snapshots` and
   never include credentials, browser data, or personal documents.
 - The project does not touch `/boot`, the bootloader, or partitions.
 
@@ -180,7 +182,7 @@ collect or expose credentials, tokens, history, or personal profiles.
 
 ## Omarchy-friendly
 
-Umbra Noctis works on top of Omarchy without replacing its foundation. It does
+Aroli Desktop works on top of Omarchy without replacing its foundation. It does
 not edit `/usr/share/omarchy/` and keeps customizations in the appropriate
 user paths. See [OMARCHY.md](OMARCHY.md) for compatibility, limits, and
 safe diagnostics.
@@ -200,7 +202,7 @@ See the step-by-step walkthrough and guarantees in [docs/MIGRATION.md](docs/MIGR
 
 <p align="center">
   <sub>
-    Umbra Noctis · Umbra identity on open platforms<br>
+    Aroli Desktop · the Aroli workspace on open platforms<br>
     Code under <a href="LICENSE">GPL-3.0</a> · details in <a href="docs/IDENTITY.md">Identity</a>
   </sub>
 </p>

@@ -1,11 +1,16 @@
-# Umbra Noctis Identity
+# Aroli Desktop Identity
+
+Aroli Desktop is the desktop product of the Aroli family: the ready-to-use
+workspace (Hyprland + Quickshell + installer) built on Aroli Themes,
+Aroli Pointer, and Aroli Backdrops. It follows the Aroli direction —
+“Tudo encontra seu lugar” — without adding a product logo of its own.
 
 ## Concept
 
-**Threshold** is the crossing between the stable Omarchy base and the
-personal Umbra surface. The system provides the dark surface and shape; the
-wallpaper provides the accent colour. This keeps the workspace recognisably
-Umbra even with a bright or strongly coloured image.
+The desktop holds the structure while the wallpaper sets the mood: the
+system provides the dark surface and shape (Aroli Dark); the wallpaper
+provides the accent colour. This keeps the workspace recognisably
+Aroli even with a bright or strongly coloured image.
 
 ## Visual assets
 
@@ -17,8 +22,10 @@ Umbra even with a bright or strongly coloured image.
 
 ## Name and attribution
 
-- Full name: **Umbra Noctis**.
-- Short form: **Noctis**, when the Umbra context is clear.
+- Full name: **Aroli Desktop**.
+- Short form: **Desktop**, when the Aroli context is clear.
+- Aroli product names in use: Aroli Themes (Dark / Black), Aroli Pointer,
+  Aroli Backdrops. The rice adds no new brand marks.
 - Omarchy and Arch are trademarks of their respective communities; they are
   shown only to identify the active platform.
 - The code remains under [GPL-3.0-only](../LICENSE), with upstream
@@ -26,11 +33,11 @@ Umbra even with a bright or strongly coloured image.
 
 ## Lock screen
 
-A single floating card, Caelestia-placed and Umbra-dressed: the morphing
+A single floating card, Caelestia-placed and Aroli-dressed: the morphing
 badge (lock icon becoming the face/initial) and the PAM states are
 Caelestia's ideas; the stable dark surface, the wallpaper as blurred mood
-only, the accent tab keeping the threshold DNA, and the motion tokens are
-Umbra's. Every element justifies itself:
+only, the accent tab, and the motion tokens are
+Aroli's. Every element justifies itself:
 
 | Element | Why it exists |
 | --- | --- |

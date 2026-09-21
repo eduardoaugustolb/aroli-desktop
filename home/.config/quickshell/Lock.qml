@@ -1,7 +1,7 @@
-// Lock.qml — Umbra lock screen entrypoint (Threshold + central auth).
+// Lock.qml — Aroli lock screen entrypoint (notch band + central auth).
 //
 // Inspired by caelestia's morphing lock (badge -> auth surface, PAM states)
-// painted with Umbra rules: the full-width threshold band stays the surface,
+// painted with Aroli rules: the full-width notch band stays the surface,
 // the wallpaper only supplies mood (blurred + dimmed) and accent, motion and
 // radii come from Appearance, states keep fixed semantic colours.
 //

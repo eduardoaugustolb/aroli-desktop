@@ -32,7 +32,7 @@ import sys
 ANCHORS = (0.0, 1 / 3, 1 / 6, 2 / 3, 5 / 6, 0.5)
 GRAY_SAT = 0.12
 
-# Umbra's stable dark foundation. Wallpaper colour belongs in the accents, not
+# Aroli's stable dark foundation. Wallpaper colour belongs in the accents, not
 # in the surface below every application. These four ANSI slots are the neutral
 # tiers pywal normally derives from the dominant image area.
 UMBRA_SPECIAL = {"background": "#0d0f12", "foreground": "#e7eaf0"}

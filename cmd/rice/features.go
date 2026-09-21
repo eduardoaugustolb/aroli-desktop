@@ -27,7 +27,7 @@ type riceProfile struct {
 }
 
 var riceProfiles = []riceProfile{
-	{"minimal", "Base visual do Umbra, sem aplicativos opcionais.", []string{"base", "config", "cursor", "final"}, nil},
+	{"minimal", "Base visual do Aroli Desktop, sem aplicativos opcionais.", []string{"base", "config", "cursor", "final"}, nil},
 	{"desktop", "Desktop completo: pacotes, gráficos, serviços e configuração.", []string{"base", "packages", "cursor", "config", "graphics", "services", "final"}, nil},
 	{"creator", "Perfil desktop com ferramentas de criação explicitamente listadas.", []string{"base", "packages", "cursor", "config", "graphics", "services", "final"}, []string{"neovim", "yazi", "onefetch", "visual-studio-code-bin"}},
 	{"gaming", "Perfil desktop; drivers e jogos continuam escolhas conscientes.", []string{"base", "packages", "cursor", "config", "graphics", "services", "final"}, nil},
@@ -94,7 +94,7 @@ var snapshotPaths = []string{
 
 func snapshotRoot() (string, error) {
 	h, err := os.UserHomeDir()
-	return filepath.Join(h, ".local", "share", "umbra-noctis", "snapshots"), err
+	return filepath.Join(h, ".local", "share", "aroli-desktop", "snapshots"), err
 }
 func validSnapshotName(name string) bool {
 	return name != "" && filepath.Base(name) == name && name != "." && name != ".."
@@ -511,7 +511,7 @@ func doctor(args []string) error {
 }
 
 func status() error {
-	fmt.Printf("Umbra Noctis CLI %s\n", cliVersion())
+	fmt.Printf("Aroli Desktop CLI %s\n", cliVersion())
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -549,7 +549,7 @@ func status() error {
 		Remote    string `json:"remote"`
 		Available bool   `json:"update_available"`
 	}
-	if data, err := os.ReadFile(filepath.Join(home, ".cache", "umbra-noctis", "update.json")); err == nil && json.Unmarshal(data, &update) == nil && update.Remote != "" {
+	if data, err := os.ReadFile(filepath.Join(home, ".cache", "aroli-desktop", "update.json")); err == nil && json.Unmarshal(data, &update) == nil && update.Remote != "" {
 		state := "em dia"
 		if update.Available {
 			state = "atualização disponível: " + update.Remote

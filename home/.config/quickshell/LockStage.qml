@@ -4,7 +4,7 @@
 // visual test harness embeds it in a plain window. Single source of truth:
 // any pixel difference between test and session is a bug, not a drift.
 //
-// A single floating card, Caelestia-placed and Umbra-dressed: stable dark
+// A single floating card, Caelestia-placed and Aroli-dressed: stable dark
 // surface, wallpaper only as blurred mood behind it, one accent tab keeping
 // the threshold DNA. The card is the whole dialog — nothing floats outside
 // it, so multi-monitor and fractional scales cannot strand content.

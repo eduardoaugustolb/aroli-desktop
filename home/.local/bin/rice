@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rice — version, update and cleanup dispatcher for Umbra Noctis.
+# rice — version, update and cleanup dispatcher for Aroli Desktop.
 #
 #   rice version              print the installed version
 #   rice status               version + update check state + backups
@@ -21,14 +21,14 @@
 set -uo pipefail
 
 VERSION_FILE_CANDIDATES=()
-CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/umbra-noctis"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/aroli-desktop"
 CACHE_FILE="$CACHE_DIR/update.json"
 ETAG_FILE="$CACHE_DIR/latest.etag"
 LOCK_FILE="$CACHE_DIR/rice.lock"
 STATE_FILE="$CACHE_DIR/state.json"
 CHECK_INTERVAL=86400   # 24 h: releases ship a few times per month, not per hour
 NET_TIMEOUT=20
-REPO_SLUG="eduardoaugustolb/umbra-noctis"
+REPO_SLUG="eduardoaugustolb/aroli-desktop"
 
 DRY=0
 ASSUME_YES=0
@@ -67,6 +67,12 @@ ask() {
 # install.sh lays down (~/.config/quickshell -> <repo>/home/.config/quickshell),
 # common clone locations, finally the script's own directory (running in-repo).
 find_repo() {
+    if [ -n "${AROLI_DESKTOP_REPO:-}" ] && [ -d "${AROLI_DESKTOP_REPO:-}/.git" ]; then
+        printf '%s' "$AROLI_DESKTOP_REPO"
+        return 0
+    fi
+    # Compatibility with checkouts from before the Umbra Noctis -> Aroli
+    # Desktop rename.
     if [ -n "${UMBRA_RICE_REPO:-}" ] && [ -d "${UMBRA_RICE_REPO:-}/.git" ]; then
         printf '%s' "$UMBRA_RICE_REPO"
         return 0
@@ -81,7 +87,7 @@ find_repo() {
         esac
     fi
     local cand
-    for cand in "$HOME/umbra-noctis" "$HOME/dotfiles" "$HOME/.dotfiles"; do
+    for cand in "$HOME/aroli-desktop" "$HOME/aroli/desktop" "$HOME/umbra-noctis" "$HOME/dotfiles" "$HOME/.dotfiles"; do
         if [ -d "$cand/.git" ]; then printf '%s' "$cand"; return 0; fi
     done
     local here
@@ -160,7 +166,7 @@ SEEN_FILE="$CACHE_DIR/update-notify.seen"
 notify_update_available() {  # $1 = remote tag
     [ "$(cat "$SEEN_FILE" 2>/dev/null)" = "$1" ] && return 1
     command -v notify-send >/dev/null 2>&1 || return 1
-    if notify-send "Umbra Noctis $1 available" "Run: rice update --dry-run" 2>/dev/null; then
+    if notify-send "Aroli Desktop $1 available" "Run: rice update --dry-run" 2>/dev/null; then
         printf '%s' "$1" > "$SEEN_FILE" 2>/dev/null || true
         return 0
     fi
@@ -304,7 +310,7 @@ stash_live_changes() {  # $1 = ref being moved to, for messages
     # -u covers untracked files that would otherwise block the checkout; -c
     # identity keeps stash working before the user ever sets up git
     # (install.sh only seeds a placeholder identity).
-    if git -C "$REPO" -c user.name="Umbra Noctis" -c user.email="rice@localhost" stash push -u -m "rice auto-stash before $1" >/dev/null 2>&1; then
+    if git -C "$REPO" -c user.name="Aroli Desktop" -c user.email="rice@localhost" stash push -u -m "rice auto-stash before $1" >/dev/null 2>&1; then
         STASHED=1
         say "remaining local changes stashed; they are restored after the checkout"
     else
@@ -316,7 +322,7 @@ stash_live_changes() {  # $1 = ref being moved to, for messages
 restore_live_changes() {  # $1 = ref now checked out, for messages
     [ "$STASHED" = 1 ] || return 0
     STASHED=0
-    if git -C "$REPO" -c user.name="Umbra Noctis" -c user.email="rice@localhost" stash pop >/dev/null 2>&1; then
+    if git -C "$REPO" -c user.name="Aroli Desktop" -c user.email="rice@localhost" stash pop >/dev/null 2>&1; then
         ok "local changes restored"
     else
         warn "now on $1, but some previous changes did not re-apply cleanly."
@@ -360,7 +366,7 @@ bootstrap_update_backend() {  # $1 = remote tag
 }
 
 cmd_update() {
-    [ -n "$REPO" ] || die "could not find the rice checkout (set UMBRA_RICE_REPO)"
+    [ -n "$REPO" ] || die "could not find the rice checkout (set AROLI_DESKTOP_REPO)"
     [ "$CHANNEL" = stable ] || die "only --channel=stable exists; main is never auto-applied"
     command -v git >/dev/null || die "git is missing"
 
@@ -433,7 +439,7 @@ cmd_update() {
 }
 
 cmd_rollback() {
-    [ -n "$REPO" ] || die "could not find the rice checkout (set UMBRA_RICE_REPO)"
+    [ -n "$REPO" ] || die "could not find the rice checkout (set AROLI_DESKTOP_REPO)"
     local prev=""
     [ -f "$STATE_FILE" ] && prev="$(read_cache_field previous_ref 2>/dev/null || true)"
     if command -v jq >/dev/null 2>&1 && [ -f "$STATE_FILE" ]; then
@@ -492,7 +498,7 @@ deployed_path() {
 }
 
 cmd_prune() {
-    [ -n "$REPO" ] || die "could not find the rice checkout (set UMBRA_RICE_REPO)"
+    [ -n "$REPO" ] || die "could not find the rice checkout (set AROLI_DESKTOP_REPO)"
     local old new
     if command -v jq >/dev/null 2>&1 && [ -f "$STATE_FILE" ]; then
         old="$(jq -r '.previous_ref // ""' "$STATE_FILE" 2>/dev/null)"

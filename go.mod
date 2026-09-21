@@ -1,4 +1,4 @@
-module github.com/eduardoaugustolb/umbra-noctis
+module github.com/eduardoaugustolb/aroli-desktop
 
 go 1.27.0
 

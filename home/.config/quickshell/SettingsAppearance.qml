@@ -326,13 +326,13 @@ Flickable {
 
             SettingsControls.Row_ {
                 label: I18n.tr("Palette preset")
-                hint: I18n.tr("Wallpaper keeps the original full pywal palette. Umbra keeps neutral surfaces. Hybrid uses the intensity below. Manual protects the four colours you enter.")
+                hint: I18n.tr("Wallpaper keeps the original full pywal palette. Aroli keeps neutral surfaces. Hybrid uses the intensity below. Manual protects the four colours you enter.")
                 SettingsControls.Choice_ {
-                    options: [I18n.tr("Wallpaper"), "Umbra", I18n.tr("Hybrid"), I18n.tr("Manual")]
-                    current: Config.palettePreset === "wallpaper" ? I18n.tr("Wallpaper") : Config.palettePreset === "umbra" ? "Umbra" : Config.palettePreset === "manual" ? I18n.tr("Manual") : I18n.tr("Hybrid")
+                    options: [I18n.tr("Wallpaper"), "Aroli", I18n.tr("Hybrid"), I18n.tr("Manual")]
+                    current: Config.palettePreset === "wallpaper" ? I18n.tr("Wallpaper") : Config.palettePreset === "umbra" ? "Aroli" : Config.palettePreset === "manual" ? I18n.tr("Manual") : I18n.tr("Hybrid")
                     onPicked: function (v) {
                         Config.rememberPalette();
-                        Config.palettePreset = v === I18n.tr("Wallpaper") ? "wallpaper" : v === "Umbra" ? "umbra" : v === I18n.tr("Manual") ? "manual" : "hybrid";
+                        Config.palettePreset = v === I18n.tr("Wallpaper") ? "wallpaper" : v === "Aroli" ? "umbra" : v === I18n.tr("Manual") ? "manual" : "hybrid";
                         if (Config.palettePreset === "wallpaper") Config.paletteIntensity = 4;
                         if (Config.palettePreset === "umbra" || Config.palettePreset === "manual") Config.paletteIntensity = 0;
                         Config.paletteMode = Config.paletteIntensity === 4 ? "wallpaper" : "umbra";
@@ -343,7 +343,7 @@ Flickable {
 
             SettingsControls.Row_ {
                 label: I18n.tr("Palette intensity")
-                hint: I18n.tr("How strongly the wallpaper tints generated surfaces. 0 keeps neutral Umbra surfaces; 4 restores the full wallpaper-derived pywal behaviour. The middle values blend the two.")
+                hint: I18n.tr("How strongly the wallpaper tints generated surfaces. 0 keeps neutral Aroli surfaces; 4 restores the full wallpaper-derived pywal behaviour. The middle values blend the two.")
                 SettingsControls.Slider_ {
                     value: Config.paletteIntensity; from: 0; to: 4
                     onMoved: function (v) {

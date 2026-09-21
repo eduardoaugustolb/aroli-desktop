@@ -1,6 +1,6 @@
-# Umbra Noctis on Omarchy
+# Aroli Desktop on Omarchy
 
-Umbra Noctis is **Omarchy-friendly**: an Umbra layer for Arch, Hyprland, and
+Aroli Desktop is **Omarchy-friendly**: an Aroli layer for Arch, Hyprland, and
 Quickshell that runs on top of the stack already provided by Omarchy.
 
 ## Compatibility rules
@@ -10,17 +10,17 @@ Quickshell that runs on top of the stack already provided by Omarchy.
 - Keep customizations in `~/.config`, `~/.local/share`, and this clone.
 - Prefer the `omarchy` commands for system operations: `omarchy update`,
   `omarchy pkg`, and `omarchy theme`.
-- Noctis starts its Quickshell shell after `WAYLAND_DISPLAY` is
+- Aroli Desktop starts its Quickshell shell after `WAYLAND_DISPLAY` is
   available. A brief flash of the native bar may appear during login.
 
-## What Noctis changes
+## What Aroli Desktop changes
 
 | Area | Behavior |
 | --- | --- |
-| Shell | Noctis Quickshell notch and panels. |
-| Palette | Pywal extracts wallpaper accents over stable Umbra dark surfaces; Settings › Appearance can restore wallpaper-tinted surfaces. |
+| Shell | Aroli Desktop Quickshell notch and panels. |
+| Palette | Pywal extracts wallpaper accents over stable Aroli Dark surfaces; Settings › Appearance can restore wallpaper-tinted surfaces. |
 | Language | Shell, Hyprlock, and SDDM in pt-BR. |
-| Cursor | Umbra XCursor, without setting `HYPRCURSOR_THEME`. |
+| Cursor | Aroli Pointer (XCursor), without setting `HYPRCURSOR_THEME`. |
 | Keyboard | ABNT2 (`br`) in Hyprland. |
 | Optional packages | Each item requires individual confirmation. |
 | Adaptive modes | Session, Game, Reading, and power profiles use user-level state only. |

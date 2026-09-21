@@ -1,4 +1,4 @@
-# Contributing to Umbra Noctis
+# Contributing to Aroli Desktop
 
 Thanks for helping out. This guide keeps the repo consistent: one language
 for collaboration, one commit style, and a safe workflow for a project that
@@ -135,7 +135,7 @@ Fix stuff                                   # vague, capitalized
 ## 8. Releases
 
 - Bump `VERSION`, add a `CHANGELOG.md` entry, commit, then tag:
-  `git tag -s vX.Y.Z -m "Umbra Noctis vX.Y.Z"` and push the tag.
+  `git tag -s vX.Y.Z -m "Aroli Desktop vX.Y.Z"` and push the tag.
   CI checks that the tag matches `VERSION` and that `rice --help`,
   `diagnose` and the i18n dictionaries still pass.
 - GitHub Releases are cut from the tag with auto-generated notes plus the

@@ -1,4 +1,4 @@
-# Changelog — Umbra Noctis
+# Changelog — Aroli Desktop
 
 All notable changes to this rice are documented here, newest first.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -9,6 +9,39 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
 - `MINOR`: new feature that stays compatible (new panel, script, package,
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
+
+## [3.0.0] - 2026-09-21
+
+### Changed
+
+- Product rebrand: Umbra Noctis is now **Aroli Desktop**
+  (`github.com/eduardoaugustolb/aroli-desktop`), the desktop product of the
+  Aroli family. The `rice` binary name is unchanged. `install.sh config`
+  migrates `~/.local/share/umbra-noctis`, `~/.local/state/umbra-noctis` and
+  `~/.cache/umbra-noctis` to their `aroli-desktop` counterparts (nothing is
+  copied when the new location already exists), and `rice export`/`import`
+  reads the legacy `umbra-preferences.json` when `aroli-preferences.json`
+  is absent. `AROLI_DESKTOP_REPO` replaces `UMBRA_RICE_REPO` (still honored
+  as a fallback).
+
+Historical entries below keep the Umbra Noctis name as published.
+
+- Follow the upstream `umbra` → `aroli` rename
+  (`github.com/eduardoaugustolb/aroli`): the `cursor` phase clones the new
+  repo, builds `themes/cursor/aroli` and installs `~/.local/share/icons/Aroli`
+  (`Aroli Pointer`). Configs (`hyprland.lua`, `hyprland.conf`, GTK 2/3/4)
+  point at `Aroli`; the legacy `~/.local/share/icons/Umbra` is moved to
+  `Umbra.bak` after a successful install.
+- Bundled wallpapers renamed to Aroli Backdrops following upstream:
+  `aroli-ember-coast.png`, `aroli-obsidian-dunes.png`,
+  `aroli-silent-threshold.png`, `aroli-black-mountains.png`
+  (was `umbra-ink-mountains.png`). `install.sh config` renames the live
+  copies in `~/Pictures/wallpapers` and fixes the `~/.cache/wal/wal` pointer
+  instead of duplicating files.
+- `home/.local/bin/aroli-cursor-size` is the canonical cursor-size tool;
+  `umbra-cursor-size` remains as a deprecated shim. `build-umbra-hyprcursor.sh`
+  is now `build-aroli-hyprcursor.sh` (with fallback to the old `Umbra` source
+  dir when present).
 
 ## [2.3.2] - 2026-09-21
 

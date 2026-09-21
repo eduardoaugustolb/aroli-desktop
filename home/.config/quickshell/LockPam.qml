@@ -1,4 +1,4 @@
-// LockPam.qml — PAM conversation for the Umbra lock screen.
+// LockPam.qml — PAM conversation for the Aroli lock screen.
 //
 // One shared instance lives in Lock.qml and is used by every LockSurface, but
 // only the primary screen drives it (see LockSurface.primary). The flow is the

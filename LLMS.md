@@ -1,7 +1,7 @@
-# Operating guide for AI agents — Umbra Noctis
+# Operating guide for AI agents — Aroli Desktop
 
-This document defines how agents should install, audit, and fix Umbra
-Noctis without taking control away from the user. Safety and privacy take
+This document defines how agents should install, audit, and fix
+Aroli Desktop without taking control away from the user. Safety and privacy take
 precedence over convenience.
 
 ## Non-negotiable principles
@@ -94,7 +94,7 @@ replaces user configurations, although it creates a backup.
   `rice-update-check.timer` (enabled by the installer) transfers a few
   KB (`git ls-remote --tags` or a conditional GET against the GitHub
   releases API, with ETag) once a day and only writes
-  `~/.cache/umbra-noctis/update.json`. A login notice
+  `~/.cache/aroli-desktop/update.json`. A login notice
   (`rice-update-notify.service`, also enabled by the installer) only reads
   that cache file — no network, oneshot, exits in milliseconds — and shows
   at most one desktop notification per release. No telemetry, no identifiers,
@@ -110,8 +110,8 @@ replaces user configurations, although it creates a backup.
 
 ## Contributions
 
-Preserve [LICENSE](LICENSE), the upstream attribution, and the Umbra
-Noctis identity. Every new package must be classified as essential or
+Preserve [LICENSE](LICENSE), the upstream attribution, and the
+Aroli Desktop identity. Every new package must be classified as essential or
 optional; when in doubt, treat it as optional.
 
 ## Recommended CLI-first workflow
@@ -119,7 +119,7 @@ optional; when in doubt, treat it as optional.
 `rice` is the supported interface for people and agents. Do not invoke
 `install.sh` directly unless debugging the installer implementation or the CLI
 is unavailable. The CLI can bootstrap the checkout in
-`~/.local/share/umbra-noctis`, keeps its binary in `~/.local/bin/rice`, and
+`~/.local/share/aroli-desktop`, keeps its binary in `~/.local/bin/rice`, and
 presents the same safe installer phases.
 
 ```sh
@@ -191,7 +191,7 @@ from the AUR before executing it, even when `rice` has already classified it.
 | AUR/yay failure | `rice logs`, `command -v omarchy-pkg-aur-add`, `command -v yay` | Complete only the missing AUR/helper prerequisite, then resume | Replace an AUR package with a different package without consent. |
 | Sudo or Omarchy package hook rejected work | Exact command output, `omarchy-version` when available | Explain the required authorization or use the Omarchy package command | Work around Omarchy hooks or write beneath `/usr/share/omarchy/`. |
 | Configuration, SDDM, Hyprland, or Quickshell fails after install | `rice diagnose`, `hyprctl configerrors`, `systemctl --user status quickshell` | Fix the smallest identified cause and re-run its named phase | Run `restore`, remove symlinks, or reboot automatically. |
-| Interrupted install | `rice logs`, `~/.local/state/umbra-noctis/install.checkpoint` | `rice install --resume` after cause is fixed | Delete the checkpoint; it is the recovery record. |
+| Interrupted install | `rice logs`, `~/.local/state/aroli-desktop/install.checkpoint` | `rice install --resume` after cause is fixed | Delete the checkpoint; it is the recovery record. |
 | CLI update verification fails | `rice cli update --dry-run`, release/checksum error | Keep the current binary and report the integrity failure | Install an unchecked binary or disable SHA-256 validation. |
 
 `rice update` updates the rice checkout and reapplies it. `rice cli update`

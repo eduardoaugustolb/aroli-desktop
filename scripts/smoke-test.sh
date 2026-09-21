@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Read-only release gate for Umbra Noctis. It never installs packages, starts
+# Read-only release gate for Aroli Desktop. It never installs packages, starts
 # services, or needs a graphical session.
 set -euo pipefail
 
@@ -13,4 +13,4 @@ bash -n home/.local/bin/game-mode home/.local/bin/battery-efficiency \
     home/.config/hypr/scripts/reading-mode.sh
 python3 home/.config/quickshell/tools/i18n-check.py
 git diff --check
-printf 'Umbra Noctis smoke test passed.\n'
+printf 'Aroli Desktop smoke test passed.\n'

@@ -162,7 +162,7 @@ func TestExportPreferencesCopiesOnlyPortableSettings(t *testing.T) {
 	if err := exportPreferences([]string{destination}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(destination, "umbra-preferences.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(destination, "aroli-preferences.json")); err != nil {
 		t.Fatalf("manifest not exported: %v", err)
 	}
 	if data, err := os.ReadFile(filepath.Join(destination, ".config", "hypr", "language.conf")); err != nil || string(data) != "pt-BR" {

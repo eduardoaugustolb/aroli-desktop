@@ -68,13 +68,13 @@ WlSessionLockSurface {
         id: releaseTimer
         interval: 220
         onTriggered: {
-            console.log("[umbra-lock] releasing lock");
+            console.log("[aroli-lock] releasing lock");
             root.lock.locked = false;
         }
     }
 
     function dumpState(tag) {
-        console.log("[umbra-lock]", tag,
+        console.log("[aroli-lock]", tag,
             "screen=" + (screen ? screen.name : "null"),
             "size=" + width + "x" + height,
             "primary=" + root.primary,

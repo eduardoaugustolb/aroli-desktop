@@ -1,4 +1,4 @@
-// rice is the supported command-line interface for Umbra Noctis.
+// rice is the supported command-line interface for Aroli Desktop.
 //
 // The installer itself deliberately remains a compatibility backend for now:
 // it contains years of idempotency and backup rules. This program owns the
@@ -28,8 +28,8 @@ import (
 )
 
 const (
-	project       = "Umbra Noctis"
-	repositoryURL = "https://github.com/eduardoaugustolb/umbra-noctis.git"
+	project       = "Aroli Desktop"
+	repositoryURL = "https://github.com/eduardoaugustolb/aroli-desktop.git"
 	defaultLang   = "pt-BR"
 )
 
@@ -209,6 +209,13 @@ func ensureRepositoryWithCleanup(explicit string, dryRun bool) (string, func(), 
 		path, err := validRepo(explicit)
 		return path, noCleanup, err
 	}
+	if env := os.Getenv("AROLI_DESKTOP_REPO"); env != "" {
+		if path, err := validRepo(env); err == nil {
+			return path, noCleanup, nil
+		}
+	}
+	// Compatibility with checkouts from before the Umbra Noctis -> Aroli
+	// Desktop rename.
 	if env := os.Getenv("UMBRA_RICE_REPO"); env != "" {
 		if path, err := validRepo(env); err == nil {
 			return path, noCleanup, nil
@@ -223,7 +230,7 @@ func ensureRepositoryWithCleanup(explicit string, dryRun bool) (string, func(), 
 	if err != nil {
 		return "", noCleanup, err
 	}
-	target := filepath.Join(home, ".local", "share", "umbra-noctis")
+	target := filepath.Join(home, ".local", "share", "aroli-desktop")
 	if path, err := validRepo(target); err == nil {
 		return path, noCleanup, nil
 	}
@@ -273,7 +280,7 @@ func validRepo(path string) (string, error) {
 		return "", err
 	}
 	if info, err := os.Stat(filepath.Join(path, "install.sh")); err != nil || info.IsDir() {
-		return "", fmt.Errorf("%s não parece ser um checkout do Umbra Noctis", path)
+		return "", fmt.Errorf("%s não parece ser um checkout do Aroli Desktop", path)
 	}
 	return path, nil
 }
@@ -375,7 +382,7 @@ func showLogs(args []string) error {
 	if err != nil {
 		return err
 	}
-	directory := filepath.Join(home, ".local", "state", "umbra-noctis")
+	directory := filepath.Join(home, ".local", "state", "aroli-desktop")
 	files, err := filepath.Glob(filepath.Join(directory, "install-*.log"))
 	if err != nil {
 		return err
@@ -403,7 +410,7 @@ func showLogs(args []string) error {
 	return nil
 }
 
-const githubAPIRelease = "https://api.github.com/repos/eduardoaugustolb/umbra-noctis/releases/latest"
+const githubAPIRelease = "https://api.github.com/repos/eduardoaugustolb/aroli-desktop/releases/latest"
 
 type githubRelease struct {
 	TagName string `json:"tag_name"`
@@ -431,7 +438,7 @@ func updateCLI(args []string) error {
 	if err != nil {
 		return err
 	}
-	base := "https://github.com/eduardoaugustolb/umbra-noctis/releases/download/" + release.TagName + "/"
+	base := "https://github.com/eduardoaugustolb/aroli-desktop/releases/download/" + release.TagName + "/"
 	fmt.Printf("CLI atual: %s\nDisponível: %s\n", cliVersion(), strings.TrimPrefix(release.TagName, "v"))
 	if *dryRun {
 		fmt.Printf("seria baixado e verificado: %s%s\n", base, asset)
@@ -575,7 +582,7 @@ func plugins(args []string) error {
 			return err
 		}
 		fmt.Println("\nAplicativos e ferramentas opcionais")
-		fmt.Println("Nada abaixo é necessário para o Umbra funcionar. Instale só o que fizer sentido para você.")
+		fmt.Println("Nada abaixo é necessário para o Aroli Desktop funcionar. Instale só o que fizer sentido para você.")
 		for _, item := range items {
 			fmt.Printf("  %-30s %-7s %s\n", item.name, item.source, item.description)
 		}
@@ -1035,7 +1042,7 @@ func (m tuiModel) View() tea.View {
 		body = tuiTitle.Render("\n  "+m.message+"\n\n") + tuiMuted.Render("  Enter/r: voltar   q: sair")
 	}
 	var view tea.View
-	view.SetContent(tuiPanel.Render(tuiTitle.Render("Umbra Noctis") + "\n" + tuiMuted.Render("rice · assistente") + "\n" + tuiAccent.Render(m.breadcrumb()) + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
+	view.SetContent(tuiPanel.Render(tuiTitle.Render("Aroli Desktop") + "\n" + tuiMuted.Render("rice · assistente") + "\n" + tuiAccent.Render(m.breadcrumb()) + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
 	view.AltScreen = true
 	return view
 }

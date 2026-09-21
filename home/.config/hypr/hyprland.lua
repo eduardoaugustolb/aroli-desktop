@@ -86,7 +86,7 @@ end)
 ---- ENVIRONMENT VARIABLES ----
 -------------------------------
 
-hl.env("XCURSOR_THEME", "Umbra")
+hl.env("XCURSOR_THEME", "Aroli")
 hl.env("XCURSOR_SIZE",  "32")
 
 
@@ -391,7 +391,7 @@ hl.config({
     master  = { new_status = "master" },
 })
 
--- Cursor: hyprcursor OFF on purpose. Umbra is an XCursor theme, not a
+-- Cursor: hyprcursor OFF on purpose. Aroli Pointer is an XCursor theme, not a
 -- hyprcursor theme.
 -- SVG theme (when available, for shake-to-find
 -- sharpness) made Hyprland also use it for the NORMAL cursor and Eduardo
@@ -423,7 +423,7 @@ pcall(function()
                 mode = "none",
                 shake = { threshold = 5.0, base = 1.5, speed = 1.1, influence = 0.8, limit = 2.4, timeout = 700 },
                 -- High-resolution source extracted directly from the installed
-                -- Umbra XCursor theme. It retains its original bitmaps,
+                -- Aroli Pointer XCursor theme. It retains its original bitmaps,
                 -- hotspots, and per-size variants, so zoom matches rest.
                 hyprcursor = { enabled = true, nearest = 0, resolution = 256 },
             },

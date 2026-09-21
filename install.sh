@@ -4,8 +4,8 @@
 #
 # All the new machine needs is Arch and git:
 #
-#     git clone https://github.com/eduardoaugustolb/umbra-noctis.git
-#     cd umbra-noctis
+#     git clone https://github.com/eduardoaugustolb/aroli-desktop.git
+#     cd aroli-desktop
 #     ./install.sh
 #
 # It can be re-run as many times as you like: it does not redo what is already
@@ -69,7 +69,7 @@ run() {
 
 # A failed package download should not make a long installation start at zero.
 # Checkpoints are opt-in: a normal rerun still reapplies every idempotent phase.
-STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/umbra-noctis"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/aroli-desktop"
 RUN_LOG=""
 CHECKPOINT_FILE=""
 RESUME=0
@@ -174,7 +174,7 @@ Phases (if you name none, all of them run in this order):
   aur         builds yay if it is missing
   packages    installs pacman.txt + extra.txt + aur.txt
   repos       clones oh-my-zsh, powerlevel10k and the zsh plugins
-  cursor      builds and installs the latest Umbra XCursor theme
+  cursor      builds and installs the latest Aroli Pointer XCursor theme
   config      puts home/ into your $HOME (symlinks or copies, with backup)
   system      copies system/etc into /etc  (asks for sudo)
   graphics    detects the graphics card(s) and installs their drivers
@@ -531,7 +531,7 @@ apply_language() {
 # ----------------------------------------------------------------- phase: base
 
 phase_base() {
-    heading "Preflight checks (Umbra Noctis $(cat "$REPO/VERSION" 2>/dev/null || echo "unversioned"))"
+    heading "Preflight checks (Aroli Desktop $(cat "$REPO/VERSION" 2>/dev/null || echo "unversioned"))"
 
     [ "$(id -u)" -ne 0 ] || die "do not run this as root. Run it as your user; it will ask for sudo when it needs to."
     ok "regular user ($USER)"
@@ -622,7 +622,7 @@ prepare_package_downloads() {
         if grep -qE '^[[:space:]]*#?[[:space:]]*ParallelDownloads[[:space:]]*=' /etc/pacman.conf; then
             sudo sed -i "s/^[[:space:]]*#\?[[:space:]]*ParallelDownloads[[:space:]]*=.*/ParallelDownloads = $jobs/" /etc/pacman.conf
         else
-            printf '\n# Umbra: parallel downloads for the initial package transaction\nParallelDownloads = %s\n' "$jobs" | sudo tee -a /etc/pacman.conf >/dev/null
+            printf '\n# Aroli Desktop: parallel downloads for the initial package transaction\nParallelDownloads = %s\n' "$jobs" | sudo tee -a /etc/pacman.conf >/dev/null
         fi
         ok "pacman downloads: $jobs in parallel"
     else
@@ -827,33 +827,39 @@ phase_repos() {
 # ----------------------------------------------------------------- phase: cursor
 
 phase_cursor() {
-    heading "Umbra Cursor"
+    heading "Aroli Pointer"
 
-    local tmp="${TMPDIR:-/tmp}/umbra-cursor"
-    local url="https://github.com/eduardoaugustolb/umbra.git"
-    local source="$tmp/themes/cursor/umbra"
-    local target="$HOME/.local/share/icons/Umbra"
+    local tmp="${TMPDIR:-/tmp}/aroli-pointer"
+    local url="https://github.com/eduardoaugustolb/aroli.git"
+    local source="$tmp/themes/cursor/aroli"
+    local legacy_source="$tmp/themes/cursor/umbra"
+    local target="$HOME/.local/share/icons/Aroli"
+    local legacy_target="$HOME/.local/share/icons/Umbra"
 
     if [ "$DRY" = 1 ]; then
-        skip "would clone the latest Umbra Cursor from $url"
+        skip "would clone the latest Aroli Pointer from $url"
         skip "would build and install $target"
         return 0
     fi
 
     run rm -rf "$tmp"
     run git clone --depth 1 "$url" "$tmp" || {
-        warn "could not fetch the Umbra Cursor repository"
+        warn "could not fetch the Aroli Pointer repository"
         return 0
     }
-    [ -d "$source" ] || { warn "Umbra Cursor source was not found in the repository"; return 0; }
-    command -v make >/dev/null 2>&1 || { warn "make is required to build Umbra Cursor"; return 0; }
+    # Compatibility: older checkouts of the repo still carry themes/cursor/umbra.
+    if [ ! -d "$source" ] && [ -d "$legacy_source" ]; then
+        source="$legacy_source"
+    fi
+    [ -d "$source" ] || { warn "Aroli Pointer source was not found in the repository"; return 0; }
+    command -v make >/dev/null 2>&1 || { warn "make is required to build Aroli Pointer"; return 0; }
 
     (cd "$source" && make build) || {
-        warn "Umbra Cursor build failed; keeping the current cursor"
+        warn "Aroli Pointer build failed; keeping the current cursor"
         return 0
     }
     [ -f "$source/index.theme" ] && [ -d "$source/cursors" ] || {
-        warn "Umbra Cursor build did not produce index.theme and cursors/"
+        warn "Aroli Pointer build did not produce index.theme and cursors/"
         return 0
     }
     # Anti-regression guard: the `text` I-beam must carry its Bone core
@@ -882,7 +888,7 @@ for _, w, h, px in frames:
             light += 1
 sys.exit(0 if light >= 20 else 1)
 EOF
-            warn "Umbra Cursor build produced an all-dark text cursor; keeping the current cursor"
+            warn "Aroli Pointer build produced an all-dark text cursor; keeping the current cursor"
             return 0
         }
     else
@@ -899,25 +905,41 @@ EOF
             [ -e "$target/cursors/$alias" ] || run ln -sf text "$target/cursors/$alias"
         done
     else
-        warn "Umbra Cursor has no text cursor; text fields will fall back to Adwaita"
+        warn "Aroli Pointer has no text cursor; text fields will fall back to Adwaita"
     fi
-    # Pin the X11/XWayland fallback (Qt, SDL, Electron, root window) to Umbra.
+    # Pin the X11/XWayland fallback (Qt, SDL, Electron, root window) to Aroli.
     run mkdir -p "$HOME/.icons/default"
     run tee "$HOME/.icons/default/index.theme" > /dev/null <<'EOF'
 [Icon Theme]
 Name=Default
-Comment=Default cursor theme (points at Umbra)
-Inherits=Umbra
+Comment=Default cursor theme (points at Aroli)
+Inherits=Aroli
 EOF
     # Apply live when possible; a relog still covers already-running apps.
     if command -v hyprctl >/dev/null 2>&1 && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
-        run hyprctl setcursor Umbra 32 > /dev/null || true
+        run hyprctl setcursor Aroli 32 > /dev/null || true
     fi
     if command -v gsettings >/dev/null 2>&1; then
-        run gsettings set org.gnome.desktop.interface cursor-theme 'Umbra' || true
+        run gsettings set org.gnome.desktop.interface cursor-theme 'Aroli' || true
         run gsettings set org.gnome.desktop.interface cursor-size 32 || true
     fi
-    ok "Umbra Cursor installed from the latest main revision"
+    # Retire the legacy Umbra install once Aroli is live: keep a backup, never
+    # delete user data outright.
+    if [ -d "$legacy_target" ] && [ "$legacy_target" != "$target" ]; then
+        if [ -e "${legacy_target}.bak" ]; then
+            skip "legacy Umbra cursor kept at ${legacy_target}.bak"
+        else
+            run mv -- "$legacy_target" "${legacy_target}.bak" \
+                && ok "legacy Umbra cursor moved to Umbra.bak" || true
+        fi
+    fi
+    # Migrate a live session still pointing at the old theme name.
+    if command -v gsettings >/dev/null 2>&1; then
+        if [ "$(gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null)" = "'Umbra'" ]; then
+            run gsettings set org.gnome.desktop.interface cursor-theme 'Aroli' || true
+        fi
+    fi
+    ok "Aroli Pointer installed from the latest main revision"
 }
 
 # Personal shell overrides: ~/.zshrc.local, ~/.bashrc.local and friends.
@@ -1142,6 +1164,55 @@ EOF
                 && ok "$(basename "$user_dest") seeded from the template (yours; updates never touch it)"
         else
             skip "$(basename "$user_dest") already yours (kept)"
+        fi
+    done
+
+    # 7d) Umbra -> Aroli product rename. Bundled wallpapers were renamed
+    #     upstream (umbra-ember-coast -> aroli-ember-coast, umbra-obsidian-dunes
+    #     -> aroli-obsidian-dunes, umbra-silent-threshold ->
+    #     aroli-silent-threshold, umbra-ink-mountains -> aroli-black-mountains).
+    #     copy_tree above uses no-clobber, so rename the live copies instead of
+    #     duplicating 4K images. Same for a stale ~/.cache/wal/wal pointer.
+    local old_wp new_wp wal_file pair
+    for pair in "umbra-ember-coast.png:aroli-ember-coast.png" \
+                "umbra-obsidian-dunes.png:aroli-obsidian-dunes.png" \
+                "umbra-silent-threshold.png:aroli-silent-threshold.png" \
+                "umbra-ink-mountains.png:aroli-black-mountains.png"; do
+        old_wp="$HOME/Pictures/wallpapers/${pair%%:*}"
+        new_wp="$HOME/Pictures/wallpapers/${pair##*:}"
+        if [ -f "$old_wp" ] && [ ! -f "$new_wp" ]; then
+            run mv -- "$old_wp" "$new_wp" \
+                && ok "$(basename "$old_wp") renamed to $(basename "$new_wp") (Aroli Backdrops)"
+        fi
+    done
+    wal_file="$HOME/.cache/wal/wal"
+    if [ -f "$wal_file" ] && grep -q "Pictures/wallpapers/umbra-" "$wal_file" 2>/dev/null; then
+        if [ "$DRY" = 1 ]; then
+            skip "would point ~/.cache/wal/wal at the renamed Aroli wallpaper"
+        else
+            sed -i 's#Pictures/wallpapers/umbra-ember-coast#Pictures/wallpapers/aroli-ember-coast#; s#Pictures/wallpapers/umbra-obsidian-dunes#Pictures/wallpapers/aroli-obsidian-dunes#; s#Pictures/wallpapers/umbra-silent-threshold#Pictures/wallpapers/aroli-silent-threshold#; s#Pictures/wallpapers/umbra-ink-mountains#Pictures/wallpapers/aroli-black-mountains#' "$wal_file" \
+                && ok "pywal last-wallpaper pointer migrated to Aroli Backdrops"
+        fi
+    fi
+
+    # 7e) Umbra Noctis -> Aroli Desktop rename. Runtime dirs moved from
+    #     umbra-noctis to aroli-desktop; move the live dirs instead of
+    #     stranding snapshots, checkpoints, and the update cache. Never
+    #     merge: when the new location already exists it wins.
+    local legacy_dir new_dir
+    for pair in ".local/share/umbra-noctis:.local/share/aroli-desktop" \
+                ".local/state/umbra-noctis:.local/state/aroli-desktop" \
+                ".cache/umbra-noctis:.cache/aroli-desktop"; do
+        legacy_dir="$HOME/${pair%%:*}"
+        new_dir="$HOME/${pair##*:}"
+        if [ -e "$legacy_dir" ] && [ ! -e "$new_dir" ]; then
+            if [ "$DRY" = 1 ]; then
+                skip "would move ~/${pair%%:*} to ~/${pair##*:} (Aroli Desktop rename)"
+            else
+                run mkdir -p "$(dirname "$new_dir")" \
+                    && run mv -- "$legacy_dir" "$new_dir" \
+                    && ok "~/${pair%%:*} moved to ~/${pair##*:}"
+            fi
         fi
     done
 

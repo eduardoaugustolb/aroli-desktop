@@ -38,7 +38,7 @@ func userScript(name string) (string, error) {
 }
 func modeCoordinationPath() (string, error) {
 	home, err := os.UserHomeDir()
-	return filepath.Join(home, ".local", "state", "umbra-noctis", "mode-coordination.json"), err
+	return filepath.Join(home, ".local", "state", "aroli-desktop", "mode-coordination.json"), err
 }
 
 func readModeCoordination() (modeCoordination, error) {
@@ -303,8 +303,8 @@ func exportPreferences(args []string) error {
 	if err := os.MkdirAll(dest, 0o755); err != nil {
 		return err
 	}
-	if _, err := os.Stat(filepath.Join(dest, "umbra-preferences.json")); err == nil {
-		return errors.New("o diretório já contém um export do Umbra; escolha outro destino")
+	if _, err := os.Stat(filepath.Join(dest, "aroli-preferences.json")); err == nil {
+		return errors.New("o diretório já contém um export do Aroli Desktop; escolha outro destino")
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -336,7 +336,7 @@ func exportPreferences(args []string) error {
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(filepath.Join(dest, "umbra-preferences.json"), data, 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(dest, "aroli-preferences.json"), data, 0o600); err != nil {
 		return err
 	}
 	fmt.Printf("Preferências exportadas para %s\n", dest)
@@ -351,7 +351,12 @@ func importPreferences(args []string) error {
 	if err != nil {
 		return err
 	}
-	data, err := os.ReadFile(filepath.Join(source, "umbra-preferences.json"))
+	data, err := os.ReadFile(filepath.Join(source, "aroli-preferences.json"))
+	if err != nil {
+		// Compatibility with exports from before the Umbra Noctis ->
+		// Aroli Desktop rename.
+		data, err = os.ReadFile(filepath.Join(source, "umbra-preferences.json"))
+	}
 	if err != nil {
 		return err
 	}

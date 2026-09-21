@@ -1,7 +1,7 @@
 // LockCenter.qml — the authentication column inside the floating card.
 //
 // Caelestia's idea (a morphing badge that becomes the auth surface) painted
-// with Umbra rules. Every element justifies itself:
+// with Aroli rules. Every element justifies itself:
 //
 //   avatar   WHO is locked out. Lock icon morphs into face/initial so the
 //            screen answers "whose password?" before asking for it. Click
