@@ -631,8 +631,13 @@ prepare_package_downloads() {
 
     # Reflector is optional on a minimal Arch install. If it exists, refresh
     # mirrors once before the large transaction; its timer maintains them later.
+    # At most weekly: mirror lists barely change, and re-rating on every run
+    # only burns minutes on timing-out mirrors. (Touch
+    # /etc/pacman.d/mirrorlist to force a refresh on the next run.)
     if command -v reflector >/dev/null 2>&1 && [ "$DRY" = 0 ]; then
-        if ask "refresh the 20 fastest mirrors before downloading packages?"; then
+        if [ -n "$(find /etc/pacman.d/mirrorlist -mtime -7 2>/dev/null)" ]; then
+            skip "mirrorlist refreshed within the last week; keeping it"
+        elif ask "refresh the 20 fastest mirrors before downloading packages?"; then
             run sudo reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist \
                 && ok "fast mirrors selected" || warn "mirror refresh failed; keeping the current list"
         fi
@@ -1073,6 +1078,9 @@ EOF
     for f in "$root"/.local/bin/*; do
         [ -e "$f" ] || continue
         local base; base="$(basename "$f")"
+        # Bytecode caches regenerate on their own; copying them would leave
+        # stale .pyc files beside the scripts that own them.
+        case "$base" in __pycache__) continue ;; esac
         # `rice` is the compiled Go CLI. It installs and updates itself before
         # this phase runs; copying the historical shell dispatcher here would
         # replace it and make the user lose the interactive interface.
@@ -1139,7 +1147,8 @@ EOF
     fi
     local pokestate="$root/.config/poke-theme/state"
     if [ ! -f "$pokestate" ]; then
-        run sh -c "printf 'on\n' > '$pokestate'" && ok "poke-theme state seeded"
+        run mkdir -p "$(dirname "$pokestate")" \
+            && run sh -c "printf 'on\n' > '$pokestate'" && ok "poke-theme state seeded"
     fi
 
     # 7b) the en-US rename: efectos.lua is now effects.lua. The writer
@@ -1840,6 +1849,23 @@ phase_spicetify() {
         ok "theme re-applied to Spotify"
     else
         warn "spicetify could not apply; try it by hand with 'spicetify backup apply'"
+    fi
+
+    # The live recolor (spicetify-push-colors.py) only reaches an open Spotify
+    # when it was launched with --remote-debugging-port. Menu launches get the
+    # flag from the ~/.local/share/applications/spotify.desktop override the
+    # repo ships (laid down by the `config` phase); keybind/terminal launches
+    # get it from launch-spotify.sh. Without the override every wallpaper
+    # change fails its push silently and Spotify looks stuck on a stale scheme,
+    # which is exactly what happened once, so check instead of assuming.
+    if [ -f "$HOME/.local/share/applications/spotify.desktop" ]; then
+        if grep -q "remote-debugging-port" "$HOME/.local/share/applications/spotify.desktop" 2>/dev/null; then
+            ok "menu launches carry --remote-debugging-port (live recolor works)"
+        else
+            warn "spotify.desktop override lacks --remote-debugging-port; re-run the config phase"
+        fi
+    else
+        warn "no ~/.local/share/applications/spotify.desktop override; re-run the config phase"
     fi
 }
 

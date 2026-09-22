@@ -10,6 +10,35 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [3.1.0] - 2026-09-21
+
+### Added
+
+- Spotify follows the wallpaper again, end to end. Menu launches get
+  `--remote-debugging-port` from the new
+  `home/.local/share/applications/spotify.desktop` override (shipped like
+  `vlc.desktop`, laid down by the `config` phase), and `launch-spotify.sh`
+  carries the same flags for keybind/terminal launches. Without the port,
+  every wallpaper change failed its live push silently and Spotify looked
+  stuck on a stale scheme.
+- `spicetify-pywal.sh` no longer swallows failures: a stale backup
+  (`refresh` exiting 0 while compiling nothing) log to
+  `~/.cache/spicetify-pywal.log` and raises a critical notification, and a
+  failed live push is logged and notified before the restart fallback.
+  `phase_spicetify` also verifies the desktop override carries the port.
+- Notch artwork is a true circle in both modes (compact 22px, expanded
+  34px). `clip: true` crops to a rectangle even with radius, so both
+  artworks now use a real `MultiEffect` mask, the same pattern as
+  `MediaPanel`. The compact media row also keeps the battery row's 15px
+  right inset, so the edge stops jumping when music starts.
+
+### Fixed
+
+- `install.sh` re-rates pacman mirrors at most weekly instead of on every
+  run (re-rating only burned minutes on timing-out mirrors).
+- `install.sh config` seeds `poke-theme/state` creating its directory
+  first, and no longer copies `__pycache__` into `~/.local/bin`.
+
 ## [3.0.0] - 2026-09-21
 
 ### Changed

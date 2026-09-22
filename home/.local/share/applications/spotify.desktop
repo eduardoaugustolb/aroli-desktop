@@ -1,0 +1,27 @@
+# Copy of /usr/share/applications/spotify.desktop with the Exec line carrying
+# the DevTools flags. It lives here because ~/.local/share wins over
+# /usr/share in XDG, so this is the entry the launcher and autostart use.
+#
+# WHY THE FLAGS. spicetify-pywal.sh recolors an already-open Spotify live by
+# pushing --spice-* variables through the DevTools WebSocket (port 9333).
+# Without --remote-debugging-port the push fails on every wallpaper change and
+# the window keeps whatever colors it had: this shipped once and left Spotify
+# stuck on a stale scheme while the on-disk palette kept updating.
+# launch-spotify.sh carries the same flags for terminal/keybind launches;
+# this file covers menu launches.
+#
+# The price of copying is staleness: if the spotify package adds MimeTypes or
+# actions to its entry, they do not arrive here. Refresh by re-copying the
+# system file and re-applying the flags (the Exec line is the only thing this
+# entry changes).
+[Desktop Entry]
+Type=Application
+Name=Spotify
+GenericName=Music Player
+Icon=spotify-client
+TryExec=spotify
+Exec=spotify --remote-debugging-port=9333 --remote-allow-origins=http://127.0.0.1:9333 --uri=%u
+Terminal=false
+MimeType=x-scheme-handler/spotify;
+Categories=Audio;Music;Player;AudioVideo;
+StartupWMClass=spotify

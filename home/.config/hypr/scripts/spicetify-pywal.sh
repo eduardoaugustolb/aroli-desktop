@@ -31,21 +31,34 @@ SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GEN="$SCRIPTS/spicetify-colors.py"
 PUSH="$SCRIPTS/spicetify-push-colors.py"
 THEME_DIR="$HOME/.config/spicetify/Themes/termspot"
+LOG="$HOME/.cache/spicetify-pywal.log"
 [ -r "$HOME/.cache/wal/colors.json" ] || exit 0
 mkdir -p "$THEME_DIR"
+
+log() { printf '%s %s\n' "$(date '+%F %T')" "$*" >>"$LOG" 2>/dev/null || true; }
 
 # Regenerate color.ini (vivid accent) from the current pywal palette and compile
 # it to disk. Refresh does not affect the open window, but stores the correct
 # color for the next launch.
 python3 "$GEN" "$THEME_DIR/color.ini" 2>/dev/null || exit 0
-spicetify refresh >/dev/null 2>&1 || true
+REFRESH_OUT="$(spicetify refresh 2>&1)" || log "refresh failed: $REFRESH_OUT"
+if printf '%s' "$REFRESH_OUT" | grep -qi "mismatched"; then
+  # Spotify updated past the spicetify backup: refresh exits 0 but compiles
+  # NOTHING, so the disk palette keeps updating while the app never does.
+  # This exact state shipped once and left Spotify stuck on a stale scheme,
+  # so say it out loud instead of swallowing it (the old `|| true` did).
+  log "refresh is a no-op: backup mismatched, colors NOT compiled into the app"
+  notify-send -u critical "Spotify theme" "Backup is stale (Spotify updated?). Reinstall it and run 'spicetify backup apply'" 2>/dev/null || true
+fi
 
 pgrep -x spotify >/dev/null 2>&1 || exit 0
 
 # --- 1. live attempt ----------------------------------------------------------
-if python3 "$PUSH" "$THEME_DIR/color.ini" >/dev/null 2>&1; then
+if PUSH_OUT="$(python3 "$PUSH" "$THEME_DIR/color.ini" 2>&1)"; then
   exit 0
 fi
+log "live push failed: $PUSH_OUT"
+notify-send "Spotify theme" "Live recolor failed, restarting Spotify with the new palette…" 2>/dev/null || true
 
 # --- 2. fallback: restart in ITS workspace without stealing focus ------------
 if pgrep -x spotify >/dev/null 2>&1; then

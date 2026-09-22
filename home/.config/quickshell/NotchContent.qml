@@ -4,6 +4,7 @@
 // forma de TopShell y el contenido solo se funde.
 import Quickshell
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 
 Item {
@@ -103,26 +104,52 @@ Item {
         }
 
         // ---- polo derecho con música: carátula + picos ----
+        // rightMargin 15 como la batería: al entrar/salir la música el borde
+        // derecho no se mueve, solo cambia el contenido (isla dinámica).
         Row {
-            anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
+            anchors { right: parent.right; rightMargin: 15; verticalCenter: parent.verticalCenter }
             spacing: 9
             opacity: ShellState.mediaLive ? 1 : 0
             visible: opacity > 0.01
             Behavior on opacity { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
 
-            Rectangle {
+            Item {
                 anchors.verticalCenter: parent.verticalCenter
-                width: 22; height: 22; radius: 7
-                color: "#171717"
-                clip: true
+                width: 22; height: 22
+
+                // Fondo: se ve mientras carga la carátula.
+                Rectangle { anchors.fill: parent; radius: width / 2; color: "#171717" }
+
                 Image {
+                    id: notchMiniCover
                     anchors.fill: parent
                     source: (ShellState.player && ShellState.player.trackArtUrl) ? ShellState.player.trackArtUrl : ""
                     fillMode: Image.PreserveAspectCrop
                     // Sin sourceSize la carátula se decodifica a su resolución
                     // nativa (600-1000 px) para pintar 22-34 px; 64 sobra.
                     sourceSize.width: 64
-                    visible: status === Image.Ready
+                    visible: false
+                }
+                // clip:true recorta en rectángulo aunque el padre tenga radio:
+                // la máscara real hace el círculo de verdad (patrón de MediaPanel).
+                Item {
+                    id: notchMiniMask
+                    anchors.fill: parent
+                    layer.enabled: true
+                    layer.smooth: true
+                    visible: false
+                    Rectangle { anchors.fill: parent; radius: width / 2 }
+                }
+                MultiEffect {
+                    anchors.fill: notchMiniCover
+                    source: notchMiniCover
+                    visible: notchMiniCover.status === Image.Ready
+                    antialiasing: true
+                    maskEnabled: true
+                    maskSource: notchMiniMask
+                    maskSpreadAtMin: 1.0
+                    maskThresholdMin: 0.5
+                    maskThresholdMax: 1.0
                 }
                 Text {
                     anchors.centerIn: parent
@@ -554,20 +581,40 @@ Item {
             anchors { fill: parent; leftMargin: 12; rightMargin: 14 }
             spacing: 10
 
-            Rectangle {
+            Item {
                 Layout.preferredWidth: 34; Layout.preferredHeight: 34
                 Layout.alignment: Qt.AlignVCenter
-                radius: 9
-                color: "#171717"
-                clip: true
+
+                Rectangle { anchors.fill: parent; radius: width / 2; color: "#171717" }
                 Image {
+                    id: notchTrackCover
                     anchors.fill: parent
                     source: (ShellState.player && ShellState.player.trackArtUrl) ? ShellState.player.trackArtUrl : ""
                     fillMode: Image.PreserveAspectCrop
                     // Sin sourceSize la carátula se decodifica a su resolución
                     // nativa (600-1000 px) para pintar 22-34 px; 64 sobra.
                     sourceSize.width: 64
-                    visible: status === Image.Ready
+                    visible: false
+                }
+                // Máscara real para el círculo de verdad (patrón de MediaPanel).
+                Item {
+                    id: notchTrackMask
+                    anchors.fill: parent
+                    layer.enabled: true
+                    layer.smooth: true
+                    visible: false
+                    Rectangle { anchors.fill: parent; radius: width / 2 }
+                }
+                MultiEffect {
+                    anchors.fill: notchTrackCover
+                    source: notchTrackCover
+                    visible: notchTrackCover.status === Image.Ready
+                    antialiasing: true
+                    maskEnabled: true
+                    maskSource: notchTrackMask
+                    maskSpreadAtMin: 1.0
+                    maskThresholdMin: 0.5
+                    maskThresholdMax: 1.0
                 }
                 Text {
                     anchors.centerIn: parent
