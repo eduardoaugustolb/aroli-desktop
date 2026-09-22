@@ -18,13 +18,13 @@ jobs:
         with:
           go-version: "1.27.x"
       - name: Format
-        run: test -z "$(gofmt -l cmd/rice)"
+        run: test -z "$(gofmt -l cmd/aroli)"
       - name: Unit tests and race detector
         run: go test -race ./...
       - name: Static analysis
         run: go vet ./...
       - name: Build
-        run: go build ./cmd/rice
+        run: go build ./cmd/aroli
 
   installer:
     name: Installer compatibility
@@ -35,6 +35,7 @@ jobs:
         run: |
           bash -n install.sh
           bash -n diagnose
+          bash -n home/.local/bin/aroli-backend
           bash -n home/.local/bin/rice
           bash -n scripts/migrate-from-legacy-rice.sh
       - name: Installer dry-run and shell interface
