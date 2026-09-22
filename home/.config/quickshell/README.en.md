@@ -1,4 +1,4 @@
-# Quickshell system (Eduardo Augusto's rice)
+# Quickshell system (Aroli Desktop)
 
 > 🇪🇸 [En castellano](README.md)
 

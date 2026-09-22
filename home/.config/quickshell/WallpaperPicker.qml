@@ -52,7 +52,7 @@ Scope {
     function refreshThumbs() { thumbsProc.running = false; thumbsProc.running = true }
     Component.onCompleted: root.refreshThumbs()
 
-    GlobalShortcut { name: "wallpaper"; description: "Wallpaper picker"; onPressed: root.open = !root.open }
+    GlobalShortcut { name: "wallpaper"; description: I18n.tr("Wallpaper picker"); onPressed: root.open = !root.open }
     HyprlandFocusGrab { windows: [win]; active: root.open; onCleared: root.open = false }
 
     FolderListModel {
@@ -211,7 +211,7 @@ Scope {
                 anchors.centerIn: parent
                 visible: wallModel.count === 0
                 text: I18n.tr("No wallpapers in {0}", "~/Pictures/wallpapers")
-                color: "#fafafa"
+                color: Colors.inkMid
                 font.pixelSize: Appearance.fsL
                 opacity: 0.85
                 layer.enabled: true

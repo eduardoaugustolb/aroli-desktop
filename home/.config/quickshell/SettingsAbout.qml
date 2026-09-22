@@ -95,7 +95,7 @@ Flickable {
                 text: Distro.glyph
                 color: Colors.accent
                 font.family: Appearance.font
-                font.pixelSize: 46
+                font.pixelSize: Appearance.fsXXL
             }
             Image {
                 visible: Distro.omarchy
@@ -115,14 +115,14 @@ Flickable {
                 spacing: 2
                 Text {
                     text: root.info["distro"] || Distro.name
-                    color: "#ffffff"
+                    color: Colors.inkHi
                     font.family: Appearance.fontUI
-                    font.pixelSize: 17
+                    font.pixelSize: Appearance.fsTitle
                     font.weight: Font.DemiBold
                 }
                 Text {
                     text: root.info["wm"] || ""
-                    color: "#8a8a8a"
+                    color: Colors.inkMid
                     font.family: Appearance.fontUI
                     font.pixelSize: Appearance.fsS
                 }

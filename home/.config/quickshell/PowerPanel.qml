@@ -89,7 +89,7 @@ Item {
         Keys.onBacktabPressed: root.move(-1)
 
         RowLayout {
-            anchors { fill: parent; leftMargin: 22; rightMargin: 22; topMargin: 30; bottomMargin: 20 }
+            anchors { fill: parent; leftMargin: 22; rightMargin: 22; topMargin: 20; bottomMargin: 18 }
             spacing: 12
 
             Repeater {
@@ -104,7 +104,7 @@ Item {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    radius: 16
+                    radius: Appearance.radM
                     color: btn.isArmed
                         ? Qt.rgba(Colors.crit.r, Colors.crit.g, Colors.crit.b, 0.52)
                         : btn.sel
@@ -113,7 +113,7 @@ Item {
                         : bMa.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.05)
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                     scale: bMa.pressed ? 0.95 : 1
-                    Behavior on scale { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+                    Behavior on scale { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppScale } }
 
                     ColumnLayout {
                         anchors.centerIn: parent
@@ -121,15 +121,15 @@ Item {
                         Text {
                             Layout.alignment: Qt.AlignHCenter
                             text: btn.modelData.icon
-                            color: btn.isArmed ? "#ffffff"
-                                : btn.sel ? (btn.modelData.danger ? Colors.crit : Colors.accent) : "#cfcfcf"
-                            font.family: Appearance.font; font.pixelSize: 26
+                            color: btn.isArmed ? Colors.inkHi
+                                : btn.sel ? (btn.modelData.danger ? Colors.crit : Colors.accent) : Colors.inkMid
+                            font.family: Appearance.font; font.pixelSize: Appearance.fsTitle
                         }
                         Text {
                             Layout.alignment: Qt.AlignHCenter
                             text: btn.isArmed ? I18n.tr("Sure?") : btn.modelData.label
-                            color: btn.sel ? "#ffffff" : "#8a8a8a"
-                            font.family: Appearance.fontUI; font.pixelSize: 11
+                            color: btn.sel ? Colors.inkHi : "#8a8a8a"
+                            font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                             font.weight: btn.sel ? Font.Medium : Font.Normal
                         }
                     }

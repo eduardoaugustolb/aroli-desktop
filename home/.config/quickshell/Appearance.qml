@@ -14,11 +14,14 @@ Singleton {
     // like digits and "Tue Aug 4" reads like terminal text.
     readonly property string fontUI: Config.fontUI   // picked in Settings › Appearance
 
-    // font sizes
+    // font sizes: the whole scale. If a size is not here, it is a bug:
+    // round text to the nearest step (ties go down, restraint).
+    readonly property int fsCaption: 10
     readonly property int fsXS: 11
     readonly property int fsS:  12
     readonly property int fsM:  13
     readonly property int fsL:  16
+    readonly property int fsTitle: 20
     readonly property int fsXXL: 42
 
     // radii
@@ -83,6 +86,16 @@ Singleton {
     // Stagger is what avoids the smear: the new starts entering just
     // as the old has finished leaving, not at the same time.
     readonly property int mStagger: 110      // = mOut
+
+    // FOLLOW: a tracked line (lyrics) gliding after the playhead. Deliberately
+    // off the scale like mTick: at CONTENT speed the view would yank every
+    // verse; the calm comes from the fixed duration, not the distance.
+    readonly property int mFollow: 1100
+    readonly property int mTint: 600         // its highlight crossfade
+
+    // Hitbox expanders share one depth: rows stay easy to hit without
+    // eating their neighbours. Use as anchors.margins: -hitPad.
+    readonly property int hitPad: 6
 
     // ══════════════════════════════════════════════════════════════════════
     //  SPRINGS, the category difference, not a tweak

@@ -116,7 +116,7 @@ Item {
             fill: parent
             leftMargin: 22
             rightMargin: 22
-            topMargin: 22
+            topMargin: 20
             bottomMargin: 18
         }
         spacing: 10
@@ -175,7 +175,7 @@ Item {
                 text: "󰎈"
                 color: root.accent
                 font.family: Appearance.font
-                font.pixelSize: 48
+                font.pixelSize: Appearance.fsXXL
                 Behavior on color { ColorAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
             }
         }
@@ -190,23 +190,23 @@ Item {
                 text: ShellState.player
                     ? (ShellState.player.trackTitle || I18n.tr("Nothing playing"))
                     : I18n.tr("Nothing playing")
-                color: "#ffffff"
+                color: Colors.inkHi
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
-                font.pixelSize: 16
+                font.pixelSize: Appearance.fsL
                 font.weight: Font.DemiBold
             }
             Text {
                 Layout.fillWidth: true
                 text: ShellState.player ? (ShellState.player.trackArtist || "") : ""
-                color: "#8d8d8d"
+                color: Colors.inkMid
                 horizontalAlignment: Text.AlignHCenter
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
-                font.pixelSize: 12
+                font.pixelSize: Appearance.fsS
             }
         }
 
@@ -233,7 +233,7 @@ Item {
                 }
                 MouseArea {
                     anchors.fill: parent
-                    anchors.margins: -7
+                    anchors.margins: -Appearance.hitPad
                     cursorShape: Qt.PointingHandCursor
                     onClicked: function (m) {
                         if (ShellState.player && ShellState.len > 0)
@@ -245,17 +245,17 @@ Item {
             Text {
                 anchors { left: parent.left; bottom: parent.bottom }
                 text: ShellState.fmt(ShellState.pos)
-                color: "#666666"
+                color: Colors.inkLo
                 font.family: Appearance.fontUI
-                font.pixelSize: 9
+                font.pixelSize: Appearance.fsCaption
                 font.features: ({ "tnum": 1 })
             }
             Text {
                 anchors { right: parent.right; bottom: parent.bottom }
                 text: ShellState.fmt(ShellState.len)
-                color: "#666666"
+                color: Colors.inkLo
                 font.family: Appearance.fontUI
-                font.pixelSize: 9
+                font.pixelSize: Appearance.fsCaption
                 font.features: ({ "tnum": 1 })
             }
         }
@@ -292,7 +292,7 @@ Item {
                             : transport.index === 1
                                 ? (ShellState.player && ShellState.player.isPlaying ? Icons.pause : Icons.play)
                                 : Icons.next
-                        color: transportMa.containsMouse ? root.accent : "#ffffff"
+                        color: transportMa.containsMouse ? root.accent : Colors.inkHi
                         font.family: Appearance.font
                         font.pixelSize: transport.index === 1 ? 24 : 19
                         Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
@@ -339,7 +339,7 @@ Item {
                 highlightRangeMode: ListView.StrictlyEnforceRange
                 preferredHighlightBegin: height / 2 - 16
                 preferredHighlightEnd: height / 2 + 16
-                highlightMoveDuration: 1100
+                highlightMoveDuration: Appearance.mFollow
                 spacing: 7
                 clip: true
                 delegate: Text {
@@ -347,16 +347,18 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
                     text: modelData.text
-                    color: index === lyricList.currentIndex ? "#ffffff" : "#7f7f7f"
-                    Behavior on color { ColorAnimation { duration: 600; easing.type: Easing.OutCubic } }
+                    color: index === lyricList.currentIndex ? Colors.inkHi : Colors.inkLo
+                    Behavior on color { ColorAnimation { duration: Appearance.mTint; easing.type: Easing.OutCubic } }
                     font.family: Appearance.fontUI
-                    font.pixelSize: 13
+                    font.pixelSize: Appearance.fsM
                 }
             }
 
             Item {
                 anchors.centerIn: parent
                 visible: root.lyricState !== "ready"
+                opacity: visible ? 1 : 0
+                Behavior on opacity { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
                 width: ShellState.bands * 13 - 7
                 height: 58
 

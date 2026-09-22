@@ -129,7 +129,7 @@ QtObject {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 120
                 text: r.label
-                color: "#ffffff"
+                color: Colors.inkHi
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsS
@@ -169,30 +169,30 @@ QtObject {
             Text {
                 visible: a.icon.length > 0
                 text: a.icon
-                color: "#9a9a9a"
+                color: Colors.inkMid
                 font.family: Appearance.font
-                font.pixelSize: 14
+                font.pixelSize: Appearance.fsL
             }
             Text {
                 Layout.fillWidth: true
                 text: a.label
-                color: "#ffffff"
+                color: Colors.inkHi
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsS
             }
             Text {
                 text: a.value
-                color: "#8a8a8a"
+                color: Colors.inkMid
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsXS
             }
             Text {
                 text: "›"
-                color: aMa.containsMouse ? "#ffffff" : "#6a6a6a"
+                color: aMa.containsMouse ? Colors.inkHi : "#6a6a6a"
                 font.family: Appearance.fontUI
-                font.pixelSize: 15
+                font.pixelSize: Appearance.fsL
             }
         }
 
@@ -215,21 +215,21 @@ QtObject {
         signal toggled(bool value)
 
         implicitWidth: 38; implicitHeight: 21
-        radius: 11
+        radius: height / 2
         color: sw.checked ? Colors.accent : Qt.rgba(1, 1, 1, 0.14)
         opacity: sw.live ? 1 : 0.45
         Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
 
         Rectangle {
             width: 15; height: 15; radius: 8
-            color: "#ffffff"
+            color: Colors.inkHi
             y: 3
             x: sw.checked ? parent.width - width - 3 : 3
-            Behavior on x { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+            Behavior on x { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppPx } }
         }
         MouseArea {
             anchors.fill: parent
-            anchors.margins: -6
+            anchors.margins: -Appearance.hitPad
             enabled: sw.live
             cursorShape: Qt.PointingHandCursor
             onClicked: sw.toggled(!sw.checked)
@@ -272,16 +272,16 @@ QtObject {
             }
             Rectangle {
                 width: 13; height: 13; radius: 7
-                color: "#ffffff"
+                color: Colors.inkHi
                 x: Math.max(0, Math.min(track.width - width, fill.width - width / 2))
                 anchors.verticalCenter: parent.verticalCenter
                 scale: drag.pressed ? 1.15 : 1
-                Behavior on scale { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+                Behavior on scale { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppScale } }
             }
             MouseArea {
                 id: drag
                 anchors.fill: parent
-                anchors.margins: -9
+                anchors.margins: -Appearance.hitPad
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 function emit(x) {
@@ -314,7 +314,7 @@ QtObject {
             Layout.preferredWidth: 44
             horizontalAlignment: Text.AlignRight
             text: sl.shown.toFixed(sl.decimals) + sl.suffix
-            color: "#9a9a9a"
+            color: Colors.inkMid
             font.family: Appearance.fontUI
             font.pixelSize: Appearance.fsXS
             font.features: ({ "tnum": 1 })
@@ -332,13 +332,13 @@ QtObject {
         spacing: 8
 
         Rectangle {
-            width: 22; height: 22; radius: 6
+            width: 22; height: 22; radius: Appearance.radS
             color: /^#[0-9a-fA-F]{6}$/.test(field.value) ? field.value : "transparent"
             border.width: 1; border.color: "#555b5a"
         }
         Rectangle {
             Layout.fillWidth: true; Layout.preferredHeight: 28
-            radius: 6; color: "#191c1c"; border.width: 1
+            radius: Appearance.radS; color: "#191c1c"; border.width: 1
             border.color: input.activeFocus ? Colors.accent : "#3b4242"
             TextInput {
                 id: input
@@ -373,7 +373,7 @@ QtObject {
                 readonly property bool sel: String(modelData) === ch.current
                 implicitWidth: t.implicitWidth + 20
                 implicitHeight: 26
-                radius: 9
+                radius: Appearance.radPill
                 color: sel ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.28)
                      : cMa.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.05)
                 Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
@@ -381,7 +381,7 @@ QtObject {
                     id: t
                     anchors.centerIn: parent
                     text: modelData
-                    color: parent.sel ? "#ffffff" : "#9a9a9a"
+                    color: parent.sel ? Colors.inkHi : Colors.inkMid
                     font.family: Appearance.fontUI
                     font.pixelSize: Appearance.fsXS
                     font.weight: parent.sel ? Font.Medium : Font.Normal
@@ -406,7 +406,7 @@ QtObject {
 
         implicitWidth: bt.implicitWidth + 26
         implicitHeight: 28
-        radius: 9
+        radius: Appearance.radPill
         color: bMa.containsMouse
              ? (b.danger ? Qt.rgba(Colors.crit.r, Colors.crit.g, Colors.crit.b, 0.30) : Qt.rgba(1, 1, 1, 0.13))
              : Qt.rgba(1, 1, 1, 0.06)
@@ -416,7 +416,7 @@ QtObject {
             id: bt
             anchors.centerIn: parent
             text: b.text
-            color: bMa.containsMouse ? "#ffffff" : "#9a9a9a"
+            color: bMa.containsMouse ? Colors.inkHi : Colors.inkMid
             font.family: Appearance.fontUI
             font.pixelSize: Appearance.fsXS
         }
@@ -432,7 +432,7 @@ QtObject {
     // ─────────── valor de solo lectura (Acerca de) ───────────
     component Val_: Text {
         Layout.maximumWidth: 310
-        color: "#b9b9b9"
+        color: Colors.inkMid
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignRight
         font.family: Appearance.fontUI
@@ -443,7 +443,7 @@ QtObject {
     component Note_: Text {
         Layout.fillWidth: true
         wrapMode: Text.Wrap
-        color: "#777777"
+        color: Colors.inkLo
         font.family: Appearance.fontUI
         font.pixelSize: Appearance.fsXS
     }
@@ -469,9 +469,9 @@ QtObject {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 text: empty.icon
-                color: "#777777"
+                color: Colors.inkLo
                 font.family: Appearance.font
-                font.pixelSize: 22
+                font.pixelSize: Appearance.fsTitle
             }
             Text {
                 Layout.fillWidth: true
@@ -485,7 +485,7 @@ QtObject {
             Text {
                 Layout.fillWidth: true
                 text: empty.body
-                color: "#707070"
+                color: Colors.inkLo
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.Wrap
                 font.family: Appearance.fontUI

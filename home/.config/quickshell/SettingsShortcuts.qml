@@ -309,7 +309,7 @@ Flickable {
             Text {
                 Layout.fillWidth: true
                 text: kr.modelData.what
-                color: "#9a9a9a"
+                color: Colors.inkMid
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsXS

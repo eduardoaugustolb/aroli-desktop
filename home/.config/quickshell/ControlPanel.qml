@@ -17,7 +17,7 @@ Item {
     MouseArea { anchors.fill: parent }
 
     RowLayout {
-        anchors { fill: parent; leftMargin: 24; rightMargin: 22; topMargin: 20; bottomMargin: 20 }
+        anchors { fill: parent; leftMargin: 22; rightMargin: 22; topMargin: 20; bottomMargin: 18 }
         spacing: 20
 
         // ═════════════ left: vertical player ═════════════
@@ -99,7 +99,7 @@ Item {
                     property real ent: ShellState.mode === "control" ? 1 : 0
                     Behavior on ent {
                         SequentialAnimation {
-                            PauseAnimation { duration: ShellState.mode === "control" ? tg.idx * 32 : 0 }
+                            PauseAnimation { duration: ShellState.mode === "control" ? tg.idx * Appearance.mStagger : 0 }
                             SpringAnimation {
                                 spring: Appearance.sprPanel
                                 damping: Appearance.dmpPanel
@@ -109,7 +109,7 @@ Item {
                     }
                     scale: 0.82 + 0.18 * tg.ent
                     transform: Translate { y: (1 - tg.ent) * 12 }
-                    radius: 14
+                    radius: Appearance.radM
                     color: tg.on ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.26)
                          : tgMa.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.05)
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
@@ -120,14 +120,14 @@ Item {
                         Text {
                             Layout.alignment: Qt.AlignHCenter
                             text: tg.icon
-                            color: tg.on ? Colors.accent : "#cfcfcf"
-                            font.family: Appearance.font; font.pixelSize: 16
+                            color: tg.on ? Colors.accent : Colors.inkMid
+                            font.family: Appearance.font; font.pixelSize: Appearance.fsL
                         }
                         Text {
                             Layout.alignment: Qt.AlignHCenter
                             text: tg.label
                             color: tg.on ? Colors.accent : "#8a8a8a"
-                            font.family: Appearance.fontUI; font.pixelSize: 9
+                            font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                         }
                     }
                     MouseArea {
@@ -215,8 +215,8 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text: ShellState.weather
-                    color: "#b0b0b0"; elide: Text.ElideRight
-                    font.family: Appearance.fontUI; font.pixelSize: 11
+                    color: Colors.inkMid; elide: Text.ElideRight
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                 }
                 // Three glyphs with percentages were unreadable without knowing
                 // by heart what each meant. Now this is a named door: keeps the
@@ -225,7 +225,7 @@ Item {
                     id: performanceLink
                     Layout.preferredWidth: 222
                     Layout.preferredHeight: 42
-                    radius: 13
+                    radius: Appearance.radM
                     color: performanceMa.containsMouse
                         ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.14)
                         : Qt.rgba(1, 1, 1, 0.05)
@@ -243,22 +243,22 @@ Item {
                             spacing: 0
                             Text {
                                 text: I18n.tr("Your computer")
-                                color: performanceMa.containsMouse ? Colors.accent : "#cfcfcf"
-                                font.family: Appearance.fontUI; font.pixelSize: 10
+                                color: performanceMa.containsMouse ? Colors.accent : Colors.inkMid
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                                 font.weight: Font.DemiBold
                             }
                             Text {
                                 text: I18n.tr("CPU {0}%  ·  RAM {1}%  ·  SSD {2}%",
                                               ShellState.cpu, ShellState.mem, ShellState.disk)
-                                color: "#747474"
-                                font.family: Appearance.fontUI; font.pixelSize: 8
+                                color: Colors.inkLo
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                                 font.features: ({ "tnum": 1 })
                             }
                         }
                         Text {
                             text: "›"
-                            color: performanceMa.containsMouse ? Colors.accent : "#707070"
-                            font.family: Appearance.fontUI; font.pixelSize: 20
+                            color: performanceMa.containsMouse ? Colors.accent : Colors.inkLo
+                            font.family: Appearance.fontUI; font.pixelSize: Appearance.fsTitle
                         }
                     }
 
@@ -286,45 +286,49 @@ Item {
                 spacing: 8
                 Text {
                     text: I18n.tr("Notifications")
-                    color: "#ffffff"
-                    font.family: Appearance.fontUI; font.pixelSize: 12; font.weight: Font.DemiBold
+                    color: Colors.inkHi
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS; font.weight: Font.DemiBold
                 }
                 Rectangle {
                     visible: ShellState.notifCount > 0
+                    opacity: visible ? 1 : 0
+                    Behavior on opacity { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
                     implicitWidth: cnt.implicitWidth + 12
                     implicitHeight: 17
-                    radius: 9
+                    radius: Appearance.radPill
                     color: Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.28)
                     Text {
                         id: cnt
                         anchors.centerIn: parent
                         text: ShellState.notifCount
                         color: Colors.accent
-                        font.family: Appearance.fontUI; font.pixelSize: 10; font.weight: Font.Medium
+                        font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption; font.weight: Font.Medium
                     }
                 }
                 Item { Layout.fillWidth: true }
                 Text {
                     text: "󰒓"
-                    color: gearMa.containsMouse ? Colors.accent : "#7d7d7d"
-                    font.family: Appearance.font; font.pixelSize: 14
+                    color: gearMa.containsMouse ? Colors.accent : Colors.inkLo
+                    font.family: Appearance.font; font.pixelSize: Appearance.fsL
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                     MouseArea {
                         id: gearMa
-                        anchors.fill: parent; anchors.margins: -5
+                        anchors.fill: parent; anchors.margins: -Appearance.hitPad
                         hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                         onClicked: { ShellState.closePanel(); ShellState.settingsOpen = true; }
                     }
                 }
                 Text {
                     visible: ShellState.notifCount > 0
+                    opacity: visible ? 1 : 0
+                    Behavior on opacity { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
                     text: I18n.tr("Clear")
-                    color: clearMa.containsMouse ? Colors.accent : "#7d7d7d"
-                    font.family: Appearance.fontUI; font.pixelSize: 11
+                    color: clearMa.containsMouse ? Colors.accent : Colors.inkLo
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                     MouseArea {
                         id: clearMa
-                        anchors.fill: parent; anchors.margins: -5
+                        anchors.fill: parent; anchors.margins: -Appearance.hitPad
                         hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                         onClicked: ShellState.clearNotifs()
                     }
@@ -420,7 +424,7 @@ Item {
 
                         width: notifList.width
                         height: ncol.implicitHeight + 20
-                        radius: 12
+                        radius: Appearance.radS
                         color: nrow.hovered ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(1, 1, 1, 0.045)
                         Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
 
@@ -446,29 +450,29 @@ Item {
                                 Text {
                                     Layout.fillWidth: true
                                     text: (nrow.modelData.appName || "").toUpperCase()
-                                    color: nrow.modelData.urgency === NotificationUrgency.Critical ? Colors.crit : "#9a9a9a"
+                                    color: nrow.modelData.urgency === NotificationUrgency.Critical ? Colors.crit : Colors.inkMid
                                     elide: Text.ElideRight
-                                    font.family: Appearance.fontUI; font.pixelSize: 10
+                                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                                     font.weight: Font.DemiBold
                                     font.letterSpacing: 0.5
                                 }
                                 Text {
                                     Layout.fillWidth: true
                                     text: nrow.modelData.summary || ""
-                                    color: "#ffffff"
+                                    color: Colors.inkHi
                                     elide: Text.ElideRight
-                                    font.family: Appearance.fontUI; font.pixelSize: 12; font.weight: Font.Medium
+                                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS; font.weight: Font.Medium
                                 }
                                 Text {
                                     Layout.fillWidth: true
                                     visible: text.length > 0
                                     text: nrow.modelData.body || ""
-                                    color: "#8a8a8a"
+                                    color: Colors.inkMid
                                     wrapMode: Text.Wrap
                                     maximumLineCount: 3
                                     elide: Text.ElideRight
                                     textFormat: Text.StyledText
-                                    font.family: Appearance.fontUI; font.pixelSize: 11
+                                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                                 }
                             }
 
@@ -482,9 +486,9 @@ Item {
                                 // chase moves because you chase it.
                                 opacity: nrow.hovered ? 1 : 0
                                 text: "󰅖"
-                                color: nrow.hovered && notifList.overClose ? Colors.crit : "#7d7d7d"
-                                font.family: Appearance.font; font.pixelSize: 12
-                                Behavior on opacity { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
+                                color: nrow.hovered && notifList.overClose ? Colors.crit : Colors.inkLo
+                                font.family: Appearance.font; font.pixelSize: Appearance.fsS
+                                Behavior on opacity { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
                                 Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                             }
                         }
@@ -515,11 +519,13 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: ShellState.notifCount === 0
+                opacity: visible ? 1 : 0
+                Behavior on opacity { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
                 text: I18n.tr("No notifications")
-                color: "#5e5e5e"
+                color: Colors.inkLo
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                font.family: Appearance.fontUI; font.pixelSize: 12
+                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS
             }
         }
     }

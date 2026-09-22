@@ -29,6 +29,13 @@ Singleton {
     readonly property color warn: "#e0a458"
     readonly property color crit: "#e05c5c"
 
+    // INK: fixed neutrals for text on dark surfaces. One step each: primary,
+    // secondary, tertiary. If a grey is not one of these three, it is a bug;
+    // collapse lookalikes here instead of inventing a fourth.
+    readonly property color inkHi:  "#ffffff"
+    readonly property color inkMid: "#9a9a9a"
+    readonly property color inkLo:  "#7d7d7d"
+
     // Current wallpaper path. Lives here and not in Config because pywal
     // is in charge: colors.json carries the path of the wallpaper the palette
     // came from, so color and wallpaper can NEVER desync. Storing it separately

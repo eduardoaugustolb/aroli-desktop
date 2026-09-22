@@ -315,7 +315,7 @@ Item {
                 text: root.modeInfo.icon
                 color: (field.text.length > 0 || !root.isApps) ? Colors.accent : "#6c6c6c"
                 font.family: Appearance.font
-                font.pixelSize: 17
+                font.pixelSize: Appearance.fsTitle
                 Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
             }
 
@@ -326,7 +326,7 @@ Item {
                 visible: !root.isApps
                 Layout.preferredWidth: modeChip.implicitWidth + 20
                 Layout.preferredHeight: 26
-                radius: 9
+                radius: Appearance.radPill
                 color: Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.16)
 
                 RowLayout {
@@ -336,12 +336,12 @@ Item {
                     Text {
                         text: root.modeInfo.prefix
                         color: Colors.accent
-                        font.family: Appearance.font; font.pixelSize: 13; font.weight: Font.Bold
+                        font.family: Appearance.font; font.pixelSize: Appearance.fsM; font.weight: Font.Bold
                     }
                     Text {
                         text: root.modeInfo.name
-                        color: "#e8e8e8"
-                        font.family: Appearance.fontUI; font.pixelSize: 12; font.weight: Font.Medium
+                        color: Colors.inkMid
+                        font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS; font.weight: Font.Medium
                     }
                 }
             }
@@ -350,12 +350,12 @@ Item {
                 id: field
                 Layout.fillWidth: true
                 placeholderText: root.modeInfo.hint
-                color: "#ffffff"
+                color: Colors.inkHi
                 placeholderTextColor: "#5e5e5e"
                 selectionColor: Colors.accent
                 selectedTextColor: "#000000"
                 font.family: Appearance.fontUI
-                font.pixelSize: 16
+                font.pixelSize: Appearance.fsL
                 background: null
                 padding: 0
 
@@ -429,10 +429,10 @@ Item {
                 visible: root.favHover.length > 0
                 Layout.maximumWidth: 170
                 text: root.favHover
-                color: "#9a9a9a"
+                color: Colors.inkMid
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
-                font.pixelSize: 12
+                font.pixelSize: Appearance.fsS
             }
 
             // Las pistas de los modos, donde iba el contador. El contador decía
@@ -450,12 +450,12 @@ Item {
                         Text {
                             text: modelData.prefix
                             color: Colors.accent
-                            font.family: Appearance.font; font.pixelSize: 12; font.weight: Font.Bold
+                            font.family: Appearance.font; font.pixelSize: Appearance.fsS; font.weight: Font.Bold
                         }
                         Text {
                             text: modelData.name
                             color: "#5e5e5e"
-                            font.family: Appearance.fontUI; font.pixelSize: 11
+                            font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                         }
                     }
                 }
@@ -466,14 +466,14 @@ Item {
                 text: String(root.results.length)
                 color: "#5e5e5e"
                 font.family: Appearance.fontUI
-                font.pixelSize: 12
+                font.pixelSize: Appearance.fsS
             }
         }
 
         Rectangle {
             Layout.fillWidth: true
-            Layout.leftMargin: 18
-            Layout.rightMargin: 18
+            Layout.leftMargin: 12
+            Layout.rightMargin: 12
             Layout.bottomMargin: 6
             height: 1
             color: "#1e1e1e"
@@ -489,6 +489,7 @@ Item {
             Layout.rightMargin: 12
             Layout.bottomMargin: root.favVisible ? 12 : 0
             Layout.preferredHeight: root.favVisible ? 58 : 0
+            Behavior on Layout.preferredHeight { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
             visible: root.favVisible
             clip: true
 
@@ -518,7 +519,7 @@ Item {
                     Rectangle {
                         anchors.centerIn: parent
                         width: 50; height: 50
-                        radius: 15
+                        radius: Appearance.radM
                         color: favMa.containsMouse && !root.favMoving ? Qt.rgba(1, 1, 1, 0.08) : "transparent"
                         Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                     }
@@ -531,7 +532,7 @@ Item {
                         fillMode: Image.PreserveAspectFit
                         // el hueco de donde sale, mientras lo llevas
                         opacity: favCell.dragged ? 0.18 : 1
-                        Behavior on opacity { NumberAnimation { duration: Appearance.mQuick } }
+                        Behavior on opacity { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
                     }
 
                     MouseArea {
@@ -637,8 +638,9 @@ Item {
             Layout.rightMargin: 12
             Layout.bottomMargin: 6
             Layout.preferredHeight: root.hasSpecial ? 56 : 0
+            Behavior on Layout.preferredHeight { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
             visible: root.hasSpecial
-            radius: 12
+            radius: Appearance.radS
             color: root.calcSelected ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.20)
                  : calcMa.containsMouse ? Qt.rgba(1, 1, 1, 0.06) : "transparent"
             Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
@@ -659,15 +661,15 @@ Item {
                         Layout.fillWidth: true
                         text: root.hasTimer ? ShellState.timerClock(root.timerSec)
                                             : ShellState.calcFormat(root.calc)
-                        color: "#ffffff"; elide: Text.ElideRight
-                        font.family: Appearance.fontUI; font.pixelSize: 19; font.weight: Font.DemiBold
+                        color: Colors.inkHi; elide: Text.ElideRight
+                        font.family: Appearance.fontUI; font.pixelSize: Appearance.fsTitle; font.weight: Font.DemiBold
                         font.features: ({ "tnum": 1 })
                     }
                     Text {
                         Layout.fillWidth: true
                         text: root.hasTimer ? I18n.tr("Enter starts the timer")
                                             : I18n.tr("Enter copies to the clipboard")
-                        color: "#7d7d7d"; elide: Text.ElideRight
+                        color: Colors.inkLo; elide: Text.ElideRight
                         font.family: Appearance.fontUI; font.pixelSize: 10
                     }
                 }
@@ -727,7 +729,7 @@ Item {
                     : I18n.tr("No results")
                 color: "#5e5e5e"
                 font.family: Appearance.fontUI
-                font.pixelSize: 13
+                font.pixelSize: Appearance.fsM
             }
         }
     }
@@ -754,7 +756,7 @@ Item {
 
         width: list.width
         height: ShellState.launcherRowH
-        radius: 12
+        radius: Appearance.radS
         color: base.sel ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.20)
              : (baseMa.containsMouse && root.mouseNav) ? Qt.rgba(1, 1, 1, 0.06)
              : "transparent"
@@ -785,7 +787,7 @@ Item {
         text: "󰌑"
         color: Colors.accent
         font.family: Appearance.font
-        font.pixelSize: 13
+        font.pixelSize: Appearance.fsM
     }
 
     // ─── aplicaciones ───
@@ -802,7 +804,7 @@ Item {
             }
 
             RowLayout {
-                anchors { fill: parent; leftMargin: 12; rightMargin: 14 }
+                anchors { fill: parent; leftMargin: 14; rightMargin: 14 }
                 spacing: 13
 
                 Image {
@@ -820,20 +822,20 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         text: appRow.modelData.name || ""
-                        color: "#ffffff"
+                        color: Colors.inkHi
                         elide: Text.ElideRight
                         font.family: Appearance.fontUI
-                        font.pixelSize: 13
+                        font.pixelSize: Appearance.fsM
                         font.weight: Font.Medium
                     }
                     Text {
                         Layout.fillWidth: true
                         visible: text.length > 0
                         text: appRow.modelData.comment || appRow.modelData.genericName || ""
-                        color: "#7d7d7d"
+                        color: Colors.inkLo
                         elide: Text.ElideRight
                         font.family: Appearance.fontUI
-                        font.pixelSize: 11
+                        font.pixelSize: Appearance.fsXS
                     }
                 }
 
@@ -852,7 +854,7 @@ Item {
                     MouseArea {
                         id: starMa
                         anchors.fill: parent
-                        anchors.margins: -7      // zona de clic cómoda sin agrandar el icono
+                        anchors.margins: -Appearance.hitPad  // zona de clic cómoda sin agrandar el icono
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: ShellState.toggleFav(appRow.modelData)
@@ -880,7 +882,7 @@ Item {
             }
 
             RowLayout {
-                anchors { fill: parent; leftMargin: 10; rightMargin: 14 }
+                anchors { fill: parent; leftMargin: 14; rightMargin: 14 }
                 spacing: 13
 
                 // La miniatura de verdad para las imágenes; un icono de documento
@@ -930,7 +932,7 @@ Item {
                     wrapMode: Text.Wrap
                     elide: Text.ElideRight
                     font.family: Appearance.fontUI
-                    font.pixelSize: 12
+                    font.pixelSize: Appearance.fsS
                     font.weight: clipRow.modelData.image ? Font.Normal : Font.Medium
                 }
 
@@ -947,7 +949,7 @@ Item {
                     MouseArea {
                         id: trashMa
                         anchors.fill: parent
-                        anchors.margins: -7
+                        anchors.margins: -Appearance.hitPad
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: { list.currentIndex = clipRow.index; root.deleteCurrent(); }
@@ -970,7 +972,7 @@ Item {
             onActivated: ShellState.runAction(cmdRow.modelData)
 
             RowLayout {
-                anchors { fill: parent; leftMargin: 16; rightMargin: 14 }
+                anchors { fill: parent; leftMargin: 14; rightMargin: 14 }
                 spacing: 15
 
                 Text {
@@ -979,7 +981,7 @@ Item {
                     color: cmdRow.sel ? Colors.accent : "#b9b9b9"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: Appearance.font
-                    font.pixelSize: 18
+                    font.pixelSize: Appearance.fsTitle
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                 }
 
@@ -989,19 +991,19 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         text: cmdRow.modelData.name
-                        color: "#ffffff"
+                        color: Colors.inkHi
                         elide: Text.ElideRight
                         font.family: Appearance.fontUI
-                        font.pixelSize: 13
+                        font.pixelSize: Appearance.fsM
                         font.weight: Font.Medium
                     }
                     Text {
                         Layout.fillWidth: true
                         text: cmdRow.modelData.desc
-                        color: "#7d7d7d"
+                        color: Colors.inkLo
                         elide: Text.ElideRight
                         font.family: Appearance.fontUI
-                        font.pixelSize: 11
+                        font.pixelSize: Appearance.fsXS
                     }
                 }
 
@@ -1021,7 +1023,7 @@ Item {
             onActivated: ShellState.focusWindow(winRow.modelData)
 
             RowLayout {
-                anchors { fill: parent; leftMargin: 12; rightMargin: 14 }
+                anchors { fill: parent; leftMargin: 14; rightMargin: 14 }
                 spacing: 13
 
                 Image {
@@ -1043,19 +1045,19 @@ Item {
                         // cambiar la fila sin esperar al siguiente refresco.
                         text: (winRow.modelData.tl && winRow.modelData.tl.title)
                               ? winRow.modelData.tl.title : winRow.modelData.title
-                        color: "#ffffff"
+                        color: Colors.inkHi
                         elide: Text.ElideRight
                         font.family: Appearance.fontUI
-                        font.pixelSize: 13
+                        font.pixelSize: Appearance.fsM
                         font.weight: Font.Medium
                     }
                     Text {
                         Layout.fillWidth: true
                         text: winRow.modelData.cls
-                        color: "#7d7d7d"
+                        color: Colors.inkLo
                         elide: Text.ElideRight
                         font.family: Appearance.fontUI
-                        font.pixelSize: 11
+                        font.pixelSize: Appearance.fsXS
                     }
                 }
 
@@ -1065,7 +1067,7 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 22
                     Layout.preferredHeight: 20
-                    radius: 7
+                    radius: height / 2
                     color: winRow.modelData.ws === ShellState.activeWs
                            ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.22)
                            : Qt.rgba(1, 1, 1, 0.07)
@@ -1075,7 +1077,7 @@ Item {
                         text: String(winRow.modelData.ws)
                         color: winRow.modelData.ws === ShellState.activeWs ? Colors.accent : "#8a8a8a"
                         font.family: Appearance.fontUI
-                        font.pixelSize: 11
+                        font.pixelSize: Appearance.fsXS
                         font.weight: Font.DemiBold
                     }
                 }

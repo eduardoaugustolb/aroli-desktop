@@ -27,7 +27,7 @@ Scope {
         return m + ":" + (s < 10 ? "0" + s : s);
     }
 
-    GlobalShortcut { name: "media"; description: "Toggle media controls"; onPressed: root.open = !root.open }
+    GlobalShortcut { name: "media"; description: I18n.tr("Toggle media controls"); onPressed: root.open = !root.open }
     HyprlandFocusGrab { windows: [win]; active: root.open; onCleared: root.open = false }
 
     PanelWindow {
@@ -73,19 +73,36 @@ Scope {
                     anchors { fill: parent; margins: 16 }
                     spacing: 16
 
-                    // ---- cover art ----
-                    Rectangle {
+                    // ---- cover art (real mask: clip crops square) ----
+                    Item {
                         Layout.preferredWidth: 116; Layout.preferredHeight: 116
-                        radius: Appearance.radM
-                        color: Colors.bgAlt
-                        clip: true
                         Image {
+                            id: mcCover
                             anchors.fill: parent
                             source: (root.player && root.player.trackArtUrl) ? root.player.trackArtUrl : ""
                             fillMode: Image.PreserveAspectCrop
                             // Decodes at paint size, not native.
                             sourceSize.width: 116
-                            visible: status === Image.Ready
+                            visible: false
+                        }
+                        Item {
+                            id: mcMask
+                            anchors.fill: parent
+                            layer.enabled: true
+                            layer.smooth: true
+                            visible: false
+                            Rectangle { anchors.fill: parent; radius: Appearance.radM }
+                        }
+                        MultiEffect {
+                            anchors.fill: mcCover
+                            source: mcCover
+                            visible: mcCover.status === Image.Ready
+                            antialiasing: true
+                            maskEnabled: true
+                            maskSource: mcMask
+                            maskSpreadAtMin: 1.0
+                            maskThresholdMin: 0.5
+                            maskThresholdMax: 1.0
                         }
                         StyledText {
                             anchors.centerIn: parent
@@ -96,7 +113,7 @@ Scope {
                         }
                         Rectangle {
                             anchors.fill: parent
-                            radius: parent.radius
+                            radius: Appearance.radM
                             color: "transparent"
                             border.width: 2
                             border.color: root.accent

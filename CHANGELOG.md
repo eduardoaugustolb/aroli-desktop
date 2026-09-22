@@ -10,6 +10,36 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [3.2.0] - 2026-09-21
+
+### Added
+
+- Aroli Sans and Aroli Mono NF ship with the rice
+  (`home/.local/share/fonts/`, installed by the `config` phase) and
+  Aroli Sans is a UI font choice in Settings › Appearance. Both are
+  original Aroli drawings from the upstream `aroli` repo.
+- Launcher uses the Encaixe product mark (U+100000 glyph from
+  Aroli Mono NF) tinted with the contrast-guaranteed `onWallAccent`
+  ink instead of the distro logo. Measured 5.95:1 against the
+  wallpaper (house guarantee is 3.5:1). Image colorization was
+  discarded: it keeps the source lightness and can never hit the
+  guaranteed ink.
+- Lyrics in MediaPanel (Super+D): synced follow from lrclib with a
+  calm centered glide, spectrum as loading/fallback.
+- Tokens: `fsCaption`/`fsTitle`, `mFollow`/`mTint`, `hitPad`,
+  `inkHi`/`inkMid`/`inkLo`; type, color, radius, spacing and motion
+  migrated to tokens across control-center panels and Settings.
+
+### Changed
+
+- Aroli for Spotify theme replaces termspot (own theme: rounded
+  cards and covers, hairlines, system type, wallpaper accent).
+- Product naming: "Rice de Eduardo" strings become Aroli Desktop.
+
+### Fixed
+
+- `fmt()` prints `--:--` for bogus durations instead of digit walls.
+
 ## [3.1.0] - 2026-09-21
 
 ### Added

@@ -118,10 +118,10 @@ Item {
     ColumnLayout {
         anchors {
             fill: parent
-            leftMargin: 21
-            rightMargin: 21
+            leftMargin: 22
+            rightMargin: 22
             topMargin: 20
-            bottomMargin: 16
+            bottomMargin: 18
         }
         spacing: 0
 
@@ -134,9 +134,9 @@ Item {
             // Clicking the title while on another month returns to today
             Text {
                 text: ShellState.capitalize(new Date(root.viewYear, root.viewMonth, 1, 12).toLocaleDateString(ShellState.loc, "MMMM yyyy"))
-                color: "#ffffff"
+                color: Colors.inkHi
                 font.family: Appearance.fontUI
-                font.pixelSize: 15
+                font.pixelSize: Appearance.fsL
                 font.weight: Font.DemiBold
 
                 MouseArea {
@@ -167,7 +167,7 @@ Item {
                         : Qt.rgba(1, 1, 1, 0.07)
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
                     scale: todayMa.pressed ? 0.95 : 1
-                    Behavior on scale { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+                    Behavior on scale { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppScale } }
 
                     Text {
                         id: todayLbl
@@ -201,14 +201,14 @@ Item {
                         : Qt.rgba(1, 1, 1, 0.05)
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
                     scale: prevMa.pressed ? 0.95 : 1
-                    Behavior on scale { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+                    Behavior on scale { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppScale } }
 
                     Text {
                         anchors.centerIn: parent
                         text: "‹"
-                        color: prevMa.containsMouse ? "#ffffff" : "#c0c0c0"
+                        color: prevMa.containsMouse ? Colors.inkHi : "#c0c0c0"
                         font.family: Appearance.fontUI
-                        font.pixelSize: 18
+                        font.pixelSize: Appearance.fsTitle
                         Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
                     }
 
@@ -234,14 +234,14 @@ Item {
                         : Qt.rgba(1, 1, 1, 0.05)
                     Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
                     scale: nextMa.pressed ? 0.95 : 1
-                    Behavior on scale { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+                    Behavior on scale { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppScale } }
 
                     Text {
                         anchors.centerIn: parent
                         text: "›"
-                        color: nextMa.containsMouse ? "#ffffff" : "#c0c0c0"
+                        color: nextMa.containsMouse ? Colors.inkHi : "#c0c0c0"
                         font.family: Appearance.fontUI
-                        font.pixelSize: 18
+                        font.pixelSize: Appearance.fsTitle
                         Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
                     }
 
@@ -271,9 +271,9 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: ShellState.loc.dayName((ShellState.loc.firstDayOfWeek + index) % 7, Locale.NarrowFormat).toUpperCase()
-                        color: "#707070"
+                        color: Colors.inkLo
                         font.family: Appearance.fontUI
-                        font.pixelSize: 11
+                        font.pixelSize: Appearance.fsXS
                         font.weight: Font.Medium
                     }
                 }
@@ -313,13 +313,13 @@ Item {
                         anchors.centerIn: parent
                         text: String(cell.modelData.day)
                         font.family: Appearance.fontUI
-                        font.pixelSize: 13
+                        font.pixelSize: Appearance.fsM
                         font.weight: cell.modelData.isToday ? Font.Bold : Font.Normal
                         font.features: ({ "tnum": 1 })
                         color: cell.modelData.isToday
                             ? Colors.bg
                             : cell.modelData.isCurrentMonth
-                            ? "#ffffff"
+                            ? Colors.inkHi
                             : Qt.rgba(1, 1, 1, 0.22)
                     }
                 }

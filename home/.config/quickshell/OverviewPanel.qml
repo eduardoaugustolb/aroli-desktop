@@ -504,7 +504,7 @@ Item {
         }
         color: root.hoverTl ? "#e6e6e6" : "#6e6e6e"
         font.family: Appearance.fontUI
-        font.pixelSize: 11
+        font.pixelSize: Appearance.fsXS
         font.weight: root.hoverTl ? Font.Medium : Font.Normal
         Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
     }

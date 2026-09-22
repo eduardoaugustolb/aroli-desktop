@@ -16,7 +16,7 @@
 // Aquí no hay superficie propia: el panel se pinta sobre la del notch como los
 // demás, y lo único que flota encima son las mismas tarjetas de radM con
 // relleno al 4,5 % y filete al 7,5 % que usa la ventana de Ajustes. La escala
-// de grises es la de la casa: #ffffff · #cfcfcf · #9a9a9a · #8a8a8a · #7d7d7d.
+// de grises es la de la casa: Colors.inkHi · inkMid · inkLo.
 //
 // LAS CURVAS MANDAN. Es lo único que este panel enseña y no se puede ver en
 // ningún otro sitio del escritorio, así que se lleva la carta grande entera y
@@ -62,9 +62,9 @@ Item {
         const days = Math.floor(mins / 1440);
         const hours = Math.floor((mins % 1440) / 60);
         const rest = mins % 60;
-        if (days > 0) return days + " d " + hours + " h";
-        if (hours > 0) return hours + " h " + rest + " min";
-        return rest + " min";
+        if (days > 0) return I18n.tr("{0} d {1} h", days, hours);
+        if (hours > 0) return I18n.tr("{0} h {1} min", hours, rest);
+        return I18n.tr("{0} min", rest);
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -212,7 +212,7 @@ Item {
         property real ent: ShellState.mode === "system" ? 1 : 0
         Behavior on ent {
             SequentialAnimation {
-                PauseAnimation { duration: ShellState.mode === "system" ? card.idx * 32 : 0 }
+                PauseAnimation { duration: ShellState.mode === "system" ? card.idx * Appearance.mStagger : 0 }
                 SpringAnimation {
                     spring: Appearance.sprPanel
                     damping: Appearance.dmpPanel
@@ -262,8 +262,8 @@ Item {
             Text {
                 Layout.alignment: Qt.AlignBaseline
                 text: lane.label
-                color: "#9a9a9a"
-                font.family: Appearance.fontUI; font.pixelSize: 11
+                color: Colors.inkMid
+                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
             }
             Text {
                 Layout.alignment: Qt.AlignBaseline
@@ -271,24 +271,24 @@ Item {
                 text: lane.reading
                     ? Math.round(lane.series[lane.hover]) + lane.unit
                     : lane.value
-                color: "#ffffff"
-                font.family: Appearance.fontUI; font.pixelSize: 18
+                color: Colors.inkHi
+                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsTitle
                 font.weight: Font.DemiBold
             }
             Text {
                 Layout.alignment: Qt.AlignBaseline
                 Layout.fillWidth: true
                 text: lane.reading ? root.agoText(lane.series.length - 1 - lane.hover) : lane.note
-                color: "#7d7d7d"; elide: Text.ElideRight
-                font.family: Appearance.fontUI; font.pixelSize: 10
+                color: Colors.inkLo; elide: Text.ElideRight
+                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                 font.features: ({ "tnum": 1 })
             }
             Text {
                 Layout.alignment: Qt.AlignBaseline
                 visible: lane.aside.length > 0
                 text: lane.aside
-                color: "#5e5e5e"
-                font.family: Appearance.fontUI; font.pixelSize: 10
+                color: Colors.inkLo
+                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
             }
         }
 
@@ -329,7 +329,7 @@ Item {
                 anchors { left: parent.left; top: parent.top }
                 text: lane.ceil + " %"
                 color: "#4f4f4f"
-                font.family: Appearance.fontUI; font.pixelSize: 9
+                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                 font.features: ({ "tnum": 1 })
             }
         }
@@ -337,7 +337,7 @@ Item {
 
 
     ColumnLayout {
-        anchors { fill: parent; leftMargin: 22; rightMargin: 20; topMargin: 20; bottomMargin: 18 }
+        anchors { fill: parent; leftMargin: 22; rightMargin: 22; topMargin: 20; bottomMargin: 18 }
         spacing: 12
 
         // ─────────────── cabecera ───────────────
@@ -358,8 +358,8 @@ Item {
                     // centro de control. Una puerta y una habitación con nombres
                     // distintos son dos sitios.
                     text: I18n.tr("Your computer")
-                    color: "#ffffff"
-                    font.family: Appearance.fontUI; font.pixelSize: 13; font.weight: Font.DemiBold
+                    color: Colors.inkHi
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsM; font.weight: Font.DemiBold
                 }
                 Text {
                     text: root.battLow ? I18n.tr("Battery low · {0}", ShellState.battEstimateText)
@@ -371,7 +371,7 @@ Item {
                             : I18n.tr("Uptime {0}", root.uptime(ShellState.uptimeSeconds))
                     color: root.battLow ? Colors.crit : root.hot ? Colors.warn : "#8a8a8a"
                     elide: Text.ElideRight
-                    font.family: Appearance.fontUI; font.pixelSize: 11
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                     Behavior on color { ColorAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
                 }
             }
@@ -396,14 +396,14 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "‹"
                         color: backMa.containsMouse ? Colors.accent : "#8a8a8a"
-                        font.family: Appearance.fontUI; font.pixelSize: 15
+                        font.family: Appearance.fontUI; font.pixelSize: Appearance.fsL
                         Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                     }
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: I18n.tr("Control Centre")
-                        color: backMa.containsMouse ? Colors.accent : "#cfcfcf"
-                        font.family: Appearance.fontUI; font.pixelSize: 11
+                        color: backMa.containsMouse ? Colors.accent : Colors.inkMid
+                        font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                         Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                     }
                 }
@@ -520,21 +520,21 @@ Item {
                             Text {
                                 text: "󰔏"
                                 color: root.tempTone
-                                font.family: Appearance.font; font.pixelSize: 15
+                                font.family: Appearance.font; font.pixelSize: Appearance.fsL
                                 Behavior on color { ColorAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
                             }
                             Text {
                                 Layout.fillWidth: true
                                 text: I18n.tr("Temperature")
-                                color: "#9a9a9a"
-                                font.family: Appearance.fontUI; font.pixelSize: 11
+                                color: Colors.inkMid
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                             }
                             Text {
                                 text: tempCard.reading
-                                    ? Math.round(ShellState.tempHistory[tempCard.hover]) + " °C"
-                                    : ShellState.cpuTemp >= 0 ? Math.round(ShellState.cpuTemp) + " °C" : "n/a"
-                                color: "#ffffff"
-                                font.family: Appearance.fontUI; font.pixelSize: 18
+                                    ? I18n.tr("{0} °C", Math.round(ShellState.tempHistory[tempCard.hover]))
+                                    : ShellState.cpuTemp >= 0 ? I18n.tr("{0} °C", Math.round(ShellState.cpuTemp)) : I18n.tr("n/a")
+                                color: Colors.inkHi
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsTitle
                                 font.weight: Font.DemiBold
                             }
                         }
@@ -552,8 +552,8 @@ Item {
                                 : ShellState.cpuTemp < 52 ? I18n.tr("Cool")
                                 : ShellState.cpuTemp < 68 ? I18n.tr("Warm")
                                 : ShellState.cpuTemp < 80 ? I18n.tr("Hot") : I18n.tr("Very hot")
-                            color: "#7d7d7d"
-                            font.family: Appearance.fontUI; font.pixelSize: 10
+                            color: Colors.inkLo
+                            font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                         }
 
                         Item {
@@ -609,19 +609,19 @@ Item {
                                 text: "󰋊"
                                 color: ShellState.disk >= 92 ? Colors.crit
                                     : ShellState.disk >= 82 ? Colors.warn : Colors.accent
-                                font.family: Appearance.font; font.pixelSize: 15
+                                font.family: Appearance.font; font.pixelSize: Appearance.fsL
                                 Behavior on color { ColorAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
                             }
                             Text {
                                 Layout.fillWidth: true
                                 text: I18n.tr("Storage")
-                                color: "#9a9a9a"
-                                font.family: Appearance.fontUI; font.pixelSize: 11
+                                color: Colors.inkMid
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                             }
                             Text {
                                 text: ShellState.disk + " %"
-                                color: "#ffffff"
-                                font.family: Appearance.fontUI; font.pixelSize: 15
+                                color: Colors.inkHi
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsL
                                 font.weight: Font.DemiBold
                             }
                         }
@@ -652,8 +652,8 @@ Item {
                                           root.gibFromBytes(Math.max(0, ShellState.diskTotalBytes - ShellState.diskUsedBytes)),
                                           root.gibFromBytes(ShellState.diskTotalBytes))
                                 : ""
-                            color: "#7d7d7d"; elide: Text.ElideRight
-                            font.family: Appearance.fontUI; font.pixelSize: 10
+                            color: Colors.inkLo; elide: Text.ElideRight
+                            font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                         }
                     }
                 }

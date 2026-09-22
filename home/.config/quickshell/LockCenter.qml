@@ -215,7 +215,7 @@ Item {
             text: Qt.formatDateTime(ShellState.now, "HH:mm")
             color: Colors.fg
             font.family: Appearance.fontUI
-            font.pixelSize: 38
+            font.pixelSize: Appearance.fsXXL
             font.weight: Font.DemiBold
             font.features: ({ "tnum": 1 })
             opacity: root.contentOpacity
@@ -229,7 +229,7 @@ Item {
                 + " · " + ShellState.now.toLocaleDateString(ShellState.loc, I18n.tr("d MMMM"))
             color: Colors.dim
             font.family: Appearance.fontUI
-            font.pixelSize: 12
+            font.pixelSize: Appearance.fsS
             opacity: root.contentOpacity
         }
 
@@ -298,7 +298,7 @@ Item {
                         selectionColor: Colors.accent
                         selectedTextColor: Colors.bg
                         font.family: Appearance.fontUI
-                        font.pixelSize: 13
+                        font.pixelSize: Appearance.fsM
                         activeFocusOnPress: root.interactive
                         text: root.pam ? root.pam.buffer : ""
                         onTextChanged: {
@@ -328,7 +328,7 @@ Item {
                         text: I18n.tr("Enter your password")
                         color: Qt.rgba(Colors.fg.r, Colors.fg.g, Colors.fg.b, 0.55)
                         font.family: Appearance.fontUI
-                        font.pixelSize: 13
+                        font.pixelSize: Appearance.fsM
                     }
                 }
 
@@ -344,7 +344,7 @@ Item {
                         text: "→"
                         color: pwdInput.text.length > 0 ? Colors.bg : Colors.dim
                         font.family: Appearance.fontUI
-                        font.pixelSize: 15
+                        font.pixelSize: Appearance.fsL
                         font.weight: Font.DemiBold
                     }
                     MouseArea {
@@ -373,7 +373,7 @@ Item {
                 visible: text.length > 0
                 color: root.pam && root.pam.checking ? Colors.ok : Colors.crit
                 font.family: Appearance.fontUI
-                font.pixelSize: 12
+                font.pixelSize: Appearance.fsS
                 font.weight: Font.Medium
             }
             Text {
@@ -383,7 +383,7 @@ Item {
                 visible: text.length > 0
                 color: Colors.warn
                 font.family: Appearance.fontUI
-                font.pixelSize: 11
+                font.pixelSize: Appearance.fsXS
                 font.weight: Font.Medium
             }
         }
@@ -395,7 +395,7 @@ Item {
             text: I18n.tr("or touch the fingerprint reader")
             color: Colors.dim
             font.family: Appearance.fontUI
-            font.pixelSize: 11
+            font.pixelSize: Appearance.fsXS
             opacity: root.contentOpacity
         }
 
@@ -413,7 +413,7 @@ Item {
                 text: root.userName
                 color: Colors.dim
                 font.family: Appearance.font
-                font.pixelSize: 12
+                font.pixelSize: Appearance.fsS
 
                 MouseArea {
                     anchors.fill: parent
@@ -433,7 +433,7 @@ Item {
                     : ShellState.battIcon + "  " + ShellState.batt + "%"
                 color: root.showEstimate ? Colors.accent : Colors.dim
                 font.family: Appearance.font
-                font.pixelSize: 12
+                font.pixelSize: Appearance.fsS
                 Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
 
                 MouseArea {

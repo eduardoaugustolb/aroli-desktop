@@ -103,27 +103,27 @@ Flickable {
             spacing: 5
             RowLayout {
                 Layout.fillWidth: true; Layout.preferredHeight: 44; spacing: 10
-                Text { text: ShellState.wifiIconFor(row.modelData.signalStrength || 0); color: row.modelData.connected ? Colors.accent : "#9a9a9a"; font.family: Appearance.font; font.pixelSize: 15 }
+                Text { text: ShellState.wifiIconFor(row.modelData.signalStrength || 0); color: row.modelData.connected ? Colors.accent : Colors.inkMid; font.family: Appearance.font; font.pixelSize: 15 }
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 0
-                    Text { Layout.fillWidth: true; text: row.ssid; color: "white"; elide: Text.ElideRight; font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS }
-                    Text { visible: text.length > 0; text: root.errorFor === row.ssid ? I18n.tr("Wrong password") : row.modelData.stateChanging ? I18n.tr("Connecting…") : row.modelData.connected ? I18n.tr("Connected") : row.modelData.known ? I18n.tr("Saved") : ""; color: root.errorFor === row.ssid ? Colors.crit : row.modelData.connected ? Colors.accent : "#7d7d7d"; font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS }
+                    Text { Layout.fillWidth: true; text: row.ssid; color: Colors.inkHi; elide: Text.ElideRight; font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS }
+                    Text { visible: text.length > 0; text: root.errorFor === row.ssid ? I18n.tr("Wrong password") : row.modelData.stateChanging ? I18n.tr("Connecting…") : row.modelData.connected ? I18n.tr("Connected") : row.modelData.known ? I18n.tr("Saved") : ""; color: root.errorFor === row.ssid ? Colors.crit : row.modelData.connected ? Colors.accent : Colors.inkLo; font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS }
                 }
                 Text { visible: row.secured; text: Icons.lock; color: "#777"; font.family: Appearance.font; font.pixelSize: 11 }
                 Text {
                     text: row.modelData.connected ? I18n.tr("Disconnect") : I18n.tr("Connect")
                     color: action.containsMouse ? Colors.accent : "#b0b0b0"; font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
-                    MouseArea { id: action; anchors.fill: parent; anchors.margins: -6; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: row.connectOrAsk() }
+                    MouseArea { id: action; anchors.fill: parent; anchors.margins: -Appearance.hitPad; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: row.connectOrAsk() }
                 }
                 Text {
-                    visible: row.modelData.known; text: "󰩹"; color: forget.containsMouse ? Colors.crit : "#7d7d7d"; font.family: Appearance.font; font.pixelSize: 13
-                    MouseArea { id: forget; anchors.fill: parent; anchors.margins: -6; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { if (root.askingFor === row.ssid) root.askingFor = ""; row.modelData.forget(); } }
+                    visible: row.modelData.known; text: "󰩹"; color: forget.containsMouse ? Colors.crit : Colors.inkLo; font.family: Appearance.font; font.pixelSize: Appearance.fsM
+                    MouseArea { id: forget; anchors.fill: parent; anchors.margins: -Appearance.hitPad; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { if (root.askingFor === row.ssid) root.askingFor = ""; row.modelData.forget(); } }
                 }
             }
             TextField {
                 id: password
                 Layout.fillWidth: true; Layout.preferredHeight: 28; visible: row.asking
-                echoMode: TextInput.Password; placeholderText: I18n.tr("Password"); color: "white"; placeholderTextColor: "#777"; selectionColor: Colors.accent
+                echoMode: TextInput.Password; placeholderText: I18n.tr("Password"); color: Colors.inkHi; placeholderTextColor: "#777"; selectionColor: Colors.accent
                 font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS
                 text: row.asking ? root.passwordDraft : ""
                 background: Rectangle { radius: Appearance.radS; color: Qt.rgba(0,0,0,0.4); border.width: 1; border.color: password.activeFocus ? Colors.accent : "#2a2a2a" }

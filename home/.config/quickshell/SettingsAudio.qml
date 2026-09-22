@@ -213,14 +213,14 @@ Flickable {
 
             Text {
                 text: dev.isSink ? "󰓃" : "󰍬"
-                color: dev.isDefault ? Colors.accent : "#9a9a9a"
+                color: dev.isDefault ? Colors.accent : Colors.inkMid
                 font.family: Appearance.font
-                font.pixelSize: 15
+                font.pixelSize: Appearance.fsL
             }
             Text {
                 Layout.fillWidth: true
                 text: dev.short_
-                color: "#ffffff"
+                color: Colors.inkHi
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsS
@@ -238,7 +238,7 @@ Flickable {
                 text: "󰄬"
                 color: Colors.accent
                 font.family: Appearance.font
-                font.pixelSize: 13
+                font.pixelSize: Appearance.fsM
             }
         }
 

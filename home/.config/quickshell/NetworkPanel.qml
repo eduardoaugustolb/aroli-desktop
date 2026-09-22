@@ -57,7 +57,7 @@ Item {
     }
 
     ColumnLayout {
-        anchors { fill: parent; leftMargin: 22; rightMargin: 20; topMargin: 20; bottomMargin: 18 }
+        anchors { fill: parent; leftMargin: 22; rightMargin: 22; topMargin: 20; bottomMargin: 18 }
         spacing: 12
 
         // ─────────────── header ───────────────
@@ -67,15 +67,15 @@ Item {
 
             Text {
                 text: ShellState.netIcon
-                color: ShellState.online ? Colors.accent : "#7d7d7d"
-                font.family: Appearance.font; font.pixelSize: 18
+                color: ShellState.online ? Colors.accent : Colors.inkLo
+                font.family: Appearance.font; font.pixelSize: Appearance.fsTitle
             }
             ColumnLayout {
                 spacing: 0
                 Text {
                     text: I18n.tr("Network")
-                    color: "#ffffff"
-                    font.family: Appearance.fontUI; font.pixelSize: 13; font.weight: Font.DemiBold
+                    color: Colors.inkHi
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsM; font.weight: Font.DemiBold
                 }
                 Text {
                     // "Wi-Fi off" only when there is a radio to TURN ON.
@@ -84,8 +84,8 @@ Item {
                     text: ShellState.wiredDev ? I18n.tr("Cable connected")
                         : ShellState.wifiNet ? ShellState.wifiNet.name
                         : (ShellState.wifiOn || !ShellState.hasWifi) ? I18n.tr("Not connected") : I18n.tr("Wi-Fi off")
-                    color: "#8a8a8a"
-                    font.family: Appearance.fontUI; font.pixelSize: 11
+                    color: Colors.inkMid
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                 }
             }
             Item { Layout.fillWidth: true }
@@ -94,15 +94,15 @@ Item {
             Rectangle {
                 visible: ShellState.hasWifi
                 implicitWidth: 42; implicitHeight: 23
-                radius: 12
+                radius: height / 2
                 color: ShellState.wifiOn ? Colors.accent : Qt.rgba(1, 1, 1, 0.14)
                 Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                 Rectangle {
-                    width: 17; height: 17; radius: 9
-                    color: "#ffffff"
+                    width: 17; height: 17; radius: height / 2
+                    color: Colors.inkHi
                     y: 3
                     x: ShellState.wifiOn ? parent.width - width - 3 : 3
-                    Behavior on x { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+                    Behavior on x { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppPx } }
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -149,7 +149,7 @@ Item {
                 width: list.width
                 height: netRow.asking ? 88 : 44
                 Behavior on height { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
-                radius: 12
+                radius: Appearance.radS
                 clip: true
                 color: modelData.connected ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.18)
                      : (netMa.containsMouse || netRow.asking || netRow.index === list.currentIndex) ? Qt.rgba(1, 1, 1, 0.08)
@@ -180,8 +180,8 @@ Item {
 
                         Text {
                             text: ShellState.wifiIconFor(netRow.modelData.signalStrength || 0)
-                            color: netRow.modelData.connected ? Colors.accent : "#cfcfcf"
-                            font.family: Appearance.font; font.pixelSize: 15
+                            color: netRow.modelData.connected ? Colors.accent : Colors.inkMid
+                            font.family: Appearance.font; font.pixelSize: Appearance.fsL
                         }
 
                         ColumnLayout {
@@ -190,8 +190,8 @@ Item {
                             Text {
                                 Layout.fillWidth: true
                                 text: netRow.ssid
-                                color: "#ffffff"; elide: Text.ElideRight
-                                font.family: Appearance.fontUI; font.pixelSize: 12
+                                color: Colors.inkHi; elide: Text.ElideRight
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS
                                 font.weight: netRow.modelData.connected ? Font.DemiBold : Font.Normal
                             }
                             Text {
@@ -204,7 +204,7 @@ Item {
                                     : netRow.modelData.known ? (netRow.enterprise ? I18n.tr("Enterprise · Saved") : I18n.tr("Saved"))
                                     : netRow.enterprise ? I18n.tr("Enterprise · EAP") : ""
                                 color: root.errorFor === netRow.ssid ? Colors.crit
-                                     : netRow.modelData.connected ? Colors.accent : "#7d7d7d"
+                                     : netRow.modelData.connected ? Colors.accent : Colors.inkLo
                                 elide: Text.ElideRight
                                 font.family: Appearance.fontUI; font.pixelSize: 10
                             }
@@ -213,7 +213,7 @@ Item {
                         Text {
                             visible: netRow.secured
                             text: netRow.enterprise ? Icons.wifiLock : Icons.lock
-                            color: netRow.enterprise ? "#9a9a9a" : "#6f6f6f"
+                            color: netRow.enterprise ? Colors.inkMid : "#6f6f6f"
                             font.family: Appearance.font; font.pixelSize: 11
                         }
 
@@ -226,7 +226,7 @@ Item {
                             font.family: Appearance.font; font.pixelSize: 12
                             MouseArea {
                                 id: editMa
-                                anchors.fill: parent; anchors.margins: -6
+                                anchors.fill: parent; anchors.margins: -Appearance.hitPad
                                 hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                                 onClicked: ShellState.editEnterprise(netRow.modelData)
                             }
@@ -237,10 +237,10 @@ Item {
                             visible: netMa.containsMouse && netRow.modelData.connected
                             text: "󰅖"
                             color: discMa.containsMouse ? Colors.crit : "#8a8a8a"
-                            font.family: Appearance.font; font.pixelSize: 13
+                            font.family: Appearance.font; font.pixelSize: Appearance.fsM
                             MouseArea {
                                 id: discMa
-                                anchors.fill: parent; anchors.margins: -6
+                                anchors.fill: parent; anchors.margins: -Appearance.hitPad
                                 hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                                 onClicked: netRow.modelData.disconnect()
                             }
@@ -253,10 +253,10 @@ Item {
                             visible: netMa.containsMouse && netRow.modelData.known
                             text: "󰩹"
                             color: forgetMa.containsMouse ? Colors.crit : "#8a8a8a"
-                            font.family: Appearance.font; font.pixelSize: 13
+                            font.family: Appearance.font; font.pixelSize: Appearance.fsM
                             MouseArea {
                                 id: forgetMa
-                                anchors.fill: parent; anchors.margins: -6
+                                anchors.fill: parent; anchors.margins: -Appearance.hitPad
                                 hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     if (root.askingFor === netRow.ssid) {
@@ -278,7 +278,7 @@ Item {
                         Rectangle {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 30
-                            radius: 9
+                            radius: Appearance.radS
                             color: Qt.rgba(0, 0, 0, 0.45)
                             border.width: 1
                             border.color: pskField.activeFocus ? Colors.accent : "#2a2a2a"
@@ -289,10 +289,10 @@ Item {
                                 anchors { fill: parent; leftMargin: 11; rightMargin: 11 }
                                 echoMode: TextInput.Password
                                 placeholderText: I18n.tr("Password")
-                                color: "#ffffff"
-                                placeholderTextColor: "#5e5e5e"
+                                color: Colors.inkHi
+                                placeholderTextColor: Colors.inkLo
                                 selectionColor: Colors.accent
-                                font.family: Appearance.fontUI; font.pixelSize: 12
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS
                                 background: null
                                 padding: 0
                                 verticalAlignment: TextInput.AlignVCenter
@@ -311,14 +311,14 @@ Item {
 
                         Rectangle {
                             Layout.preferredWidth: 74; Layout.preferredHeight: 30
-                            radius: 9
+                            radius: Appearance.radPill
                             color: okMa.containsMouse ? Colors.accent : Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.28)
                             Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                             Text {
                                 anchors.centerIn: parent
                                 text: I18n.tr("Connect")
-                                color: okMa.containsMouse ? "#000000" : "#ffffff"
-                                font.family: Appearance.fontUI; font.pixelSize: 11; font.weight: Font.Medium
+                                color: okMa.containsMouse ? "#000000" : Colors.inkHi
+                                font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS; font.weight: Font.Medium
                             }
                             MouseArea {
                                 id: okMa
@@ -376,10 +376,10 @@ Item {
             // "Scanning for networks…" would be a wait that never ends.
             text: !ShellState.hasWifi ? (ShellState.wiredDev ? I18n.tr("This computer uses a cable") : I18n.tr("This computer has no Wi-Fi"))
                 : !ShellState.wifiOn ? I18n.tr("Wi-Fi off") : I18n.tr("Looking for networks…")
-            color: "#5e5e5e"
+            color: Colors.inkLo
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            font.family: Appearance.fontUI; font.pixelSize: 12
+            font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS
         }
     }
 }

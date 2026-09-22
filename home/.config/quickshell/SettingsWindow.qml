@@ -146,7 +146,10 @@ Scope {
     Timer {
         id: grabFocus
         interval: 90
-        onTriggered: Hyprland.dispatch('hl.dsp.focus({ window = "title:Settings" })')
+        // The title is translated (I18n.tr above), so the lookup must use
+        // the same translation: a hard-coded "Settings" only matches in
+        // English and keyboard focus silently stops working elsewhere.
+        onTriggered: Hyprland.dispatch('hl.dsp.focus({ window = "title:' + I18n.tr("Settings") + '" })')
     }
 
     // Pinchar fuera cierra Ajustes, con el mismo mecanismo que los paneles del
@@ -181,7 +184,7 @@ Scope {
     FloatingWindow {
         id: win
         visible: ShellState.settingsOpen
-        title: "Settings"
+        title: I18n.tr("Settings")
         // Sigue siendo una ventana contenida, pero ya no conserva el tamaño de
         // cuando había muchas menos filas. El alto deja ver Energía completa y
         // el ancho da aire a nombres de dispositivos y atajos.
@@ -254,9 +257,9 @@ Scope {
                         Text {
                             Layout.leftMargin: 8
                             text: I18n.tr("Settings")
-                            color: "#ffffff"
+                            color: Colors.inkHi
                             font.family: Appearance.fontUI
-                            font.pixelSize: 19
+                            font.pixelSize: Appearance.fsTitle
                             font.weight: Font.DemiBold
                         }
 
@@ -266,7 +269,7 @@ Scope {
                             Layout.topMargin: 12
                             Layout.bottomMargin: root.searching ? 2 : 9
                             implicitHeight: 38
-                            radius: 12
+                            radius: Appearance.radS
                             color: search.activeFocus ? Qt.rgba(1, 1, 1, 0.12) : Qt.rgba(1, 1, 1, 0.075)
                             border.width: 1
                             border.color: search.activeFocus
@@ -283,7 +286,7 @@ Scope {
                                     text: "󰍉"
                                     color: search.activeFocus ? Colors.accent : "#828282"
                                     font.family: Appearance.font
-                                    font.pixelSize: 12
+                                    font.pixelSize: Appearance.fsS
                                 }
 
                                 Item {
@@ -294,7 +297,7 @@ Scope {
                                         id: search
                                         anchors.verticalCenter: parent.verticalCenter
                                         width: parent.width
-                                        color: "#ffffff"
+                                        color: Colors.inkHi
                                         selectionColor: Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.45)
                                         selectByMouse: true
                                         clip: true
@@ -321,7 +324,7 @@ Scope {
                                         x: 2
                                         visible: search.text.length === 0
                                         text: I18n.tr("Search Settings")
-                                        color: "#707070"
+                                        color: Colors.inkLo
                                         font.family: Appearance.fontUI
                                         font.pixelSize: Appearance.fsS
                                     }
@@ -330,13 +333,13 @@ Scope {
                                 Text {
                                     visible: search.text.length > 0
                                     text: "󰅖"
-                                    color: clearMa.containsMouse ? "#ffffff" : "#828282"
+                                    color: clearMa.containsMouse ? Colors.inkHi : "#828282"
                                     font.family: Appearance.font
-                                    font.pixelSize: 11
+                                    font.pixelSize: Appearance.fsXS
                                     MouseArea {
                                         id: clearMa
                                         anchors.fill: parent
-                                        anchors.margins: -5
+                                        anchors.margins: -Appearance.hitPad
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: { search.text = ""; search.forceActiveFocus(); }
@@ -369,7 +372,7 @@ Scope {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 40
                                 visible: !root.searching || navItem.hits > 0
-                                radius: 12
+                                radius: Appearance.radS
                                 color: navItem.sel ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.24)
                                      : navMa.containsMouse ? Qt.rgba(1, 1, 1, 0.07) : "transparent"
                                 Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
@@ -379,14 +382,14 @@ Scope {
                                     spacing: 11
                                     Text {
                                         text: navItem.modelData.icon
-                                        color: navItem.sel ? Colors.accent : "#9a9a9a"
+                                        color: navItem.sel ? Colors.accent : Colors.inkMid
                                         font.family: Appearance.font
-                                        font.pixelSize: 14
+                                        font.pixelSize: Appearance.fsL
                                     }
                                     Text {
                                         Layout.fillWidth: true
                                         text: navItem.modelData.label
-                                        color: navItem.sel ? "#ffffff" : "#b0b0b0"
+                                        color: navItem.sel ? Colors.inkHi : "#b0b0b0"
                                         font.family: Appearance.fontUI
                                         font.pixelSize: Appearance.fsS
                                         font.weight: navItem.sel ? Font.Medium : Font.Normal
@@ -403,9 +406,9 @@ Scope {
                                             id: hitText
                                             anchors.centerIn: parent
                                             text: navItem.hits
-                                            color: navItem.sel ? "#ffffff" : "#8a8a8a"
+                                            color: navItem.sel ? Colors.inkHi : "#8a8a8a"
                                             font.family: Appearance.fontUI
-                                            font.pixelSize: 10
+                                            font.pixelSize: Appearance.fsCaption
                                             font.weight: Font.Medium
                                         }
                                     }
@@ -429,15 +432,15 @@ Scope {
                             spacing: 3
                             Text {
                                 text: I18n.tr("Ctrl+F  search  ·  Esc  close")
-                                color: "#666666"
+                                color: Colors.inkLo
                                 font.family: Appearance.fontUI
-                                font.pixelSize: 10
+                                font.pixelSize: Appearance.fsCaption
                             }
                             Text {
-                                text: I18n.tr("Quickshell · Eduardo Augusto's rice")
-                                color: "#454545"
+                                text: I18n.tr("Quickshell · Aroli Desktop")
+                                color: Colors.inkLo
                                 font.family: Appearance.fontUI
-                                font.pixelSize: 10
+                                font.pixelSize: Appearance.fsCaption
                             }
                         }
                     }
@@ -461,14 +464,14 @@ Scope {
                             Rectangle {
                                 Layout.preferredWidth: 38
                                 Layout.preferredHeight: 38
-                                radius: 12
+                                radius: width / 2
                                 color: Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.18)
                                 Text {
                                     anchors.centerIn: parent
                                     text: root.sectionInfo(root.section).icon
                                     color: Colors.accent
                                     font.family: Appearance.font
-                                    font.pixelSize: 17
+                                    font.pixelSize: Appearance.fsTitle
                                 }
                             }
 
@@ -478,10 +481,10 @@ Scope {
                                 Text {
                                     Layout.fillWidth: true
                                     text: root.sectionInfo(root.section).label
-                                    color: "#ffffff"
+                                    color: Colors.inkHi
                                     elide: Text.ElideRight
                                     font.family: Appearance.fontUI
-                                    font.pixelSize: 18
+                                    font.pixelSize: Appearance.fsTitle
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
@@ -512,15 +515,15 @@ Scope {
                             Rectangle {
                                 Layout.preferredWidth: 32
                                 Layout.preferredHeight: 32
-                                radius: 10
+                                radius: Appearance.radS
                                 color: closeMa.containsMouse ? Qt.rgba(1, 1, 1, 0.11) : Qt.rgba(1, 1, 1, 0.055)
                                 Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰅖"
-                                    color: closeMa.containsMouse ? "#ffffff" : "#8a8a8a"
+                                    color: closeMa.containsMouse ? Colors.inkHi : "#8a8a8a"
                                     font.family: Appearance.font
-                                    font.pixelSize: 12
+                                    font.pixelSize: Appearance.fsS
                                 }
                                 MouseArea {
                                     id: closeMa
@@ -590,9 +593,9 @@ Scope {
                             Text {
                                 Layout.alignment: Qt.AlignHCenter
                                 text: "󰍉"
-                                color: "#666666"
+                                color: Colors.inkLo
                                 font.family: Appearance.font
-                                font.pixelSize: 26
+                                font.pixelSize: Appearance.fsTitle
                             }
                             Text {
                                 Layout.fillWidth: true
@@ -607,7 +610,7 @@ Scope {
                             Text {
                                 Layout.fillWidth: true
                                 text: I18n.tr("Try another word, or press Esc to clear the search.")
-                                color: "#777777"
+                                color: Colors.inkLo
                                 horizontalAlignment: Text.AlignHCenter
                                 wrapMode: Text.Wrap
                                 font.family: Appearance.fontUI
@@ -633,7 +636,7 @@ Scope {
                                 text: "󰋼"
                                 color: ShellState.settingsHint.length > 0 ? Colors.accent : "#606060"
                                 font.family: Appearance.font
-                                font.pixelSize: 12
+                                font.pixelSize: Appearance.fsS
                                 Behavior on color { ColorAnimation { duration: Appearance.mQuick } }
                             }
                             Text {

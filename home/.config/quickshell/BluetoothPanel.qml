@@ -28,7 +28,7 @@ Item {
     }
 
     ColumnLayout {
-        anchors { fill: parent; leftMargin: 22; rightMargin: 20; topMargin: 20; bottomMargin: 18 }
+        anchors { fill: parent; leftMargin: 22; rightMargin: 22; topMargin: 20; bottomMargin: 18 }
         spacing: 12
 
         // ─────────────── header ───────────────
@@ -38,15 +38,15 @@ Item {
 
             Text {
                 text: ShellState.btIcon
-                color: ShellState.btConnected > 0 ? Colors.accent : (ShellState.btOn ? "#cfcfcf" : "#7d7d7d")
-                font.family: Appearance.font; font.pixelSize: 18
+                color: ShellState.btConnected > 0 ? Colors.accent : (ShellState.btOn ? Colors.inkMid : Colors.inkLo)
+                font.family: Appearance.font; font.pixelSize: Appearance.fsTitle
             }
             ColumnLayout {
                 spacing: 0
                 Text {
                     text: I18n.tr("Bluetooth")
-                    color: "#ffffff"
-                    font.family: Appearance.fontUI; font.pixelSize: 13; font.weight: Font.DemiBold
+                    color: Colors.inkHi
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsM; font.weight: Font.DemiBold
                 }
                 Text {
                     text: !root.adapter ? I18n.tr("No adapter")
@@ -55,24 +55,24 @@ Item {
                         : ShellState.btConnected > 0
                             ? ShellState.btLabel(ShellState.btPaired[0])
                             : I18n.tr("Not connected")
-                    color: "#8a8a8a"; elide: Text.ElideRight
-                    font.family: Appearance.fontUI; font.pixelSize: 11
+                    color: Colors.inkMid; elide: Text.ElideRight
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsXS
                 }
             }
             Item { Layout.fillWidth: true }
 
             Rectangle {
                 implicitWidth: 42; implicitHeight: 23
-                radius: 12
+                radius: height / 2
                 opacity: ShellState.btBlocked ? 0.4 : 1
                 color: ShellState.btOn ? Colors.accent : Qt.rgba(1, 1, 1, 0.14)
                 Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
                 Rectangle {
-                    width: 17; height: 17; radius: 9
-                    color: "#ffffff"
+                    width: 17; height: 17; radius: height / 2
+                    color: Colors.inkHi
                     y: 3
                     x: ShellState.btOn ? parent.width - width - 3 : 3
-                    Behavior on x { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+                    Behavior on x { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppPx } }
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -105,7 +105,7 @@ Item {
                     visible: ShellState.btPaired.length > 0
                     text: I18n.tr("MY DEVICES")
                     color: Colors.accent
-                    font.family: Appearance.fontUI; font.pixelSize: 10
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                     font.weight: Font.DemiBold; font.letterSpacing: 0.6
                 }
                 Repeater { model: ShellState.btPaired; BtRow {} }
@@ -116,7 +116,7 @@ Item {
                     visible: ShellState.btOn && ShellState.btNearby.length > 0
                     text: I18n.tr("AVAILABLE")
                     color: Colors.accent
-                    font.family: Appearance.fontUI; font.pixelSize: 10
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                     font.weight: Font.DemiBold; font.letterSpacing: 0.6
                 }
                 Repeater { model: ShellState.btOn ? ShellState.btNearby : []; BtRow {} }
@@ -133,11 +133,11 @@ Item {
                         + "\n" + I18n.tr("Unblock it with:  rfkill unblock bluetooth")
                 : !ShellState.btOn ? I18n.tr("Bluetooth off")
                 : I18n.tr("Looking for devices…")
-            color: "#5e5e5e"
+            color: Colors.inkLo
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             lineHeight: 1.5
-            font.family: Appearance.fontUI; font.pixelSize: 12
+            font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS
         }
     }
 
@@ -148,7 +148,7 @@ Item {
 
         Layout.fillWidth: true
         Layout.preferredHeight: 46
-        radius: 12
+        radius: Appearance.radS
         color: dev.modelData.connected ? Qt.rgba(Colors.accent.r, Colors.accent.g, Colors.accent.b, 0.18)
              : dMa.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : Qt.rgba(1, 1, 1, 0.04)
         Behavior on color { ColorAnimation { duration: Appearance.mQuick; easing.type: Easing.OutQuad } }
@@ -159,8 +159,8 @@ Item {
 
             Text {
                 text: dev.modelData.connected ? "󰂱" : "󰂯"
-                color: dev.modelData.connected ? Colors.accent : "#cfcfcf"
-                font.family: Appearance.font; font.pixelSize: 15
+                color: dev.modelData.connected ? Colors.accent : Colors.inkMid
+                font.family: Appearance.font; font.pixelSize: Appearance.fsL
             }
 
             ColumnLayout {
@@ -169,8 +169,8 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text: ShellState.btLabel(dev.modelData)
-                    color: "#ffffff"; elide: Text.ElideRight
-                    font.family: Appearance.fontUI; font.pixelSize: 12
+                    color: Colors.inkHi; elide: Text.ElideRight
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsS
                     font.weight: dev.modelData.connected ? Font.DemiBold : Font.Normal
                 }
                 Text {
@@ -185,20 +185,20 @@ Item {
                             ? I18n.tr("Couldn’t connect · try again")
                             : (dev.modelData.paired || dev.modelData.bonded) ? I18n.tr("Paired") : ""
                     color: dev.modelData.connected ? Colors.accent
-                        : ShellState.btFailureFor === (dev.modelData.address || "") ? Colors.crit : "#7d7d7d"
+                        : ShellState.btFailureFor === (dev.modelData.address || "") ? Colors.crit : Colors.inkLo
                     elide: Text.ElideRight
-                    font.family: Appearance.fontUI; font.pixelSize: 10
+                    font.family: Appearance.fontUI; font.pixelSize: Appearance.fsCaption
                 }
             }
 
             Text {
                 visible: dMa.containsMouse && (dev.modelData.paired || dev.modelData.bonded)
                 text: "󰩹"
-                color: fMa.containsMouse ? Colors.crit : "#7d7d7d"
-                font.family: Appearance.font; font.pixelSize: 13
+                color: fMa.containsMouse ? Colors.crit : Colors.inkLo
+                font.family: Appearance.font; font.pixelSize: Appearance.fsM
                 MouseArea {
                     id: fMa
-                    anchors.fill: parent; anchors.margins: -6
+                    anchors.fill: parent; anchors.margins: -Appearance.hitPad
                     hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                     onClicked: dev.modelData.forget()
                 }

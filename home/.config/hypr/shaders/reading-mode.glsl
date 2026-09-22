@@ -1,7 +1,7 @@
 #version 320 es
 
 /*
- * Reading mode for Eduardo Augusto's rice.
+ * Reading mode for Aroli Desktop.
  *
  * Custom implementation inspired by surface-dots' e-ink mode:
  * https://github.com/snes19xx/surface-dots

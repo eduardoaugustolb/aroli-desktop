@@ -164,15 +164,15 @@ Flickable {
 
             Text {
                 text: dev.modelData.connected ? "󰂱" : "󰂯"
-                color: dev.modelData.connected ? Colors.accent : "#9a9a9a"
+                color: dev.modelData.connected ? Colors.accent : Colors.inkMid
                 font.family: Appearance.font
-                font.pixelSize: 15
+                font.pixelSize: Appearance.fsL
             }
 
             Text {
                 Layout.fillWidth: true
                 text: dev.name_
-                color: "#ffffff"
+                color: Colors.inkHi
                 elide: Text.ElideRight
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsS
@@ -183,7 +183,7 @@ Flickable {
                 visible: dev.state_.length > 0
                 text: dev.state_
                 color: dev.modelData.connected ? Colors.accent
-                     : ShellState.btFailureFor === (dev.modelData.address || "") ? Colors.crit : "#7d7d7d"
+                     : ShellState.btFailureFor === (dev.modelData.address || "") ? Colors.crit : Colors.inkLo
                 font.family: Appearance.fontUI
                 font.pixelSize: Appearance.fsXS
             }
@@ -196,7 +196,7 @@ Flickable {
                 font.pixelSize: Appearance.fsXS
                 MouseArea {
                     id: actionMa
-                    anchors.fill: parent; anchors.margins: -6
+                    anchors.fill: parent; anchors.margins: -Appearance.hitPad
                     hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                     onClicked: ShellState.connectBluetooth(dev.modelData)
                 }
@@ -207,13 +207,13 @@ Flickable {
             Text {
                 visible: dev.modelData.paired || dev.modelData.bonded
                 text: "󰩹"
-                color: fMa.containsMouse ? Colors.crit : "#7d7d7d"
+                color: fMa.containsMouse ? Colors.crit : Colors.inkLo
                 font.family: Appearance.font
-                font.pixelSize: 13
+                font.pixelSize: Appearance.fsM
                 MouseArea {
                     id: fMa
                     anchors.fill: parent
-                    anchors.margins: -6
+                    anchors.margins: -Appearance.hitPad
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onEntered: ShellState.settingsHint = I18n.tr("Forget “{0}”: removes the pairing.", dev.name_)

@@ -11,7 +11,7 @@ Rectangle {
     color: mouse.containsMouse ? Colors.accent : (active ? Colors.accent2 : Qt.rgba(Colors.fg.r, Colors.fg.g, Colors.fg.b, 0.07))
     Behavior on color { ColorAnimation { duration: Appearance.animFast } }
     scale: mouse.pressed ? 0.96 : 1.0
-    Behavior on scale { NumberAnimation { duration: Appearance.mQuick; easing.type: Easing.OutCubic } }
+    Behavior on scale { SpringAnimation { spring: Appearance.sprTight; damping: Appearance.dmpTight; epsilon: Appearance.eppScale } }
 
     StyledText {
         anchors.centerIn: parent
