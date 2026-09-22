@@ -1,9 +1,9 @@
 // MediaPanel.qml, vertical player inside the control center (Super+D).
 //
 // The layout follows a single column: hero cover art, title and
-// artist, progress, controls, and the spectrum. That way the player reads not
-// as a horizontal card wedged into the control center, but as its own face
-// inside the expanded panel.
+// artist, progress, controls, and lyrics when available (spectrum otherwise).
+// That way the player reads not as a horizontal card wedged into the control
+// center, but as its own face inside the expanded panel.
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
@@ -11,6 +11,101 @@ import QtQuick.Layouts
 Item {
     id: root
     readonly property color accent: ShellState.mediaAccent
+
+    // ── lyrics (lrclib, no key needed) ────────────────────────────────────
+    // One request per track; the spectrum stays put while loading and when
+    // nothing is found, so the foot of the panel never jumps.
+    property var lyricLines: []   // [{t: seconds | -1, text}]
+    property bool lyricSynced: false
+    property string lyricState: "idle" // idle|ready|none
+    property var lyricXhr: null
+    readonly property string trackKey: ShellState.player
+        ? ((ShellState.player.trackArtist || "") + " — " + (ShellState.player.trackTitle || "")) : ""
+    onTrackKeyChanged: fetchLyrics()
+
+    // Largest timestamp at or before the playhead; -1 for plain lyrics.
+    readonly property int lyricCurrent: {
+        if (!root.lyricSynced || root.lyricLines.length === 0) return -1;
+        const p = ShellState.pos;
+        let idx = -1;
+        for (let i = 0; i < root.lyricLines.length; i++) {
+            if (root.lyricLines[i].t <= p) idx = i; else break;
+        }
+        return idx;
+    }
+
+    function parseLrc(text) {
+        const out = [];
+        const re = /\[(\d+):(\d+(?:\.\d+)?)\]/g;
+        const rows = text.split("\n");
+        for (let r = 0; r < rows.length; r++) {
+            const times = rows[r].match(re);
+            if (!times) continue;
+            const lyric = rows[r].replace(re, "").trim();
+            if (!lyric) continue;
+            for (let k = 0; k < times.length; k++) {
+                const m = /\[(\d+):(\d+(?:\.\d+)?)\]/.exec(times[k]);
+                out.push({ t: parseInt(m[1], 10) * 60 + parseFloat(m[2]), text: lyric });
+            }
+        }
+        out.sort(function (a, b) { return a.t - b.t; });
+        return out;
+    }
+
+    function fetchLyrics() {
+        if (root.lyricXhr) { try { root.lyricXhr.abort(); } catch (e) {} root.lyricXhr = null; }
+        const p = ShellState.player;
+        const title = p ? (p.trackTitle || "") : "";
+        const artist = p ? (p.trackArtist || "") : "";
+        root.lyricLines = [];
+        root.lyricSynced = false;
+        root.lyricState = "idle";
+        if (!title) { root.lyricState = "none"; return; }
+        const q = "https://lrclib.net/api/get?track_name=" + encodeURIComponent(title)
+            + (artist ? "&artist_name=" + encodeURIComponent(artist) : "")
+            + (ShellState.len > 0 ? "&duration=" + Math.round(ShellState.len) : "");
+        const xhr = new XMLHttpRequest();
+        root.lyricXhr = xhr;
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== XMLHttpRequest.DONE) return;
+            // The panel may be gone (hot reload) while a request flies:
+            // a dead component resolves its own id to null.
+            if (!root || xhr !== root.lyricXhr) return;
+            root.lyricXhr = null;
+            if (xhr.status !== 200) { root.lyricState = "none"; return; }
+            try {
+                const d = JSON.parse(xhr.responseText);
+                if (d.syncedLyrics) {
+                    const lines = parseLrc(d.syncedLyrics);
+                    if (lines.length) {
+                        root.lyricLines = lines;
+                        root.lyricSynced = true;
+                        root.lyricState = "ready";
+                        return;
+                    }
+                }
+                if (d.plainLyrics) {
+                    const lines = [];
+                    const rows = d.plainLyrics.split("\n");
+                    for (let r = 0; r < rows.length; r++)
+                        lines.push({ t: -1, text: rows[r].trim() });
+                    while (lines.length && !lines[0].text) lines.shift();
+                    while (lines.length && !lines[lines.length - 1].text) lines.pop();
+                    if (lines.length) {
+                        root.lyricLines = lines;
+                        root.lyricSynced = false;
+                        root.lyricState = "ready";
+                        return;
+                    }
+                }
+            } catch (e) {}
+            root.lyricState = "none";
+        };
+        xhr.open("GET", q);
+        xhr.send();
+    }
+
+    Component.onCompleted: fetchLyrics()
 
     // The whole background swallows clicks so a gap between controls never
     // reaches any action behind the panel.
@@ -26,34 +121,14 @@ Item {
         }
         spacing: 10
 
-        // ── circular cover art ──────────────────────────────────────────────
+        // ── rounded cover art, no rings (Apple Music-like) ────────────────────
+        // Soft shadow baked into the mask effect: depth without drawing
+        // attention away from the cover.
         Item {
             id: artStage
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 166
             Layout.preferredHeight: 166
-
-            // Very faint halo: gives depth without turning the cover into a
-            // spinning wheel or competing with the visualizer below.
-            Rectangle {
-                anchors.centerIn: parent
-                width: 166; height: 166; radius: 83
-                color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0.10)
-                scale: ShellState.player && ShellState.player.isPlaying ? 1 : 0.94
-                opacity: ShellState.player && ShellState.player.isPlaying ? 1 : 0.45
-                Behavior on scale { SpringAnimation { spring: Appearance.sprPanel; damping: Appearance.dmpPanel; epsilon: Appearance.eppScale } }
-                Behavior on opacity { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
-                Behavior on color { ColorAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
-            }
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: 154; height: 154; radius: 77
-                color: "#151515"
-                border.width: 2
-                border.color: Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0.72)
-                Behavior on border.color { ColorAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
-            }
 
             Image {
                 id: coverImage
@@ -71,8 +146,8 @@ Item {
             }
 
             // clip:true crops to a rectangle even when the parent has radius.
-            // MultiEffect uses this real mask so the cover is a true
-            // circle like in the reference.
+            // MultiEffect uses this real mask so the cover keeps the
+            // rounded corners (mask radius = cover radius).
             Item {
                 id: coverMask
                 width: coverImage.width
@@ -80,7 +155,7 @@ Item {
                 layer.enabled: true
                 layer.smooth: true
                 visible: false
-                Rectangle { anchors.fill: parent; radius: width / 2 }
+                Rectangle { anchors.fill: parent; radius: 28 }
             }
             MultiEffect {
                 anchors.fill: coverImage
@@ -240,14 +315,48 @@ Item {
             }
         }
 
-        // ── spectrum: the living "illustration" at the column foot ─────────
+        // ── lyrics when found, spectrum otherwise ─────────────────────────────
+        // Same slot either way, so the foot never jumps: the wave is also
+        // the loading state while the request flies.
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumHeight: 58
+            Layout.minimumHeight: 96
+
+            ListView {
+                id: lyricList
+                anchors.fill: parent
+                visible: root.lyricState === "ready"
+                opacity: visible ? 1 : 0
+                Behavior on opacity { NumberAnimation { duration: Appearance.mIn; easing.type: Easing.OutCubic } }
+                model: root.lyricLines
+                currentIndex: root.lyricCurrent
+                // A linha atual fica sempre centrada (quando há letra acima
+                // para permitir): StrictlyEnforceRange cola o highlight na
+                // faixa central, e a duração fixa dá o deslize de ~0,5s a
+                // cada verso, sem salto. No início, sem linhas acima, ela
+                // fica no topo até dar para centralizar.
+                highlightRangeMode: ListView.StrictlyEnforceRange
+                preferredHighlightBegin: height / 2 - 16
+                preferredHighlightEnd: height / 2 + 16
+                highlightMoveDuration: 1100
+                spacing: 7
+                clip: true
+                delegate: Text {
+                    width: lyricList.width
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    text: modelData.text
+                    color: index === lyricList.currentIndex ? "#ffffff" : "#7f7f7f"
+                    Behavior on color { ColorAnimation { duration: 600; easing.type: Easing.OutCubic } }
+                    font.family: Appearance.fontUI
+                    font.pixelSize: 13
+                }
+            }
 
             Item {
                 anchors.centerIn: parent
+                visible: root.lyricState !== "ready"
                 width: ShellState.bands * 13 - 7
                 height: 58
 

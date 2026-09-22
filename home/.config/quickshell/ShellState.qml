@@ -410,6 +410,9 @@ Singleton {
 
     function fmt(sec) {
         if (!sec || sec < 0) return "0:00";
+        // Some players (Spotify on certain podcast episodes) report a
+        // bogus length; print a placeholder instead of a wall of digits.
+        if (!isFinite(sec) || sec > 35999) return "--:--";
         const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
         return m + ":" + (s < 10 ? "0" + s : s);
     }
