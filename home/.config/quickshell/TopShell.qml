@@ -281,11 +281,18 @@ Scope {
 
                     BarItem {
                         visible: Config.showArch
-                        icon: Distro.glyph
-                        iconSource: Distro.markSource
-                        iconSize: Appearance.fsL
-                        iconColor: Colors.accent
-                        imageTint: Colors.accent
+                        // The product mark as a glyph, not an image: Text color
+                        // is exact, while image colorization keeps the source
+                        // lightness and can never hit the guaranteed ink.
+                        // 28 px on purpose, not a token: the Encaixe ink is
+                        // ~0.58 em tall (measured), so this paints ≈16 px.
+                        icon: String.fromCodePoint(0x100000)
+                        iconFontFamily: "Aroli Mono NF"
+                        iconSize: 28
+                        // The bar has no surface: the mark floats over the
+                        // wallpaper, so it uses the contrast-guaranteed ink
+                        // (3.5:1 vs the sampled strip), not the raw accent.
+                        iconColor: Colors.onWallAccent
                         hpad: 7
                         onClicked: ShellState.togglePanel("launcher")
                         onScrolled: function (d) { ShellState.nudgeVolume(d); }

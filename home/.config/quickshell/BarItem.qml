@@ -11,10 +11,13 @@ Item {
 
     property string icon: ""
     property url iconSource: ""
+    // Glyph family override: icons live in the Nerd family, except product
+    // marks that ship their own (the Encaixe lives in Aroli Mono NF).
+    property string iconFontFamily: Appearance.font
     property string label: ""
     property color iconColor: Colors.fg
-    // Tint for the iconSource image (the Omarchy mark is a grayscale SVG, so
-    // without this it never follows the palette). Transparent = untinted,
+    // Tint for the iconSource image (brand marks are grayscale SVGs, so
+    // without this they never follow the palette). Transparent = untinted,
     // keeping full-color images safe if one is ever passed here.
     property color imageTint: "#00000000"
     property color labelColor: Colors.fg
@@ -58,7 +61,7 @@ Item {
             visible: root.icon.length > 0 && root.iconSource.toString().length === 0
             text: root.icon
             color: root.iconColor
-            font.family: Appearance.font
+            font.family: root.iconFontFamily
             font.pixelSize: root.iconSize
             style: Text.Outline
             styleColor: root.outline

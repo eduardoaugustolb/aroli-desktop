@@ -12,7 +12,7 @@ Singleton {
     property string id: "linux"
     property string name: "Linux"
     readonly property bool omarchy: id === "omarchy"
-    readonly property string glyph: omarchy ? "" : (id === "arch" ? Icons.arch : "")
+    readonly property string glyph: omarchy ? "" : (id === "arch" ? Icons.arch : "")
     readonly property url markSource: omarchy ? Qt.resolvedUrl("assets/omarchy.svg") : ""
 
     Process {
