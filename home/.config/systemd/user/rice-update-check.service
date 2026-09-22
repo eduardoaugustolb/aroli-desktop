@@ -11,11 +11,11 @@
 # means nothing stays in memory; the idle scheduling means a check that lands
 # mid-game does not steal a frame.
 Description=Aroli Desktop update check (tiny GitHub tag query)
-Documentation=file://%h/.local/bin/rice
+Documentation=file://%h/.local/bin/aroli
 
 [Service]
 Type=oneshot
-ExecStart=%h/.local/bin/rice check --quiet
+ExecStart=%h/.local/bin/aroli check --quiet
 LockPersonality=yes
 NoNewPrivileges=yes
 SystemCallArchitectures=native

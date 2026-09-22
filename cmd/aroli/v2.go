@@ -135,7 +135,7 @@ func restoreGameModeCoordination() error {
 
 func reading(args []string) error {
 	if len(args) != 1 || (args[0] != "on" && args[0] != "off" && args[0] != "status") {
-		return errors.New("use: rice reading on|off|status")
+		return errors.New("use: aroli reading on|off|status")
 	}
 	if args[0] == "on" {
 		if state, _ := scriptState("game-mode", "status"); state == "on" {
@@ -171,7 +171,7 @@ func sessionProfile(args []string) error {
 		return nil
 	}
 	if len(args) != 2 || args[0] != "apply" {
-		return errors.New("use: rice session list|status|apply laptop|desktop|gaming|creator")
+		return errors.New("use: aroli session list|status|apply laptop|desktop|gaming|creator")
 	}
 	var wanted *sessionMode
 	for i := range sessionModes {
@@ -227,7 +227,7 @@ func recoverDesktop(args []string) error {
 			i++
 			snapshot = args[i]
 		default:
-			return errors.New("use: rice recover [--dry-run|--yes] [--snapshot NOME]")
+			return errors.New("use: aroli recover [--dry-run|--yes] [--snapshot NOME]")
 		}
 	}
 	if snapshot == "latest" {
@@ -279,7 +279,7 @@ func recoverDesktop(args []string) error {
 	if _, err := exec.LookPath("systemctl"); err == nil {
 		_ = exec.Command("systemctl", "--user", "restart", "quickshell.service").Run()
 	}
-	fmt.Println("Recuperação concluída. Execute rice diagnose para um relatório completo.")
+	fmt.Println("Recuperação concluída. Execute aroli diagnose para um relatório completo.")
 	return nil
 }
 
@@ -294,7 +294,7 @@ type portablePreferences struct {
 
 func exportPreferences(args []string) error {
 	if len(args) != 1 {
-		return errors.New("use: rice export DIRETÓRIO")
+		return errors.New("use: aroli export DIRETÓRIO")
 	}
 	dest, err := filepath.Abs(args[0])
 	if err != nil {
@@ -310,7 +310,7 @@ func exportPreferences(args []string) error {
 	if err != nil {
 		return err
 	}
-	for _, rel := range []string{".config/quickshell-rice.json", ".config/hypr/language.conf"} {
+	for _, rel := range []string{".config/quickshell-aroli.json", ".config/hypr/language.conf"} {
 		source := filepath.Join(home, rel)
 		if _, err := os.Lstat(source); err == nil {
 			if err := copyTree(source, filepath.Join(dest, rel)); err != nil {
@@ -325,7 +325,7 @@ func exportPreferences(args []string) error {
 	if target, err := os.Readlink(filepath.Join(home, ".cache", "wal", "lockbg")); err == nil {
 		pref.Wallpaper = filepath.Base(target)
 	}
-	for _, p := range riceProfiles {
+	for _, p := range aroliProfiles {
 		for _, name := range p.plugins {
 			if _, err := exec.Command("pacman", "-Q", name).Output(); err == nil {
 				pref.OptionalPlugins = append(pref.OptionalPlugins, name)
@@ -345,7 +345,7 @@ func exportPreferences(args []string) error {
 
 func importPreferences(args []string) error {
 	if len(args) < 1 || len(args) > 2 || (len(args) == 2 && args[1] != "--yes") {
-		return errors.New("use: rice import DIRETÓRIO [--yes]")
+		return errors.New("use: aroli import DIRETÓRIO [--yes]")
 	}
 	source, err := filepath.Abs(args[0])
 	if err != nil {
@@ -371,7 +371,7 @@ func importPreferences(args []string) error {
 	if err != nil {
 		return err
 	}
-	for _, rel := range []string{".config/quickshell-rice.json", ".config/hypr/language.conf"} {
+	for _, rel := range []string{".config/quickshell-aroli.json", ".config/hypr/language.conf"} {
 		from := filepath.Join(source, rel)
 		if _, err := os.Lstat(from); err == nil {
 			target := filepath.Join(home, rel)

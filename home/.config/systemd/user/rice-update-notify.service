@@ -9,14 +9,14 @@
 # Opt out (stays off, check cache and bar dot keep working):
 #   systemctl --user disable rice-update-notify.service
 Description=Aroli Desktop update notice on graphical login (cache read only)
-Documentation=file://%h/.local/bin/rice
+Documentation=file://%h/.local/bin/aroli
 PartOf=graphical-session.target
 After=graphical-session.target quickshell.service
 ConditionEnvironment=WAYLAND_DISPLAY
 
 [Service]
 Type=oneshot
-ExecStart=%h/.local/bin/rice notify-login
+ExecStart=%h/.local/bin/aroli notify-login
 LockPersonality=yes
 NoNewPrivileges=yes
 SystemCallArchitectures=native

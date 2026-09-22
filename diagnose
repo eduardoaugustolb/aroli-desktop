@@ -668,12 +668,12 @@ if [ -f "$rice_cache" ]; then
     rice_remote="$(sed -n 's/^[[:space:]]*"remote"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$rice_cache" | head -1)"
     rice_avail="$(sed -n 's/^[[:space:]]*"update_available"[[:space:]]*:[[:space:]]*\(true\|false\).*/\1/p' "$rice_cache" | head -1)"
     if [ "$rice_avail" = true ]; then
-        eye "release $rice_remote is available: rice update --dry-run"
+        eye "release $rice_remote is available: aroli update --dry-run"
     elif [ -n "$rice_remote" ]; then
         good "no newer release known (latest seen: $rice_remote)"
     fi
 else
-    note "never checked for releases yet: rice check --force"
+    note "never checked for releases yet: aroli check --force"
 fi
 
 if systemctl --user list-unit-files --no-legend rice-update-check.timer 2>/dev/null | grep -q .; then

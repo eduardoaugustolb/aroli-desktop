@@ -1,4 +1,4 @@
-// rice is the supported command-line interface for Aroli Desktop.
+// aroli is the supported command-line interface for Aroli Desktop.
 //
 // The installer itself deliberately remains a compatibility backend for now:
 // it contains years of idempotency and backup rules. This program owns the
@@ -43,7 +43,7 @@ type installOptions struct {
 
 func main() {
 	if err := run(os.Args[1:]); err != nil {
-		fmt.Fprintln(os.Stderr, "rice:", err)
+		fmt.Fprintln(os.Stderr, "aroli:", err)
 		os.Exit(1)
 	}
 }
@@ -94,9 +94,9 @@ func run(args []string) error {
 	case "status":
 		return status()
 	case "check", "update", "rollback", "prune":
-		return runBackend("rice", args)
+		return runBackend("aroli", args)
 	default:
-		return fmt.Errorf("comando desconhecido %q (use 'rice help')", args[0])
+		return fmt.Errorf("comando desconhecido %q (use 'aroli help')", args[0])
 	}
 }
 
@@ -104,23 +104,23 @@ func usage(w io.Writer) {
 	fmt.Fprintf(w, `%s CLI
 
 Uso:
-  rice                     abre o assistente interativo
-  rice install [opções] [fase...]
-  rice diagnose
-  rice logs [--list]         mostra o registro da instalação mais recente
-  rice doctor [--fix]        verifica e repara integrações locais conhecidas
-  rice profile list|show|install NOME
-  rice snapshot create|list|restore NOME
-  rice wallpaper list|set|random|import|remove
-  rice gaming status|on|off|toggle|launch COMANDO [args...]
-  rice battery status|available|set power-saver|balanced|performance|next
-  rice session list|status|apply laptop|desktop|gaming|creator
-  rice reading on|off|status
-  rice recover [--dry-run|--yes] [--snapshot NOME]
-  rice export DIRETÓRIO | rice import DIRETÓRIO [--yes]
-  rice cli update [--dry-run] atualiza somente o binário da CLI
-  rice plugins list|install [opções] [nome...]
-  rice status | check | update | rollback | prune
+  aroli                     abre o assistente interativo
+  aroli install [opções] [fase...]
+  aroli diagnose
+  aroli logs [--list]         mostra o registro da instalação mais recente
+  aroli doctor [--fix]        verifica e repara integrações locais conhecidas
+  aroli profile list|show|install NOME
+  aroli snapshot create|list|restore NOME
+  aroli wallpaper list|set|random|import|remove
+  aroli gaming status|on|off|toggle|launch COMANDO [args...]
+  aroli battery status|available|set power-saver|balanced|performance|next
+  aroli session list|status|apply laptop|desktop|gaming|creator
+  aroli reading on|off|status
+  aroli recover [--dry-run|--yes] [--snapshot NOME]
+  aroli export DIRETÓRIO | aroli import DIRETÓRIO [--yes]
+  aroli cli update [--dry-run] atualiza somente o binário da CLI
+  aroli plugins list|install [opções] [nome...]
+  aroli status | check | update | rollback | prune
 
 Instalação:
   --dry-run                mostra o plano, sem alterar nada
@@ -132,17 +132,17 @@ Instalação:
   --resume                 continua uma instalação interrompida
 
 Opcionais:
-  rice plugins list         mostra apps e ferramentas que podem ser adicionadas
-  rice plugins install NOME instala somente os itens escolhidos
+  aroli plugins list         mostra apps e ferramentas que podem ser adicionadas
+  aroli plugins install NOME instala somente os itens escolhidos
 
 Fases: base, aur, packages, repos, cursor, config, system, graphics,
        services, sddm, spicetify, final ou restore.
 
 Exemplos:
-  rice install --dry-run
-  rice install --lang pt-BR
-  rice install packages services
-  rice update --dry-run
+  aroli install --dry-run
+  aroli install --lang pt-BR
+  aroli install packages services
+  aroli update --dry-run
 `, project)
 }
 
@@ -159,7 +159,7 @@ func install(args []string) error {
 	fs.BoolVar(&opts.resume, "resume", false, "retoma a última instalação interrompida")
 	fs.Bool("link", false, "cria links (padrão)")
 	fs.StringVar(&opts.lang, "lang", defaultLang, "pt-BR, en ou es")
-	fs.StringVar(&repo, "repo", "", "checkout do rice")
+	fs.StringVar(&repo, "repo", "", "checkout do aroli")
 	fs.Usage = func() { usage(fs.Output()) }
 	if err := fs.Parse(args); err != nil {
 		return err
@@ -235,26 +235,26 @@ func ensureRepositoryWithCleanup(explicit string, dryRun bool) (string, func(), 
 		return path, noCleanup, nil
 	}
 	if dryRun {
-		parent, err := os.MkdirTemp("", "rice-dry-run-")
+		parent, err := os.MkdirTemp("", "aroli-dry-run-")
 		if err != nil {
 			return "", noCleanup, err
 		}
 		dryRunTarget := filepath.Join(parent, "checkout")
 		if err := cloneRepositoryQuiet(dryRunTarget); err != nil {
 			_ = os.RemoveAll(parent)
-			return "", noCleanup, fmt.Errorf("não foi possível preparar o rice para o dry-run: %w", err)
+			return "", noCleanup, fmt.Errorf("não foi possível preparar o aroli para o dry-run: %w", err)
 		}
 		return dryRunTarget, func() { _ = os.RemoveAll(parent) }, nil
 	}
 	if _, err := exec.LookPath("git"); err != nil {
-		return "", noCleanup, errors.New("git é necessário para baixar o rice")
+		return "", noCleanup, errors.New("git é necessário para baixar o aroli")
 	}
 	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
 		return "", noCleanup, err
 	}
-	fmt.Println("Baixando o rice pela primeira vez…")
+	fmt.Println("Baixando o aroli pela primeira vez…")
 	if err := cloneRepository(target); err != nil {
-		return "", noCleanup, fmt.Errorf("não foi possível baixar o rice: %w", err)
+		return "", noCleanup, fmt.Errorf("não foi possível baixar o aroli: %w", err)
 	}
 	path, err := validRepo(target)
 	return path, noCleanup, err
@@ -285,7 +285,7 @@ func validRepo(path string) (string, error) {
 	return path, nil
 }
 
-// installSelf keeps ~/.local/bin/rice under the CLI's control. The dotfile
+// installSelf keeps ~/.local/bin/aroli under the CLI's control. The dotfile
 // deployment intentionally skips that filename so an upgrade cannot replace
 // the binary with the historical shell dispatcher.
 func installSelf() error {
@@ -300,7 +300,7 @@ func installSelf() error {
 	if err != nil {
 		return err
 	}
-	dest := filepath.Join(home, ".local", "bin", "rice")
+	dest := filepath.Join(home, ".local", "bin", "aroli")
 	if sameFile(exe, dest) {
 		return nil
 	}
@@ -312,7 +312,7 @@ func installSelf() error {
 		return err
 	}
 	defer src.Close()
-	tmp, err := os.CreateTemp(filepath.Dir(dest), ".rice-")
+	tmp, err := os.CreateTemp(filepath.Dir(dest), ".aroli-")
 	if err != nil {
 		return err
 	}
@@ -327,7 +327,26 @@ func installSelf() error {
 	if err != nil {
 		return err
 	}
-	return os.Rename(tmpName, dest)
+	if err := os.Rename(tmpName, dest); err != nil {
+		return err
+	}
+	return ensureRiceShim(home)
+}
+
+// ensureRiceShim keeps the deprecated `rice` name working: a tiny script
+// that warns once on stderr and hands over to the aroli binary. Same
+// treatment the umbra-cursor-size rename got.
+func ensureRiceShim(home string) error {
+	dest := filepath.Join(home, ".local", "bin", "aroli")
+	shim := filepath.Join(home, ".local", "bin", "rice")
+	content := "#!/usr/bin/env bash\n# Deprecated shim: rice is now aroli.\nset -euo pipefail\nprintf 'Deprecated: use aroli instead.\\n' >&2\nexec \"" + dest + "\" \"$@\"\n"
+	if data, err := os.ReadFile(shim); err == nil && string(data) == content {
+		return nil
+	}
+	if err := os.MkdirAll(filepath.Dir(shim), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(shim, []byte(content), 0o755)
 }
 
 func sameFile(a, b string) bool {
@@ -343,12 +362,12 @@ func runBackend(kind string, args []string) error {
 	}
 	defer cleanup()
 	if _, err := validRepo(repo); err != nil {
-		return errors.New("rice ainda não foi instalado; execute: rice install")
+		return errors.New("aroli ainda não foi instalado; execute: aroli install")
 	}
 	if kind == "diagnose" {
 		return command(repo, "bash", append([]string{"diagnose"}, args...)...).Run()
 	}
-	legacy := filepath.Join(repo, "home", ".local", "bin", "rice")
+	legacy := filepath.Join(repo, "home", ".local", "bin", "aroli-backend")
 	if _, err := os.Stat(legacy); err != nil {
 		return fmt.Errorf("backend de atualização ausente: %w", err)
 	}
@@ -376,7 +395,7 @@ func cliVersion() string {
 
 func showLogs(args []string) error {
 	if len(args) > 1 || (len(args) == 1 && args[0] != "--list") {
-		return errors.New("use: rice logs [--list]")
+		return errors.New("use: aroli logs [--list]")
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -418,7 +437,7 @@ type githubRelease struct {
 
 func updateCLI(args []string) error {
 	if len(args) == 0 || args[0] != "update" {
-		return errors.New("use: rice cli update [--dry-run]")
+		return errors.New("use: aroli cli update [--dry-run]")
 	}
 	fs := flag.NewFlagSet("cli update", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
@@ -427,7 +446,7 @@ func updateCLI(args []string) error {
 		return err
 	}
 	if len(fs.Args()) > 0 {
-		return errors.New("use: rice cli update [--dry-run]")
+		return errors.New("use: aroli cli update [--dry-run]")
 	}
 
 	release, err := latestRelease(http.DefaultClient)
@@ -496,7 +515,7 @@ func cliAssetName(goos, arch string) (string, error) {
 	if goos != "linux" || (arch != "amd64" && arch != "arm64") {
 		return "", fmt.Errorf("não há binário publicado para %s/%s", goos, arch)
 	}
-	return "rice-linux-" + arch, nil
+	return "aroli-linux-" + arch, nil
 }
 
 func download(client *http.Client, url string) ([]byte, error) {
@@ -537,7 +556,7 @@ func installDownloadedCLI(binary []byte) error {
 	if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil {
 		return err
 	}
-	temporary, err := os.CreateTemp(filepath.Dir(destination), ".rice-download-")
+	temporary, err := os.CreateTemp(filepath.Dir(destination), ".aroli-download-")
 	if err != nil {
 		return err
 	}
@@ -552,7 +571,14 @@ func installDownloadedCLI(binary []byte) error {
 	if err != nil {
 		return err
 	}
-	return os.Rename(name, destination)
+	if err := os.Rename(name, destination); err != nil {
+		return err
+	}
+	home, _ := os.UserHomeDir()
+	if home != "" {
+		return ensureRiceShim(home)
+	}
+	return nil
 }
 
 func cliInstallPath() string {
@@ -560,15 +586,15 @@ func cliInstallPath() string {
 		if resolved, err := filepath.EvalSymlinks(executable); err == nil {
 			executable = resolved
 		}
-		if filepath.Base(executable) == "rice" {
+		if filepath.Base(executable) == "aroli" || filepath.Base(executable) == "aroli" {
 			return executable
 		}
 	}
 	home, err := os.UserHomeDir()
 	if err == nil {
-		return filepath.Join(home, ".local", "bin", "rice")
+		return filepath.Join(home, ".local", "bin", "aroli")
 	}
-	return filepath.Join(".local", "bin", "rice")
+	return filepath.Join(".local", "bin", "aroli")
 }
 
 type plugin struct {
@@ -589,7 +615,7 @@ func plugins(args []string) error {
 		return nil
 	}
 	if args[0] != "install" {
-		return errors.New("use: rice plugins list ou rice plugins install NOME")
+		return errors.New("use: aroli plugins list ou aroli plugins install NOME")
 	}
 	fs := flag.NewFlagSet("plugins install", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
@@ -599,7 +625,7 @@ func plugins(args []string) error {
 		return err
 	}
 	if len(fs.Args()) == 0 {
-		return errors.New("escolha pelo menos um nome; veja as opções com: rice plugins list")
+		return errors.New("escolha pelo menos um nome; veja as opções com: aroli plugins list")
 	}
 	items, err := pluginCatalog()
 	if err != nil {
@@ -616,7 +642,7 @@ func plugins(args []string) error {
 			}
 		}
 		if !found {
-			return fmt.Errorf("%q não é um opcional conhecido; use: rice plugins list", name)
+			return fmt.Errorf("%q não é um opcional conhecido; use: aroli plugins list", name)
 		}
 	}
 	if !*yes && !*dry {
@@ -639,7 +665,7 @@ func pluginCatalog() ([]plugin, error) {
 	}
 	defer cleanup()
 	if _, err := validRepo(repo); err != nil {
-		return nil, errors.New("instale o rice antes de gerenciar opcionais: rice install")
+		return nil, errors.New("instale o aroli antes de gerenciar opcionais: aroli install")
 	}
 	items := []plugin{}
 	for _, manifest := range []struct{ file, source string }{{"optional-pacman.txt", "oficial"}, {"optional-aur.txt", "AUR"}} {
@@ -706,7 +732,7 @@ func installPlugins(items []plugin, dry bool) error {
 			}
 		} else {
 			if _, err := exec.LookPath("yay"); err != nil {
-				return errors.New("estes itens vêm do AUR, mas o yay não está instalado. Rode: rice install aur")
+				return errors.New("estes itens vêm do AUR, mas o yay não está instalado. Rode: aroli install aur")
 			}
 			args := append([]string{"-S", "--needed", "--noconfirm", "--"}, aur...)
 			if err := command("", "yay", args...).Run(); err != nil {
@@ -831,12 +857,12 @@ func newTUIModel() tuiModel {
 
 func (m tuiModel) actions() []tuiAction {
 	return []tuiAction{
-		{label: "Instalar ou reparar", hint: "aplicar o rice no sistema", command: func(m *tuiModel) error { return install([]string{"--yes", "--lang", m.language}) }},
+		{label: "Instalar ou reparar", hint: "aplicar o aroli no sistema", command: func(m *tuiModel) error { return install([]string{"--yes", "--lang", m.language}) }},
 		{label: "Ver plano de instalação", hint: "simular sem alterar arquivos", command: func(m *tuiModel) error { return install([]string{"--dry-run", "--yes", "--lang", m.language}) }},
 		{label: "Adicionar plugins", hint: "escolher aplicativos oficiais e AUR", command: nil},
 		{label: "Diagnosticar", hint: "verificar problemas conhecidos", command: func(*tuiModel) error { return runBackend("diagnose", nil) }},
-		{label: "Verificar atualizações", hint: "consultar a versão estável", command: func(*tuiModel) error { return runBackend("rice", []string{"check", "--force"}) }},
-		{label: "Atualizar rice", hint: "aplicar a versão estável mais recente", command: func(*tuiModel) error { return runBackend("rice", []string{"update"}) }},
+		{label: "Verificar atualizações", hint: "consultar a versão estável", command: func(*tuiModel) error { return runBackend("aroli", []string{"check", "--force"}) }},
+		{label: "Atualizar aroli", hint: "aplicar a versão estável mais recente", command: func(*tuiModel) error { return runBackend("aroli", []string{"update"}) }},
 		{label: "Atualizar CLI", hint: "baixar a CLI com checksum SHA-256", command: func(*tuiModel) error { return updateCLI([]string{"update"}) }},
 		{label: "Ver último log", hint: "abrir o registro da instalação", command: func(*tuiModel) error { return showLogs(nil) }},
 	}
@@ -844,7 +870,7 @@ func (m tuiModel) actions() []tuiAction {
 
 func tui() error {
 	if !termIsInteractive() {
-		return errors.New("a TUI precisa de um terminal interativo; use 'rice help' para os comandos")
+		return errors.New("a TUI precisa de um terminal interativo; use 'aroli help' para os comandos")
 	}
 	_, err := tea.NewProgram(newTUIModel()).Run()
 	return err
@@ -1042,7 +1068,7 @@ func (m tuiModel) View() tea.View {
 		body = tuiTitle.Render("\n  "+m.message+"\n\n") + tuiMuted.Render("  Enter/r: voltar   q: sair")
 	}
 	var view tea.View
-	view.SetContent(tuiPanel.Render(tuiTitle.Render("Aroli Desktop") + "\n" + tuiMuted.Render("rice · assistente") + "\n" + tuiAccent.Render(m.breadcrumb()) + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
+	view.SetContent(tuiPanel.Render(tuiTitle.Render("Aroli Desktop") + "\n" + tuiMuted.Render("aroli · assistente") + "\n" + tuiAccent.Render(m.breadcrumb()) + "\n\n" + body + "\n\n" + tuiMuted.Render("↑/↓ navegar · Enter selecionar · q sair")))
 	view.AltScreen = true
 	return view
 }

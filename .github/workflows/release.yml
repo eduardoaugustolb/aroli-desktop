@@ -52,13 +52,17 @@ jobs:
       - name: Build CLI releases
         run: |
           for arch in amd64 arm64; do
-            GOOS=linux GOARCH="$arch" go build -trimpath -ldflags "-s -w -X main.version=${GITHUB_REF_NAME}" -o "rice-linux-$arch" ./cmd/rice
+            GOOS=linux GOARCH="$arch" go build -trimpath -ldflags "-s -w -X main.version=${GITHUB_REF_NAME}" -o "aroli-linux-$arch" ./cmd/aroli
+            # Transition names so installers predating the aroli rename
+            # (they fetch rice-linux-*) keep updating. Drop once no
+            # supported release looks them up.
+            cp "aroli-linux-$arch" "rice-linux-$arch"
           done
       - name: Checksums
         run: |
           git archive --format=tar.gz --prefix="aroli-desktop-${GITHUB_REF_NAME}/" \
             -o "aroli-desktop-${GITHUB_REF_NAME}.tar.gz" "$GITHUB_REF_NAME"
-          sha256sum "aroli-desktop-${GITHUB_REF_NAME}.tar.gz" rice-linux-amd64 rice-linux-arm64 > SHA256SUMS.txt
+          sha256sum "aroli-desktop-${GITHUB_REF_NAME}.tar.gz" aroli-linux-amd64 aroli-linux-arm64 rice-linux-amd64 rice-linux-arm64 > SHA256SUMS.txt
       - name: Extract CHANGELOG entry
         run: |
           awk -v tag="[${GITHUB_REF_NAME#v}]" '
@@ -70,7 +74,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          assets=(aroli-desktop-*.tar.gz SHA256SUMS.txt rice-linux-amd64 rice-linux-arm64)
+          assets=(aroli-desktop-*.tar.gz SHA256SUMS.txt aroli-linux-amd64 aroli-linux-arm64 rice-linux-amd64 rice-linux-arm64)
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
             while IFS= read -r asset; do
               [ -n "$asset" ] || continue

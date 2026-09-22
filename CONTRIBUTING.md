@@ -35,8 +35,8 @@ files, with Spanish and Brazilian Portuguese dictionaries (see
 
 1. Build or install the CLI, then preview before touching anything:
    ```sh
-   go build -o /tmp/rice ./cmd/rice
-   /tmp/rice install --dry-run --lang pt-BR
+   go build -o /tmp/aroli ./cmd/aroli
+   /tmp/aroli install --dry-run --lang pt-BR
    ```
 2. Create a worktree + branch for each change (keeps `main` clean):
    ```sh
@@ -97,8 +97,8 @@ Fix stuff                                   # vague, capitalized
 - Python helpers: `python3 -m py_compile <script>` must pass.
 - Palette/i18n changes: verify placeholder parity (`{0}`, `{1}`, `{2}`)
   between dictionaries and keep key sets identical.
-- Go CLI changes: run `go test -race ./...`, `go vet ./...`, and `gofmt -l cmd/rice`.
-- Installer changes: run `/tmp/rice install --dry-run` (or `./install.sh --dry-run` when testing the backend) and read the plan.
+- Go CLI changes: run `go test -race ./...`, `go vet ./...`, and `gofmt -l cmd/aroli`.
+- Installer changes: run `/tmp/aroli install --dry-run` (or `./install.sh --dry-run` when testing the backend) and read the plan.
 - Runtime changes: switch wallpapers once (`Super+Shift+W`) and confirm
   the bar, terminal, and derived app themes (btop, Discord, Spotify)
   follow the new palette.
@@ -122,9 +122,9 @@ Fix stuff                                   # vague, capitalized
 | Path | What lives there |
 | --- | --- |
 | `home/` | Deployed configs, mirrored into `$HOME` by `install.sh` |
-| `home/.local/bin/rice` | Version/update/rollback/prune CLI |
-| `home/.config/systemd/user/rice-update-check.{service,timer}` | Daily release check (idle, oneshot) |
-| `home/.config/systemd/user/rice-update-notify.service` | Login update notice, cache-read only (idle, oneshot) |
+| `home/.local/bin/aroli` | Version/update/rollback/prune CLI |
+| `home/.config/systemd/user/aroli-update-check.{service,timer}` | Daily release check (idle, oneshot) |
+| `home/.config/systemd/user/aroli-update-notify.service` | Login update notice, cache-read only (idle, oneshot) |
 | `VERSION` / `CHANGELOG.md` | Single source of truth for the version + release history |
 | `install.sh` | Installer (symlink mode by default, `--copy` available) |
 | `diagnose` | Read-only system diagnostics |
@@ -136,8 +136,8 @@ Fix stuff                                   # vague, capitalized
 
 - Bump `VERSION`, add a `CHANGELOG.md` entry, commit, then tag:
   `git tag -s vX.Y.Z -m "Aroli Desktop vX.Y.Z"` and push the tag.
-  CI checks that the tag matches `VERSION` and that `rice --help`,
+  CI checks that the tag matches `VERSION` and that `aroli --help`,
   `diagnose` and the i18n dictionaries still pass.
 - GitHub Releases are cut from the tag with auto-generated notes plus the
-  `CHANGELOG.md` entry. Clients only follow `vX.Y.Z` tags (`rice update`
+  `CHANGELOG.md` entry. Clients only follow `vX.Y.Z` tags (`aroli update`
   refuses anything else); `main` is never auto-applied.

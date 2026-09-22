@@ -26,7 +26,7 @@
 
 **Aroli Desktop** is the ready-to-use Aroli workspace on top of the
 stable Omarchy base: the desktop product of the Aroli family
-(Aroli Themes, Aroli Pointer, Aroli Backdrops). The rice keeps the
+(Aroli Themes, Aroli Pointer, Aroli Backdrops). Aroli Desktop keeps the
 structure, notch, dark surfaces, cutouts, and luminance bands,
 while each wallpaper sets the mood with Pywal.
 
@@ -58,7 +58,7 @@ your image without turning every application surface into its dominant colour.
 - Pywal accents extracted from the current wallpaper, applied over stable dark
   Aroli Dark surfaces. Settings › Appearance › Colour system can restore the legacy
   mode where the wallpaper also tints application backgrounds.
-- Four Aroli Backdrops installed with the rice: Ember Coast, Silent
+- Four Aroli Backdrops installed with the aroli: Ember Coast, Silent
   Threshold, Obsidian Dunes, and Black Mountains.
 - Assisted migration for installs coming from the previous fork.
 
@@ -68,7 +68,7 @@ so already-running applications reload the XCursor.
 (`umbra-cursor-size` remains as a deprecated alias.)
 
 <details>
-<summary><strong>See the rice in motion</strong></summary>
+<summary><strong>See the aroli in motion</strong></summary>
 <br>
 
 [Open video demo](https://github.com/user-attachments/assets/2b35a6fb-5a08-4539-99a9-7c525eb463b3)
@@ -82,7 +82,7 @@ so already-running applications reload the XCursor.
 > installs no packages, and asks for no privileges.
 
 > [!TIP]
-> `rice` is the recommended installation path. It gives first-time users a guided
+> `aroli` is the recommended installation path. It gives first-time users a guided
 > terminal assistant, while the explicit subcommands remain suitable for automation.
 
 ```sh
@@ -90,76 +90,76 @@ so already-running applications reload the XCursor.
 # Note: versioned `go install ...@vX.Y.Z` does not work for v2+ releases
 # because the module intentionally has no `/v2` suffix; use the binary.
 arch="$(uname -m)"; case "$arch" in x86_64) arch=amd64;; aarch64|arm64) arch=arm64;; esac
-curl -fL "https://github.com/eduardoaugustolb/aroli-desktop/releases/latest/download/rice-linux-$arch" -o ~/.local/bin/rice
-chmod +x ~/.local/bin/rice
+curl -fL "https://github.com/eduardoaugustolb/aroli-desktop/releases/latest/download/aroli-linux-$arch" -o ~/.local/bin/aroli
+chmod +x ~/.local/bin/aroli
 
 # Or install from the current main branch (Go 1.27+, development version)
-go install github.com/eduardoaugustolb/aroli-desktop/cmd/rice@main
+go install github.com/eduardoaugustolb/aroli-desktop/cmd/aroli@main
 
 # Opens a guided terminal interface for first-time users
-rice
+aroli
 
 # Or use the non-interactive commands
-rice install --dry-run --lang pt-BR
-rice install --lang pt-BR
+aroli install --dry-run --lang pt-BR
+aroli install --lang pt-BR
 ```
 
-Requires **Hyprland 0.56+**. This rice uses `hyprland.lua`, not
+Requires **Hyprland 0.56+**. Aroli Desktop uses `hyprland.lua`, not
 `hyprland.conf`.
 
 | Command | Result |
 | --- | --- |
-| `rice` | Opens the guided terminal interface. |
-| `rice install --dry-run --lang pt-BR` | Shows the plan without changing anything. |
-| `rice install --lang pt-BR` | Installs the rice in Brazilian Portuguese. |
-| `rice install restore` | Restores the previous configuration files. |
-| `rice diagnose` | Read-only diagnostics. |
-| `rice doctor` | Checks the local desktop integration; `--fix` offers safe session repairs. |
-| `rice status` | Installed version, last check, and rollback ref. |
-| `rice profile list` | Lists curated, transparent installation profiles. |
-| `rice profile install creator` | Installs a named set of phases; its optional apps remain visible and confirmable. |
-| `rice snapshot create before-tweaks` | Saves the supported visual configuration paths locally. |
-| `rice snapshot restore before-tweaks` | Restores a configuration snapshot while retaining the current files as backups. |
-| `rice wallpaper list` | Lists bundled and imported wallpapers. |
-| `rice wallpaper set aroli-ember-coast.png` | Applies a wallpaper and its dynamic Pywal palette. |
-| `rice gaming on` | Temporarily disables expensive compositor effects, preserving their exact previous state. |
-| `rice gaming launch steam` | Runs a game under GameMode when the optional `gamemode` package is installed. |
-| `rice battery set power-saver` | Selects the Power Profiles Daemon energy-saver profile. |
-| `rice battery balanced` | Selects the balanced profile; `performance` is available when supported by the hardware. |
-| `rice session apply laptop` | Applies a coordinated daily-use profile. |
-| `rice recover --snapshot latest` | Recovers stuck modes and can restore the newest local snapshot. |
-| `rice export ~/aroli-preferences` | Exports portable visual preferences without credentials or personal data. |
-| `rice update --dry-run` | Shows the update plan without changing anything. |
-| `rice prune` | Lists files retired by the latest release (nothing is deleted without `--apply`). |
-| `rice plugins list` | Lists optional applications and tools that can be installed later. |
-| `rice plugins install btop` | Installs only the selected optional item, after confirmation. |
-| `rice cli update --dry-run` | Checks the CLI release and its verified binary update plan. |
-| `rice cli update` | Updates only the CLI binary after verifying SHA-256. |
-| `rice install --resume` | Continues from the last successfully completed installation phase. |
-| `rice logs` | Shows the last 100 lines of the latest installation log. |
+| `aroli` | Opens the guided terminal interface. |
+| `aroli install --dry-run --lang pt-BR` | Shows the plan without changing anything. |
+| `aroli install --lang pt-BR` | Installs the aroli in Brazilian Portuguese. |
+| `aroli install restore` | Restores the previous configuration files. |
+| `aroli diagnose` | Read-only diagnostics. |
+| `aroli doctor` | Checks the local desktop integration; `--fix` offers safe session repairs. |
+| `aroli status` | Installed version, last check, and rollback ref. |
+| `aroli profile list` | Lists curated, transparent installation profiles. |
+| `aroli profile install creator` | Installs a named set of phases; its optional apps remain visible and confirmable. |
+| `aroli snapshot create before-tweaks` | Saves the supported visual configuration paths locally. |
+| `aroli snapshot restore before-tweaks` | Restores a configuration snapshot while retaining the current files as backups. |
+| `aroli wallpaper list` | Lists bundled and imported wallpapers. |
+| `aroli wallpaper set aroli-ember-coast.png` | Applies a wallpaper and its dynamic Pywal palette. |
+| `aroli gaming on` | Temporarily disables expensive compositor effects, preserving their exact previous state. |
+| `aroli gaming launch steam` | Runs a game under GameMode when the optional `gamemode` package is installed. |
+| `aroli battery set power-saver` | Selects the Power Profiles Daemon energy-saver profile. |
+| `aroli battery balanced` | Selects the balanced profile; `performance` is available when supported by the hardware. |
+| `aroli session apply laptop` | Applies a coordinated daily-use profile. |
+| `aroli recover --snapshot latest` | Recovers stuck modes and can restore the newest local snapshot. |
+| `aroli export ~/aroli-preferences` | Exports portable visual preferences without credentials or personal data. |
+| `aroli update --dry-run` | Shows the update plan without changing anything. |
+| `aroli prune` | Lists files retired by the latest release (nothing is deleted without `--apply`). |
+| `aroli plugins list` | Lists optional applications and tools that can be installed later. |
+| `aroli plugins install btop` | Installs only the selected optional item, after confirmation. |
+| `aroli cli update --dry-run` | Checks the CLI release and its verified binary update plan. |
+| `aroli cli update` | Updates only the CLI binary after verifying SHA-256. |
+| `aroli install --resume` | Continues from the last successfully completed installation phase. |
+| `aroli logs` | Shows the last 100 lines of the latest installation log. |
 
 ## Updates
 
-The rice follows **stable tags** (`vX.Y.Z`, SemVer), never `main`,
+Aroli Desktop follows **stable tags** (`vX.Y.Z`, SemVer), never `main`,
 and notifies you on its own when a release lands on GitHub:
 
-- A daily timer (`rice-update-check.timer`, idle priority, no
+- A daily timer (`aroli-update-check.timer`, idle priority, no
   resident process) transfers a few KB and writes
   `~/.cache/aroli-desktop/update.json`. The bar/notch shows a dot
   and `Settings > About` shows the version seen.
-- A login notice (`rice-update-notify.service`) reads only that cache file,
+- A login notice (`aroli-update-notify.service`) reads only that cache file,
   no network, exits in milliseconds, and shows one desktop notification per
   release when an update is pending.
-- Updating is always your own act: `rice update --dry-run` shows the plan,
-  `rice update` asks for confirmation, hands over to the target release's
+- Updating is always your own act: `aroli update --dry-run` shows the plan,
+  `aroli update` asks for confirmation, hands over to the target release's
   own updater, records the rollback point, and re-runs
   the installer. Local changes are stashed automatically and restored
   afterwards, so files the desktop rewrote on its own never block the update.
-  `rice rollback` undoes it. `rice prune --apply` moves
+  `aroli rollback` undoes it. `aroli prune --apply` moves
   leftovers to the Trash (with backup), never deletes directly, and never
   touches files you modified.
-- To turn off the notices (the cache, the dot, and `rice status` keep working):
-  `systemctl --user disable rice-update-check.timer rice-update-notify.service`.
+- To turn off the notices (the cache, the dot, and `aroli status` keep working):
+  `systemctl --user disable aroli-update-check.timer aroli-update-notify.service`.
 Details and history in [CHANGELOG.md](CHANGELOG.md).
 
 ## Privacy and control
@@ -187,7 +187,7 @@ not edit `/usr/share/omarchy/` and keeps customizations in the appropriate
 user paths. See [OMARCHY.md](OMARCHY.md) for compatibility, limits, and
 safe diagnostics.
 
-## Migrating from the previous rice
+## Migrating from the previous aroli
 
 The script first inspects existing links; it only changes anything with `--apply`.
 

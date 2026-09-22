@@ -1081,13 +1081,17 @@ EOF
         # Bytecode caches regenerate on their own; copying them would leave
         # stale .pyc files beside the scripts that own them.
         case "$base" in __pycache__) continue ;; esac
-        # `rice` is the compiled Go CLI. It installs and updates itself before
-        # this phase runs; copying the historical shell dispatcher here would
-        # replace it and make the user lose the interactive interface.
-        if [ "$base" = rice ]; then
-            skip ".local/bin/rice managed by the Go CLI"
-            continue
-        fi
+        # `aroli` is the compiled Go CLI. It installs and updates itself before
+        # this phase runs; copying anything over it would make the user lose
+        # the interactive interface. `rice` is its deprecation shim (also
+        # managed by the CLI) and `aroli-backend` only ever runs from the
+        # checkout, never from PATH.
+        case "$base" in
+            aroli|rice|aroli-backend)
+                skip ".local/bin/$base managed by the Go CLI"
+                continue
+                ;;
+        esac
         run cp -a "$f" "$HOME/.local/bin/$base"
         run chmod +x "$HOME/.local/bin/$base"
         ok ".local/bin/$base"

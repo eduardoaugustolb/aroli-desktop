@@ -8,7 +8,7 @@ set -euo pipefail
 mode="${1:-status}"
 need_daemon() {
     command -v powerprofilesctl >/dev/null \
-        || { echo "power-profiles-daemon is not installed; install it with: rice plugins install power-profiles-daemon" >&2; exit 1; }
+        || { echo "power-profiles-daemon is not installed; install it with: aroli plugins install power-profiles-daemon" >&2; exit 1; }
 }
 
 profile() {

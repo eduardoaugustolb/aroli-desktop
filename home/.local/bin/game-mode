@@ -3,7 +3,7 @@
 #
 # This intentionally does not change CPU governors, GPU clocks, services, or
 # power profiles. GameMode itself owns those per-process optimisations when a
-# game is launched through `rice gaming launch`; this helper only removes the
+# game is launched through `aroli gaming launch`; this helper only removes the
 # compositor work that can compete with a fullscreen game.
 
 set -euo pipefail

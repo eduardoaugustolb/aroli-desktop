@@ -12,8 +12,8 @@ func TestCLIAssetName(t *testing.T) {
 		goos, arch, want string
 		ok               bool
 	}{
-		{"linux", "amd64", "rice-linux-amd64", true},
-		{"linux", "arm64", "rice-linux-arm64", true},
+		{"linux", "amd64", "aroli-linux-amd64", true},
+		{"linux", "arm64", "aroli-linux-arm64", true},
 		{"darwin", "arm64", "", false},
 		{"linux", "386", "", false},
 	}
@@ -27,8 +27,8 @@ func TestCLIAssetName(t *testing.T) {
 
 func TestChecksumFor(t *testing.T) {
 	checksum := strings.Repeat("a", 64)
-	contents := checksum + "  rice-linux-amd64\n" + strings.Repeat("b", 64) + " *rice-linux-arm64\n"
-	got, err := checksumFor("rice-linux-arm64", contents)
+	contents := checksum + "  aroli-linux-amd64\n" + strings.Repeat("b", 64) + " *aroli-linux-arm64\n"
+	got, err := checksumFor("aroli-linux-arm64", contents)
 	if err != nil || got != strings.Repeat("b", 64) {
 		t.Fatalf("checksumFor returned %q, %v", got, err)
 	}
@@ -90,7 +90,7 @@ func TestEnsureRepositoryDryRunBootstrapsTemporaryCheckout(t *testing.T) {
 	if _, err := validRepo(path); err != nil {
 		t.Fatalf("dry-run checkout is invalid: %v", err)
 	}
-	if !strings.HasPrefix(filepath.Base(filepath.Dir(path)), "rice-dry-run-") {
+	if !strings.HasPrefix(filepath.Base(filepath.Dir(path)), "aroli-dry-run-") {
 		t.Fatalf("dry-run checkout was not temporary: %q", path)
 	}
 	cleanup()

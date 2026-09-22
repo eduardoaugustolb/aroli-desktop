@@ -20,13 +20,13 @@ import (
 	"time"
 )
 
-type riceProfile struct {
+type aroliProfile struct {
 	name, description string
 	phases            []string
 	plugins           []string
 }
 
-var riceProfiles = []riceProfile{
+var aroliProfiles = []aroliProfile{
 	{"minimal", "Base visual do Aroli Desktop, sem aplicativos opcionais.", []string{"base", "config", "cursor", "final"}, nil},
 	{"desktop", "Desktop completo: pacotes, gráficos, serviços e configuração.", []string{"base", "packages", "cursor", "config", "graphics", "services", "final"}, nil},
 	{"creator", "Perfil desktop com ferramentas de criação explicitamente listadas.", []string{"base", "packages", "cursor", "config", "graphics", "services", "final"}, []string{"neovim", "yazi", "onefetch", "visual-studio-code-bin"}},
@@ -36,13 +36,13 @@ var riceProfiles = []riceProfile{
 func profiles(args []string) error {
 	if len(args) == 0 || args[0] == "list" {
 		fmt.Println("\nPerfis de instalação")
-		for _, p := range riceProfiles {
+		for _, p := range aroliProfiles {
 			fmt.Printf("  %-10s %s\n", p.name, p.description)
 		}
 		return nil
 	}
 	if len(args) < 2 || (args[0] != "show" && args[0] != "install") {
-		return errors.New("use: rice profile list|show|install NOME")
+		return errors.New("use: aroli profile list|show|install NOME")
 	}
 	p, err := profileByName(args[1])
 	if err != nil {
@@ -79,13 +79,13 @@ func profiles(args []string) error {
 	return plugins(append(pluginArgs, p.plugins...))
 }
 
-func profileByName(name string) (riceProfile, error) {
-	for _, p := range riceProfiles {
+func profileByName(name string) (aroliProfile, error) {
+	for _, p := range aroliProfiles {
 		if p.name == name {
 			return p, nil
 		}
 	}
-	return riceProfile{}, fmt.Errorf("perfil %q não existe; veja: rice profile list", name)
+	return aroliProfile{}, fmt.Errorf("perfil %q não existe; veja: aroli profile list", name)
 }
 
 var snapshotPaths = []string{
@@ -102,7 +102,7 @@ func validSnapshotName(name string) bool {
 
 func snapshots(args []string) error {
 	if len(args) == 0 {
-		return errors.New("use: rice snapshot create|list|restore NOME")
+		return errors.New("use: aroli snapshot create|list|restore NOME")
 	}
 	root, err := snapshotRoot()
 	if err != nil {
@@ -126,7 +126,7 @@ func snapshots(args []string) error {
 		return nil
 	case "create":
 		if len(args) != 2 || !validSnapshotName(args[1]) {
-			return errors.New("use: rice snapshot create NOME (somente um nome simples)")
+			return errors.New("use: aroli snapshot create NOME (somente um nome simples)")
 		}
 		dest := filepath.Join(root, args[1])
 		if _, err := os.Stat(dest); err == nil {
@@ -150,7 +150,7 @@ func snapshots(args []string) error {
 		return os.WriteFile(filepath.Join(dest, "METADATA"), []byte("created="+time.Now().Format(time.RFC3339)+"\n"), 0o644)
 	case "restore":
 		if len(args) < 2 || !validSnapshotName(args[1]) {
-			return errors.New("use: rice snapshot restore NOME [--yes]")
+			return errors.New("use: aroli snapshot restore NOME [--yes]")
 		}
 		assume := len(args) == 3 && args[2] == "--yes"
 		src := filepath.Join(root, args[1])
@@ -183,7 +183,7 @@ func snapshots(args []string) error {
 		fmt.Println("Snapshot restaurado. As versões anteriores foram mantidas com .before-snapshot-…")
 		return nil
 	default:
-		return errors.New("use: rice snapshot create|list|restore NOME")
+		return errors.New("use: aroli snapshot create|list|restore NOME")
 	}
 }
 
@@ -240,7 +240,7 @@ func copyTree(src, dst string) error {
 
 func wallpapers(args []string) error {
 	if len(args) == 0 {
-		return errors.New("use: rice wallpaper list|set|random|import|remove")
+		return errors.New("use: aroli wallpaper list|set|random|import|remove")
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -266,7 +266,7 @@ func wallpapers(args []string) error {
 		return nil
 	case "set":
 		if len(args) != 2 {
-			return errors.New("use: rice wallpaper set ARQUIVO")
+			return errors.New("use: aroli wallpaper set ARQUIVO")
 		}
 		return setWallpaper(filepath.Join(dir, filepath.Base(args[1])))
 	case "random":
@@ -280,7 +280,7 @@ func wallpapers(args []string) error {
 		return setWallpaper(filepath.Join(dir, images[int(b[0])%len(images)]))
 	case "import":
 		if len(args) != 2 {
-			return errors.New("use: rice wallpaper import /caminho/imagem")
+			return errors.New("use: aroli wallpaper import /caminho/imagem")
 		}
 		source, err := filepath.Abs(args[1])
 		if err != nil {
@@ -299,7 +299,7 @@ func wallpapers(args []string) error {
 		return copyTree(source, dest)
 	case "remove":
 		if len(args) < 2 {
-			return errors.New("use: rice wallpaper remove ARQUIVO [--yes]")
+			return errors.New("use: aroli wallpaper remove ARQUIVO [--yes]")
 		}
 		path := filepath.Join(dir, filepath.Base(args[1]))
 		if _, err := os.Stat(path); err != nil {
@@ -315,7 +315,7 @@ func wallpapers(args []string) error {
 		}
 		return os.Rename(path, path+".removed-"+time.Now().Format("20060102-150405"))
 	default:
-		return errors.New("use: rice wallpaper list|set|random|import|remove")
+		return errors.New("use: aroli wallpaper list|set|random|import|remove")
 	}
 }
 
@@ -352,7 +352,7 @@ func gaming(args []string) error {
 	switch args[0] {
 	case "status":
 		if len(args) > 2 || (len(args) == 2 && args[1] != "--json") {
-			return errors.New("use: rice gaming status [--json]")
+			return errors.New("use: aroli gaming status [--json]")
 		}
 		state, err := runHelper("status")
 		if err != nil {
@@ -369,7 +369,7 @@ func gaming(args []string) error {
 		return nil
 	case "on", "off", "toggle":
 		if len(args) != 1 {
-			return errors.New("use: rice gaming on|off|toggle")
+			return errors.New("use: aroli gaming on|off|toggle")
 		}
 		before, err := runHelper("status")
 		if err != nil {
@@ -396,7 +396,7 @@ func gaming(args []string) error {
 		return nil
 	case "launch":
 		if len(args) < 2 {
-			return errors.New("use: rice gaming launch COMANDO [args...]")
+			return errors.New("use: aroli gaming launch COMANDO [args...]")
 		}
 		wasActive, err := runHelper("status")
 		if err != nil {
@@ -428,7 +428,7 @@ func gaming(args []string) error {
 		}
 		return err
 	default:
-		return errors.New("use: rice gaming status|on|off|toggle|launch COMANDO [args...]")
+		return errors.New("use: aroli gaming status|on|off|toggle|launch COMANDO [args...]")
 	}
 }
 
@@ -440,7 +440,7 @@ func battery(args []string) error {
 	}
 	valid := (len(args) == 1 && (args[0] == "status" || args[0] == "available" || args[0] == "next" || args[0] == "balanced" || args[0] == "performance" || args[0] == "power-saver")) || (len(args) == 2 && args[0] == "set" && (args[1] == "power-saver" || args[1] == "balanced" || args[1] == "performance"))
 	if !valid {
-		return errors.New("use: rice battery status|available|set power-saver|balanced|performance|next")
+		return errors.New("use: aroli battery status|available|set power-saver|balanced|performance|next")
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -468,7 +468,7 @@ func battery(args []string) error {
 func doctor(args []string) error {
 	fix := len(args) == 1 && args[0] == "--fix"
 	if len(args) > 1 || (len(args) == 1 && !fix) {
-		return errors.New("use: rice doctor [--fix]")
+		return errors.New("use: aroli doctor [--fix]")
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -494,7 +494,7 @@ func doctor(args []string) error {
 		}
 	}
 	if !fix {
-		fmt.Println("\nPara reaplicar integrações seguras da sessão: rice doctor --fix")
+		fmt.Println("\nPara reaplicar integrações seguras da sessão: aroli doctor --fix")
 		return nil
 	}
 	if !confirm(bufio.NewReader(os.Stdin), "Recarregar Hyprland e reiniciar o serviço Quickshell do usuário?") {
@@ -556,7 +556,7 @@ func status() error {
 		}
 		fmt.Printf("atualização  %s\n", state)
 	} else {
-		fmt.Println("atualização  ainda não verificada (rice check --force)")
+		fmt.Println("atualização  ainda não verificada (aroli check --force)")
 	}
 	if root, err := snapshotRoot(); err == nil {
 		if entries, err := os.ReadDir(root); err == nil {
