@@ -1,0 +1,53 @@
+name: Bug report
+description: Something on Aroli Desktop broke or looks wrong
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: symptom
+    attributes:
+      label: Symptom
+      description: What looks wrong, in one sentence.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Exact steps and commands, in order.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: Expected vs actual
+      description: One sentence each.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence bundle
+      description: Paste verbatim output (trimmed, not paraphrased).
+      value: |
+        ```
+        aroli status:
+        VERSION:
+        ./diagnose BAD/HUH lines:
+        hyprctl configerrors:
+        systemctl --user --failed:
+        ```
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Checkout VERSION plus `aroli status` line.
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: Already tried
+      description: What was attempted and its outcome.

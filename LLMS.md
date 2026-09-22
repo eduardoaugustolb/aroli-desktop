@@ -38,6 +38,7 @@ precedence over convenience.
 | `VERSION` / `CHANGELOG.md` | Single source of truth for the version and per-release history. |
 | `home/Pictures/wallpapers/` | Default wallpapers shipped by the aroli. |
 | `scripts/migrate-from-legacy-rice.sh` | Safe migration from the legacy fork. |
+| `agents/skills/` | AI agent skills, deployed to `~/.agents/skills` by `install.sh`. |
 | `OMARCHY.md` | Compatibility contract with Omarchy. |
 
 ## Safe install flow

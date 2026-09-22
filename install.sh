@@ -1119,6 +1119,23 @@ EOF
         ok "desktop entries"
     fi
 
+    # 4c) agent skills, OS level. AI agents discover skills on their own from
+    #     ~/.agents/skills (opencode, Claude-compatible harnesses), so the
+    #     rice ships its own: linked in --link mode so skill updates arrive
+    #     with the rice, copied in --copy mode. place() backs up whatever was
+    #     there, like everywhere else in this phase.
+    local skills="$REPO/agents/skills"
+    if [ -d "$skills" ]; then
+        run mkdir -p "$HOME/.agents/skills"
+        local s
+        for s in "$skills"/*; do
+            [ -e "$s" ] || continue
+            local sbase; sbase="$(basename "$s")"
+            place "$s" "$HOME/.agents/skills/$sbase" "agents/skills/$sbase"
+        done
+        ok "agent skills"
+    fi
+
     # 5) wallpapers: copied without clobbering. If you already have some there,
     #    they are left alone.
     if [ -d "$root/Pictures/wallpapers" ]; then
