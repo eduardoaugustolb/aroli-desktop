@@ -133,3 +133,6 @@ home/.config/vlc/vlc-qt-interface.conf
 .dotfiles-backup/
 
 home/Pictures/wallpapers/.descartes/
+
+# Go build output (make build / install-cli)
+bin/
