@@ -20,7 +20,7 @@ import base64, json, os, re, socket, struct, sys, urllib.request
 
 PUERTO = 9333
 SECCION = "pywal"
-INI = os.path.expanduser("~/.config/spicetify/Themes/termspot/color.ini")
+INI = os.path.expanduser("~/.config/spicetify/Themes/aroli/color.ini")
 
 args = sys.argv[1:]
 i = 0
@@ -42,8 +42,8 @@ def morir(msg, codigo=1):
 
 
 # ---- 1. read the color.ini section ------------------------------------------
-# Parse manually rather than using configparser: termspot color.ini has 20
-# sections and ';' comments, while only one section is needed.
+# Parse manually rather than using configparser: the theme color.ini has
+# several sections and ';' comments, while only one section is needed.
 def leer_seccion(ruta, seccion):
     try:
         texto = open(ruta).read()
@@ -174,8 +174,6 @@ def objetivo(puerto):
 
 # ---- 4. JavaScript executed inside Spotify ----------------------------------
 def construir_js(colores):
-    # Also recalculate --termspot-mono-filter. The theme only updates it on a
-    # track change, leaving album art tinted with the previous accent otherwise.
     return """(() => {
   const c = %s;
   const el = document.documentElement;
@@ -183,24 +181,6 @@ def construir_js(colores):
   for (const k in c) {
     el.style.setProperty('--spice-' + k, '#' + c[k]);
     el.style.setProperty('--spice-rgb-' + k, rgb(c[k]).join(','));
-  }
-  const a = c['accent-active'] || c['accent'];
-  if (a) {
-    const [r,g,b] = rgb(a);
-    const max = Math.max(r,g,b), min = Math.min(r,g,b);
-    let hue = 0;
-    if (max !== min) {
-      const d = max - min;
-      if (max === r) hue = ((g-b)/d) %% 6;
-      else if (max === g) hue = (b-r)/d + 2;
-      else hue = (r-g)/d + 4;
-      hue = Math.round(hue*60);
-      if (hue < 0) hue += 360;
-    }
-    const sat = max === 0 ? 0 : (max-min)/max;
-    el.style.setProperty('--termspot-mono-filter',
-      'grayscale(1) sepia(1) hue-rotate(' + (hue-40) + 'deg) saturate(' +
-      (0.6+sat).toFixed(2) + ') brightness(0.8)');
   }
   return Object.keys(c).length;
 })()""" % json.dumps(colores)

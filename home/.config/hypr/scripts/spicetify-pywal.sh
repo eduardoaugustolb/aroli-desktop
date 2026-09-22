@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Re-themes Spotify (spicetify) using the pywal palette. Called by set-wallpaper.sh.
 #
-# Uses the 'termspot' theme (github.com/fdeox/termspot): a CRT phosphor TUI.
-# Its color.ini includes 19 custom schemes, so spicetify-colors.py only inserts
-# or updates the [pywal] block with a vivid accent derived from the wallpaper's
-# dominant hue, leaving the rest of the file unchanged.
+# Uses the 'aroli' theme (original, made by us): Apple-like ease on a dark
+# foundation. Its color.ini holds the [Aroli] fallback plus the [pywal]
+# block, so spicetify-colors.py only inserts or updates [pywal] with a vivid
+# accent derived from the wallpaper's dominant hue, leaving [Aroli] intact.
 #
 # How color reaches an already-open Spotify instance:
 #
@@ -30,7 +30,7 @@ command -v spicetify >/dev/null 2>&1 || exit 0
 SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GEN="$SCRIPTS/spicetify-colors.py"
 PUSH="$SCRIPTS/spicetify-push-colors.py"
-THEME_DIR="$HOME/.config/spicetify/Themes/termspot"
+THEME_DIR="$HOME/.config/spicetify/Themes/aroli"
 LOG="$HOME/.cache/spicetify-pywal.log"
 [ -r "$HOME/.cache/wal/colors.json" ] || exit 0
 mkdir -p "$THEME_DIR"

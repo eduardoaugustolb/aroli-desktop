@@ -1,0 +1,10 @@
+[
+  {
+    "name": "aroli",
+    "description": "Aroli for Spotify: Apple-like ease on a dark foundation. Rounded cards and covers, hairline borders, system type, wallpaper accent over stable dark surfaces. Original theme, made by us.",
+    "usercss": "user.css",
+    "schemes": "color.ini",
+    "authors": [{ "name": "Aroli", "url": "https://github.com/eduardoaugustolb/aroli-desktop" }],
+    "tags": ["aroli", "dark", "rounded", "minimal", "pywal"]
+  }
+]

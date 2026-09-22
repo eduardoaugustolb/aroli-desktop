@@ -1765,7 +1765,7 @@ phase_sddm() {
 # its stock look no matter what the repo ships.
 #
 # WHY IT IS A PHASE OF ITS OWN. The `config` phase already lays down
-# ~/.config/spicetify with the termspot theme and the pywal color scheme, and
+# ~/.config/spicetify with the aroli theme and the pywal color scheme, and
 # `set-wallpaper.sh` already calls `spicetify refresh` on every wallpaper
 # change... but `refresh` only does anything once spicetify has been APPLIED at
 # least once, and applying means writing inside /opt/spotify, which needs sudo.
@@ -1826,14 +1826,14 @@ phase_spicetify() {
     # Seed the colors before applying, so the very first paint is already the
     # pywal ones instead of whatever the theme ships with.
     local gen="$HOME/.config/hypr/scripts/spicetify-colors.py"
-    local theme="$HOME/.config/spicetify/Themes/termspot"
+    local theme="$HOME/.config/spicetify/Themes/aroli"
     if [ -r "$gen" ] && [ -r "$HOME/.cache/wal/colors.json" ] && [ "$DRY" = 0 ]; then
         mkdir -p "$theme"
         python3 "$gen" "$theme/color.ini" >/dev/null 2>&1 \
             && ok "colors generated from the current pywal palette"
     fi
 
-    run spicetify config current_theme termspot color_scheme pywal >/dev/null 2>&1
+    run spicetify config current_theme aroli color_scheme pywal >/dev/null 2>&1
 
     if [ "$DRY" = 1 ]; then
         skip "would apply the theme to Spotify (spicetify backup apply)"

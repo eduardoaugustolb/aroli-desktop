@@ -5,17 +5,17 @@
 # Use the wallpaper's dominant hue with a saturation boost, floor, and cap to
 # keep the original theme character without becoming fluorescent.
 #
-# termspot's color.ini has 19 built-in schemes, so only the [pywal] block is
+# The theme's color.ini keeps its own schemes, so only the [pywal] block is
 # inserted or replaced. The rest remains intact across theme updates.
 #
 # Usage: spicetify-colors.py [color.ini path]
-#        (default: ~/.config/spicetify/Themes/termspot/color.ini)
+#        (default: ~/.config/spicetify/Themes/aroli/color.ini)
 import json, sys, os, re, colorsys, math
 
 HOME = os.path.expanduser("~")
 SRC  = os.path.join(HOME, ".cache/wal/colors.json")
 OUT  = sys.argv[1] if len(sys.argv) > 1 else \
-       os.path.join(HOME, ".config/spicetify/Themes/termspot/color.ini")
+       os.path.join(HOME, ".config/spicetify/Themes/aroli/color.ini")
 
 try:
     d = json.load(open(SRC))
@@ -55,8 +55,8 @@ tint_sat = min(s_best + 0.08, 0.24)
 
 mk   = lambda l, s: H(*colorsys.hls_to_rgb(hue, l, s))
 bl   = colorsys.rgb_to_hls(*h2rgb(sp["background"]))[1]
-# Surfaces are dark but tinted, creating the phosphor feel. The ramp mirrors
-# termspot's Fdeox spacing.
+# Surfaces are dark but tinted, creating depth. The ramp mirrors
+# the theme's surface spacing.
 tint = lambda l: mk(min(l, 0.30), tint_sat)
 
 accent  = mk(0.62, acc_sat)   # play / active / bar / selected

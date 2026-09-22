@@ -1,0 +1,217 @@
+/*  ══════════════════════════════════════════════════════════════
+    Aroli for Spotify. Original theme, made by us.
+    Apple-like ease on an Aroli foundation: a stable dark surface, the
+    wallpaper accent, generous radii, hairline borders, system type.
+    No remote code, no terminal, no CRT. "Tudo encontra seu lugar."
+    ══════════════════════════════════════════════════════════════ */
+
+/*  ── knobs ─────────────────────────────────────────────────────── */
+:root {
+    --aroli-radius-xl: 16px; /* cards, hero covers */
+    --aroli-radius-lg: 12px; /* tiles, menus, dialogs, tooltips */
+    --aroli-radius-md: 10px; /* inputs, chips, list rows */
+    --aroli-font: system-ui, -apple-system, "SF Pro Text", Inter,
+        "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --aroli-lyrics-size: 20px;
+}
+
+/*  ── type: the system voice, everywhere ─────────────────────────── */
+.Root__top-container,
+.Root__top-container * {
+    font-family: var(--aroli-font) !important;
+}
+
+/*  ── recolor bridge: spice palette into Encore tokens ───────────── */
+:root {
+    --spice-main-elevated: var(--spice-highlight);
+    --spice-highlight-elevated: var(--spice-highlight);
+    --spice-sidebar: var(--spice-main);
+    --spice-player: var(--spice-main);
+    --spice-card: var(--spice-highlight);
+    --spice-shadow: var(--spice-main);
+    --spice-selected-row: var(--spice-highlight);
+    --spice-button: var(--spice-accent);
+    --spice-button-active: var(--spice-accent-active);
+    --spice-button-disabled: var(--spice-accent-inactive);
+    --spice-tab-active: var(--spice-main);
+    --spice-rgb-main-elevated: var(--spice-rgb-highlight);
+    --spice-rgb-highlight-elevated: var(--spice-rgb-highlight);
+    --spice-rgb-sidebar: var(--spice-rgb-main);
+    --spice-rgb-player: var(--spice-rgb-main);
+    --spice-rgb-card: var(--spice-rgb-highlight);
+    --spice-rgb-shadow: var(--spice-rgb-main);
+    --spice-rgb-selected-row: var(--spice-rgb-highlight);
+    --spice-rgb-button: var(--spice-rgb-accent);
+    --spice-rgb-button-active: var(--spice-rgb-accent-active);
+    --spice-rgb-button-disabled: var(--spice-rgb-accent-inactive);
+    --spice-rgb-tab-active: var(--spice-rgb-main);
+    --text-subdued: var(--spice-subtext) !important;
+}
+.encore-dark-theme,
+.encore-dark-theme .encore-base-set {
+    --background-base: var(--spice-main);
+    --background-highlight: var(--spice-highlight);
+    --background-press: var(--spice-highlight);
+    --background-elevated-base: var(--spice-highlight);
+    --background-elevated-highlight: var(--spice-highlight);
+    --background-elevated-press: var(--spice-highlight);
+    --essential-base: var(--spice-text);
+    --essential-subdued: var(--spice-subtext);
+    --decorative-subdued: var(--spice-border-inactive);
+    --background-tinted-base: rgba(var(--spice-rgb-accent), 0.16);
+    --background-tinted-highlight: rgba(var(--spice-rgb-accent), 0.28);
+    --background-tinted-press: rgba(var(--spice-rgb-accent), 0.4);
+}
+/* play buttons: solid accent discs */
+.encore-dark-theme .encore-bright-accent-set {
+    --background-base: var(--spice-accent) !important;
+    --background-highlight: var(--spice-accent-active) !important;
+    --background-press: var(--spice-accent-active) !important;
+    --background-elevated-base: var(--spice-accent) !important;
+    --background-elevated-highlight: var(--spice-accent-active) !important;
+    --background-elevated-press: var(--spice-accent-active) !important;
+}
+
+/*  ── shell surfaces: one dark, lifted where touched ─────────────── */
+.Root__top-container,
+.Root__nav-bar,
+.main-yourLibraryX-libraryContainer {
+    background-color: var(--spice-main);
+}
+.main-topBar-background {
+    background-color: rgba(var(--spice-rgb-main), 0.82) !important;
+}
+
+/*  ── headers: mood, not neon ───────────────────────────────────────
+    Artist and playlist headers ship loud gradients; keep a whisper of
+    the artwork tint over the dark foundation. */
+.main-entityHeader-backgroundColor {
+    background-color: var(--spice-main) !important;
+    background-image: linear-gradient(
+        rgba(var(--spice-rgb-highlight), 0.55),
+        var(--spice-main) 78%) !important;
+}
+.main-entityHeader-container + div,
+.main-entityHeader-container + div > div {
+    background-color: var(--spice-main) !important;
+    background-image: none !important;
+}
+.main-home-filterChipsSection,
+.main-home-filterChipsSection::after {
+    background-color: var(--spice-main) !important;
+}
+
+/*  ── cards and tiles: rounded, hairlined, lifted ─────────────────── */
+.main-card-card,
+div[data-encore-id="card"] {
+    border-radius: var(--aroli-radius-xl) !important;
+    background-color: var(--spice-card) !important;
+    border: 1px solid rgba(var(--spice-rgb-border-inactive), 0.5);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.main-card-card:hover,
+div[data-encore-id="card"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+.main-card-imageContainer,
+.main-card-imageContainer img,
+div[data-encore-id="card"] img {
+    border-radius: var(--aroli-radius-lg) !important;
+}
+
+/*  ── cover art everywhere: softly rounded, never sharp ───────────── */
+.main-image-image,
+.main-coverSlotCollapsed-container img,
+.main-nowPlayingWidget-coverArt img,
+.main-nowPlayingView-coverArt img,
+.main-entityHeader-image {
+    border-radius: var(--aroli-radius-lg) !important;
+}
+
+/*  ── pills: search, chips, buttons ───────────────────────────────── */
+.main-topBar-searchBar {
+    border-radius: 999px !important;
+    background-color: var(--spice-highlight) !important;
+    border: 1px solid rgba(var(--spice-rgb-border-inactive), 0.5);
+}
+.main-topBar-searchBar:focus-within {
+    border-color: var(--spice-border-active) !important;
+}
+button[data-encore-id="buttonPrimary"],
+button[data-encore-id="buttonSecondary"] {
+    border-radius: 999px !important;
+}
+.ChipInnerComponent-smaller,
+.ChipInnerComponent-small {
+    border-radius: 999px !important;
+}
+
+/*  ── lists: quiet rows with a soft landing ───────────────────────── */
+.main-trackList-trackListRow:hover {
+    border-radius: var(--aroli-radius-md);
+}
+.main-trackList-trackListRow:focus-within {
+    border-radius: var(--aroli-radius-md);
+}
+
+/*  ── player bar: hairline on top, slim rounded progress ──────────── */
+.main-nowPlayingBar-nowPlayingBar {
+    border-top: 1px solid rgba(var(--spice-rgb-border-inactive), 0.5);
+}
+.main-playbackBar-progressBar {
+    border-radius: 999px;
+}
+.main-playbackBar-progressBar > div {
+    border-radius: 999px;
+}
+
+/*  ── overlays: menus, dialogs, tooltips ──────────────────────────── */
+div[data-encore-id="popover"],
+div[role="dialog"],
+div[data-encore-id="tooltip"] {
+    border-radius: var(--aroli-radius-lg) !important;
+    background-color: var(--spice-highlight) !important;
+    border: 1px solid rgba(var(--spice-rgb-border-inactive), 0.6);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+/*  ── lyrics: big Apple-like type ─────────────────────────────────── */
+.lyrics-lyrics-container *,
+.main-nowPlayingView-lyricsContent * {
+    font-family: var(--aroli-font);
+    font-size: var(--aroli-lyrics-size);
+    line-height: 1.45;
+}
+
+/*  ── scrollbars: thin, rounded, out of the way ───────────────────── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--spice-border-inactive);
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--spice-subtext);
+}
+
+/*  ── selection and focus: accent, always rounded ─────────────────── */
+::selection {
+    background: var(--spice-accent);
+    color: var(--spice-main);
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--spice-border-active);
+    outline-offset: 2px;
+    border-radius: var(--aroli-radius-md);
+}
