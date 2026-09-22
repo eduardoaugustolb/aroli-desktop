@@ -10,6 +10,19 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [3.3.0] - 2026-09-21
+
+### Changed
+
+- The CLI is now `aroli`, the product name. `rice` stays as a
+  deprecation shim (warning + handover), same treatment the
+  `umbra-cursor-size` rename got. Backend dispatcher renamed to
+  `aroli-backend` with a silent repo-level `rice` shim so installers
+  predating the rename keep updating; the updater fetches
+  `aroli-linux-*` assets while releases keep publishing the
+  `rice-linux-*` names through the transition. Units, shell helpers,
+  diagnose, docs and help speak `aroli`.
+
 ## [3.2.0] - 2026-09-21
 
 ### Added
