@@ -97,7 +97,7 @@ Singleton {
     property alias clockSize: opts.clockSize
 
     readonly property var fontChoices: [
-        "Adwaita Sans", "Google Sans Flex", "Rubik", "Red Hat Text",
+        "Aroli Sans", "Adwaita Sans", "Google Sans Flex", "Rubik", "Red Hat Text",
         "Space Grotesk", "Readex Pro", "Noto Sans"
     ]
 
