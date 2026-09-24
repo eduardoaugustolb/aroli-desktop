@@ -10,6 +10,27 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   translation, optional).
 - `PATCH`: fix or docs with no behavior change for existing installs.
 
+## [Unreleased]
+
+### Added
+
+- Aroli para o Brave Origin (`~/.config/aroli-newtab`): tela inicial
+  (hero, busca, zonas de atalhos, tarefas e atividade GitHub) com o
+  Encaixe e o avatar oficiais, aba de ajustes oculta na engrenagem
+  (tema, buscador, nome, GitHub, atalho) e dropdown próprio nos tokens
+  Aroli. A chave Sistema / Aroli Dark / Aroli Black repinta o navegador
+  inteiro via `chrome.theme` (frame, toolbar, abas, omnibox, incógnito).
+  O Encaixe acompanha o acento do tema; animações (entrada, relógio,
+  ajustes, itens) via anime.js vendorizado, sem CDN. Sem seleção de
+  texto com o mouse; atividade em cache (1 fetch/hora, sem token). O tema
+  é derivado uma vez por wallpaper por `aroli-newtab-pywal.sh` e
+  registrado via `brave-origin-flags.conf` pelo `install.sh config`.
+
+### Changed
+
+- `brave-origin-bin` replaces `google-chrome` in the optional plugins
+  and becomes the default handler for web links.
+
 ## [3.3.0] - 2026-09-21
 
 ### Changed

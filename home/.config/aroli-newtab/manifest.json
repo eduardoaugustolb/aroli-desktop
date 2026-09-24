@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Aroli",
+  "short_name": "Aroli",
+  "version": "0.1.0",
+  "description": "Aroli para o Brave: tela inicial com busca, relógio, atalhos, tarefas e atividade, no tema do seu wallpaper.",
+  "minimum_chrome_version": "88",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": ["storage", "theme"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "128": "icon-128.png"
+  },
+  "action": {
+    "default_title": "Aroli"
+  }
+}

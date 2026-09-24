@@ -107,6 +107,7 @@ scope_enabled paletteScopeGtkQt && ~/.config/hypr/scripts/qt-pywal.py >/dev/null
 # Also update already-open GTK/libadwaita applications through the appearance portal.
 scope_enabled paletteScopeGtkQt && ~/.config/hypr/scripts/gtk-pywal.sh >/dev/null 2>&1 || true
 ~/.config/hypr/scripts/discord-pywal.sh 2>/dev/null || true
+~/.config/hypr/scripts/aroli-newtab-pywal.sh 2>/dev/null || true
 # (spicetify was already launched above, before the wallpaper transition)
 # Reorders Pokemon sprites for the new palette (~0.1 s) so the next terminal
 # immediately picks matching ones. If it fails, pokefetch uses randomness.

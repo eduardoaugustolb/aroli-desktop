@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="system">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aroli</title>
+<link rel="stylesheet" href="newtab.css">
+<link rel="stylesheet" href="theme-system.css" id="systemCss">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body data-settings="closed">
+  <main class="screen">
+    <header class="hero">
+        <div class="titleblock">
+          <p class="kicker">Aroli</p>
+          <h1 class="greet" id="greet">Boa tarde</h1>
+        </div>
+        <div class="heroright">
+        <div class="clockblock">
+          <div class="clock" aria-label="Hora atual">
+            <span class="time" id="clock"><span class="dg" id="d0">–</span><span class="dg" id="d1">–</span><span class="hsep">h</span><span class="dg" id="d2">–</span><span class="dg" id="d3">–</span></span>
+          </div>
+          <p class="date" id="date">&nbsp;</p>
+        </div>
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 192 192" width="88" height="88" aria-hidden="true"><g fill="currentColor"><path d="M96 40 C100 40 102 43 102 49 C102 77 122 95 148 96 C155 96 157 101 156 109 C150 146 126 160 91 160 C53 160 26 137 26 102 C26 68 54 42 88 40 Z"/><path d="M122 25 C144 30 164 49 169 70 C171 80 162 87 153 82 C147 68 133 54 116 49 C107 46 106 39 110 32 C113 27 118 24 122 25 Z"/></g></svg>
+        </div>
+      </div>
+    </header>
+
+    <form class="search" id="searchForm" role="search">
+      <span class="badge" id="engineBadge">Brave</span>
+      <input id="q" class="q" type="search" name="q" autocomplete="off" spellcheck="false"
+             placeholder="Buscar…" aria-label="Buscar">
+      <button class="go" type="submit" aria-label="Buscar">→</button>
+    </form>
+
+    <div class="zones">
+      <section class="zone" aria-label="Atalhos">
+        <h2 class="zonetitle">Atalhos</h2>
+        <ul class="grid" id="shortcuts"></ul>
+      </section>
+
+      <section class="zone" aria-label="Tarefas">
+        <h2 class="zonetitle">Tarefas</h2>
+        <form class="todoadd" id="todoForm">
+          <input id="todoInput" maxlength="120" placeholder="Nova tarefa…" aria-label="Nova tarefa">
+          <button type="submit">+</button>
+        </form>
+        <ul class="todo" id="todo"></ul>
+      </section>
+    </div>
+
+    <section class="zone wide" aria-label="Atividade no GitHub">
+      <div class="calhead">
+        <div>
+          <h2 class="zonetitle"><a class="zonelink" id="activityLink" href="https://github.com/">The year</a></h2>
+          <p class="fhint" id="activityHint"></p>
+        </div>
+        <div class="legend" aria-hidden="true"><span>less</span><span class="day l0"></span><span class="day l1"></span><span class="day l2"></span><span class="day l3"></span><span class="day l4"></span><span>more</span></div>
+      </div>
+      <div class="calwrap">
+        <div class="dow" aria-hidden="true"><span>mon</span><span>wed</span><span>fri</span></div>
+        <div class="rightcol">
+          <div class="cal" id="activity"></div>
+          <div class="months" id="activityMonths" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="toast" id="calToast" hidden></div>
+    </section>
+
+    <footer class="footbar">
+      <p class="foot">Tudo encontra seu lugar.</p>
+    </footer>
+  </main>
+
+  <button class="gear" id="gear" type="button" aria-label="Abrir ajustes" aria-expanded="false">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+      <path fill="currentColor" d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5zm0 5.2a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4z"/>
+      <path fill="currentColor" d="M20.7 13.4c.05-.45.08-.92.08-1.4s-.03-.95-.08-1.4l2-1.55a.5.5 0 0 0 .12-.64l-1.9-3.29a.5.5 0 0 0-.6-.22l-2.35.95a7.6 7.6 0 0 0-2.42-1.4L15.2 2a.5.5 0 0 0-.49-.4H9.29a.5.5 0 0 0-.49.4l-.36 2.46a7.6 7.6 0 0 0-2.42 1.4l-2.35-.95a.5.5 0 0 0-.6.22L1.17 8.4a.5.5 0 0 0 .12.64l2 1.55c-.05.45-.08.92-.08 1.4s.03.95.08 1.4l-2 1.55a.5.5 0 0 0-.12.64l1.9 3.29c.12.2.37.3.6.22l2.35-.95c.74.57 1.55 1.05 2.42 1.4l.36 2.46c.05.24.26.4.49.4h5.42c.23 0 .44-.16.49-.4l.36-2.46a7.6 7.6 0 0 0 2.42-1.4l2.35.95c.23.08.48 0 .6-.22l1.9-3.29a.5.5 0 0 0-.12-.64l-2-1.55z"/>
+    </svg>
+  </button>
+
+  <div class="scrim" id="scrim"></div>
+
+  <aside class="sheet" id="sheet" aria-label="Ajustes" aria-hidden="true">
+    <header class="sheethead">
+      <h2>Ajustes</h2>
+      <button class="x" id="closeSettings" type="button" aria-label="Fechar ajustes">×</button>
+    </header>
+
+    <div class="field">
+      <label class="flabel" id="themeLabel">Tema do navegador</label>
+      <div class="seg" role="group" aria-labelledby="themeLabel">
+        <button data-mode="system" type="button">Sistema</button>
+        <button data-mode="dark" type="button">Aroli Dark</button>
+        <button data-mode="black" type="button">Aroli Black</button>
+      </div>
+      <p class="fhint">Sistema segue o wallpaper; Dark e Black usam o tema Aroli fixo.</p>
+      <p class="fhint" id="themeStatus"></p>
+    </div>
+
+    <div class="field">
+      <span class="flabel" id="engineLabel">Buscador</span>
+      <div class="dd" id="engineDd">
+        <div class="selectwrap">
+          <button class="ddbtn" id="engineBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="engineLabel engineCur">
+            <span id="engineCur">Brave</span>
+          </button>
+        </div>
+        <ul class="ddlist" id="engineList" role="listbox" aria-labelledby="engineLabel" hidden></ul>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="flabel" for="nameInput">Como devo te chamar</label>
+      <input id="nameInput" class="text" maxlength="24" placeholder="Seu nome" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label class="flabel" for="ghUser">GitHub (grade do ano)</label>
+      <input id="ghUser" class="text" maxlength="39" placeholder="usuário" autocomplete="off" spellcheck="false">
+      <input id="ghToken" class="text" type="password" maxlength="100" placeholder="token (opcional, só para o ano inteiro)" autocomplete="off" spellcheck="false">
+      <p class="fhint">Sem token: últimos ~90 dias. Com token: 365 dias. Fica só neste navegador.</p>
+    </div>
+
+    <div class="field">
+      <span class="flabel" id="addLabel">Novo atalho</span>
+      <form class="addlink col" id="addForm" aria-labelledby="addLabel">
+        <input id="addTitle" class="text" maxlength="24" placeholder="Nome" aria-label="Nome do atalho">
+        <input id="addUrl" class="text" inputmode="url" placeholder="https://…" aria-label="URL do atalho">
+        <button class="btn" type="submit">Adicionar atalho</button>
+      </form>
+      <p class="fhint">Até 8 atalhos. Para remover, passe o mouse sobre um atalho na tela.</p>
+    </div>
+  </aside>
+
+<script src="vendor/anime.min.js"></script>
+<script src="newtab.js"></script>
+</body>
+</html>

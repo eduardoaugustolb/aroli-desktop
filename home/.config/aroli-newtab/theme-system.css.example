@@ -1,0 +1,18 @@
+/* Fallback Aroli Dark para theme-system.css.
+   Gerado por aroli-newtab-pywal.sh a partir do wallpaper; este .example
+   só serve de semente até a primeira geração. Não edite o live. */
+html[data-theme="system"] {
+  --nt-bg: #101111;
+  --nt-deep: #050505;
+  --nt-surface: #161919;
+  --nt-raised: #191c1c;
+  --nt-hover: #202424;
+  --nt-border: #252727;
+  --nt-border-hi: #3b4242;
+  --nt-fg: #c5c7c5;
+  --nt-muted: #aeb9bc;
+  --nt-faint: #858a89;
+  --nt-accent: #9ab7b0;
+  --nt-accent-ink: #101111;
+  --nt-link: #9ab7b0;
+}

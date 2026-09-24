@@ -1246,9 +1246,78 @@ EOF
         fi
     done
 
-    # 8) the language. Last, because it edits files that have just been laid
+    # 8) the Brave Origin new tab: extension already in place from step 2,
+    #    flags merged and live theme seeded here (idempotent, keeps yours).
+    configure_brave_newtab
+
+    # 9) the language. Last, because it edits files that have just been laid
     #    down, and before the 'sddm' phase, which copies one of them into /usr.
     apply_language
+}
+
+# 7f) Brave Origin + Aroli New Tab. The extension source ships in
+#     ~/.config/aroli-newtab (laid down by step 2 above); Brave Origin loads
+#     unpacked dirs listed in ~/.config/brave-origin-flags.conf, the same
+#     mechanism Omarchy uses for its own extensions. This only APPENDS our
+#     dir to that line (the Omarchy migration pattern), never rewrites the
+#     file, and seeds the gitignored live theme files from their .example
+#     fallbacks when missing.
+configure_brave_newtab() {
+    local ext="$HOME/.config/aroli-newtab" flags="$HOME/.config/brave-origin-flags.conf" f
+
+    for f in theme-system.css theme-system.json; do
+        if [ -f "$ext/$f" ]; then
+            skip "aroli-newtab/$f already there (kept)"
+        elif [ -f "$ext/$f.example" ]; then
+            if [ "$DRY" = 1 ]; then
+                skip "would seed aroli-newtab/$f from its .example"
+            else
+                run cp -- "$ext/$f.example" "$ext/$f" \
+                    && ok "aroli-newtab/$f seeded (yours; regenerated on wallpaper change)"
+            fi
+        fi
+    done
+
+    # First paint: without this a fresh install shows Aroli Dark until the
+    # first wallpaper change, even though the palette already exists.
+    # (On a virgin machine there is no palette yet; final derives it.)
+    if [ "$DRY" = 1 ]; then
+        skip "would derive the new-tab theme from the current pywal palette"
+    elif [ -f "$HOME/.cache/wal/colors.json" ] && [ -x "$HOME/.config/hypr/scripts/aroli-newtab-pywal.sh" ]; then
+        "$HOME/.config/hypr/scripts/aroli-newtab-pywal.sh" >/dev/null 2>&1 \
+            && ok "aroli-newtab theme derived from the current palette" || true
+    else
+        skip "no pywal palette yet; the 'final' phase derives the new-tab theme"
+    fi
+
+    if [ ! -f "$flags" ]; then
+        if [ "$DRY" = 1 ]; then
+            skip "would register the new-tab in a new brave-origin-flags.conf"
+        else
+            printf '%s\n' "--load-extension=$ext" > "$flags" \
+                && ok "brave-origin-flags.conf created with the Aroli New Tab"
+        fi
+        return 0
+    fi
+
+    if grep -qF "$ext" "$flags" 2>/dev/null; then
+        skip "Brave Origin already loads the Aroli New Tab"
+    elif grep -q "^--load-extension=" "$flags"; then
+        if [ "$DRY" = 1 ]; then
+            skip "would append the Aroli New Tab to --load-extension in brave-origin-flags.conf"
+        else
+            run sed -i --follow-symlinks "s|^--load-extension=\(.*\)$|--load-extension=\1,$ext|" "$flags" \
+                && ok "Aroli New Tab appended to Brave Origin extensions"
+        fi
+    else
+        if [ "$DRY" = 1 ]; then
+            skip "would add --load-extension=$ext to brave-origin-flags.conf"
+        else
+            [ -n "$(tail -c1 "$flags")" ] && printf '\n' >> "$flags"
+            printf '%s\n' "--load-extension=$ext" >> "$flags" \
+                && ok "Aroli New Tab registered in Brave Origin"
+        fi
+    fi
 }
 
 # ----------------------------------------------------------------- phase: system
@@ -1942,7 +2011,7 @@ phase_final() {
     if [ -n "$wallpaper" ] && command -v wal >/dev/null; then
         if [ "$DRY" = 1 ]; then
             skip "would generate the pywal palette from $(basename "$wallpaper")"
-            skip "would regenerate the derived themes (btop, cava, yazi, discord, spicetify, Qt)"
+            skip "would regenerate the derived themes (btop, cava, yazi, discord, new-tab, spicetify, Qt)"
         else
             # Same backend and --saturate as set-wallpaper.sh: the first
             # boot palette must look like after the first wallpaper change.
@@ -1970,12 +2039,12 @@ phase_final() {
             # config files: no session needed.
             local regenerated=0 s
             for s in yazi-pywal.sh cava-pywal.sh btop-pywal.sh discord-pywal.sh \
-                     spicetify-pywal.sh qt-pywal.py; do
+                     aroli-newtab-pywal.sh spicetify-pywal.sh qt-pywal.py; do
                 if [ -x "$HOME/.config/hypr/scripts/$s" ]; then
                     "$HOME/.config/hypr/scripts/$s" >/dev/null 2>&1 && regenerated=$((regenerated + 1))
                 fi
             done
-            [ "$regenerated" -gt 0 ] && ok "derived themes regenerated ($regenerated of 6)"
+            [ "$regenerated" -gt 0 ] && ok "derived themes regenerated ($regenerated of 7)"
         fi
     else
         warn "could not generate the initial palette (python-pywal missing, or no wallpapers)"

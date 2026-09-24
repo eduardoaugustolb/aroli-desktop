@@ -1,0 +1,21 @@
+{
+  "_note": "Semente Aroli Dark. Regenerado por aroli-newtab-pywal.sh a cada wallpaper. Nao editar o live.",
+  "colors": {
+    "frame": [16, 17, 17],
+    "frame_inactive": [10, 11, 11],
+    "frame_incognito": [5, 5, 5],
+    "frame_incognito_inactive": [5, 5, 5],
+    "toolbar": [22, 25, 25],
+    "tab_text": [197, 199, 197],
+    "tab_background_text": [133, 138, 137],
+    "toolbar_text": [197, 199, 197],
+    "toolbar_button_icon": [174, 185, 188],
+    "omnibox_text": [197, 199, 197],
+    "omnibox_background": [22, 25, 25],
+    "bookmark_text": [197, 199, 197],
+    "ntp_background": [16, 17, 17],
+    "ntp_text": [197, 199, 197],
+    "ntp_link": [154, 183, 176],
+    "button_background": [154, 183, 176]
+  }
+}

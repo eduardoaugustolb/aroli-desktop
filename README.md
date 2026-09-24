@@ -60,6 +60,9 @@ your image without turning every application surface into its dominant colour.
   mode where the wallpaper also tints application backgrounds.
 - Four Aroli Backdrops installed with the aroli: Ember Coast, Silent
   Threshold, Obsidian Dunes, and Black Mountains.
+- Aroli New Tab for Brave Origin: search, clock, shortcuts and tasks on the
+  wallpaper palette, with a Sistema / Aroli Dark / Aroli Black switch that
+  also repaints the browser frame. No network, no polling.
 - Assisted migration for installs coming from the previous fork.
 
 Change the cursor size consistently across Hyprland and GTK with
