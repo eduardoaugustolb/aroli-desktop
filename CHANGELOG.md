@@ -28,9 +28,18 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
 - Quadrado Máquina ao lado do ano (CPU, memória, disco, temperatura,
   bateria, uptime via host nativo `aroli-sys.py`); o Brave abre direto
   na página Aroli por policy gerenciada.
+- `scripts/sync-aroli-fonts.sh` (`--check`/`--apply`/`--install`) com
+  verificação (allowlist, magic OTTO, piso de tamanho, família Aroli via
+  fc-scan) e lock em `scripts/aroli-fonts.lock`; workflow `fonts`
+  valida os OTFs em todo PR e abre PR de revisão quando o upstream
+  publica builds novos (nunca push direto na main).
 
 ### Changed
 
+- Aroli Mono NF e Aroli Sans sincronizadas com o upstream `aroli@main`
+  (0.905: família óptica de pontos unificada, rabicho da vírgula/ponto
+  e vírgula redesenhados). `scripts/sync-aroli-fonts.sh --install`
+  aplica no `$HOME`; `./install.sh config` + `final` também.
 - `brave-origin-bin` replaces `google-chrome` in the optional plugins
   and becomes the default handler for web links.
 

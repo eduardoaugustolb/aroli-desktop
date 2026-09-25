@@ -1,0 +1,145 @@
+name: fonts
+
+# Keeps the vendored Aroli OTFs honest and up to date.
+#
+# - validate (push/PR touching fonts): offline checks only, no network.
+#   Magic bytes, sizes, fc-scan families, 644 perms, lock-file hashes.
+# - check-upstream (weekly + manual): diffs the tree against upstream main.
+#   On drift it verifies, applies, and opens a PR for human review.
+#   Nothing ever pushes to main directly.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "home/.local/share/fonts/**"
+      - "scripts/sync-aroli-fonts.sh"
+      - "scripts/aroli-fonts.lock"
+      - ".github/workflows/fonts.yml"
+  pull_request:
+    paths:
+      - "home/.local/share/fonts/**"
+      - "scripts/sync-aroli-fonts.sh"
+      - "scripts/aroli-fonts.lock"
+      - ".github/workflows/fonts.yml"
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fonts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Vendored fonts are sane
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Offline checks (magic, size, family, perms, lock)
+        run: |
+          python3 - <<'EOF'
+          import json, os, hashlib, stat, sys
+
+          root = os.getcwd()
+          mono = root + "/home/.local/share/fonts/aroli-mono"
+          sans = root + "/home/.local/share/fonts/aroli-sans"
+          expected = {
+              mono: ["AroliMonoNF-Regular.otf", "AroliMonoNF-Medium.otf",
+                     "AroliMonoNF-SemiBold.otf"],
+              sans: ["AroliSans-Regular.otf", "AroliSans-Medium.otf",
+                     "AroliSans-SemiBold.otf", "AroliSans-Bold.otf"],
+          }
+          failures = []
+          seen = {}
+          for d, files in expected.items():
+              actual = sorted(f for f in os.listdir(d) if f.endswith(".otf"))
+              if actual != sorted(files):
+                  failures.append(f"{d}: unexpected OTF set {actual}")
+              for f in files:
+                  p = os.path.join(d, f)
+                  data = open(p, "rb").read()
+                  if data[:4] != b"OTTO":
+                      failures.append(f"{p}: bad magic {data[:4]!r}")
+                  if len(data) < 10240:
+                      failures.append(f"{p}: suspiciously small ({len(data)} bytes)")
+                  mode = stat.S_IMODE(os.stat(p).st_mode)
+                  if mode != 0o644:
+                      failures.append(f"{p}: perms {oct(mode)}, want 0o644")
+                  seen[os.path.basename(d) + "/" + f] = hashlib.sha256(data).hexdigest()
+          lock = json.load(open(root + "/scripts/aroli-fonts.lock"))
+          for name, want in lock["files"].items():
+              if seen.get(name) != want:
+                  failures.append(f"lock mismatch for {name}")
+          if failures:
+              print("\n".join(failures))
+              sys.exit(1)
+          print(f"OK: {len(seen)} OTFs, magic + size + perms + lock all match.")
+          EOF
+      - name: fontconfig sees the Aroli families
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fontconfig >/dev/null
+          for f in home/.local/share/fonts/aroli-mono/*.otf home/.local/share/fonts/aroli-sans/*.otf; do
+            fc-scan "$f" | grep -qi aroli || { echo "fc-scan rejects $f"; exit 1; }
+          done
+          echo "OK: fc-scan accepts all vendored OTFs."
+      - name: Sync script syntax
+        run: bash -n scripts/sync-aroli-fonts.sh
+
+  check-upstream:
+    name: Check upstream for new font builds
+    # Scheduled/manual only: push/PR runs have nothing new to find, and the
+    # read-only token there must never try to open PRs.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Already in sync?
+        id: check
+        run: |
+          if bash scripts/sync-aroli-fonts.sh --check; then
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Apply verified upstream builds
+        if: steps.check.outputs.drift == 'true'
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fontconfig >/dev/null
+          bash scripts/sync-aroli-fonts.sh --apply
+          git status --short -- home/.local/share/fonts/ scripts/aroli-fonts.lock
+      - name: Open review PR
+        if: steps.check.outputs.drift == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(gh pr list --head fonts/sync-aroli --json number --jq length)" -gt 0 ]; then
+            echo "A sync PR is already open; skipping."
+            exit 0
+          fi
+          short="$(python3 -c 'import json; print(json.load(open("scripts/aroli-fonts.lock"))["upstream_commit"][:7])')"
+          git config user.name "aroli-fonts-bot"
+          git config user.email "aroli-fonts-bot@users.noreply.github.com"
+          git checkout -b "fonts/sync-aroli-$short"
+          git add home/.local/share/fonts/aroli-mono home/.local/share/fonts/aroli-sans scripts/aroli-fonts.lock
+          git commit -m "chore(fonts): sync Aroli Mono/Sans with upstream @$short
+
+          Verified by scripts/sync-aroli-fonts.sh: OTTO magic, size floor,
+          fc-scan Aroli family. Human review required before merge."
+          git push -u origin "fonts/sync-aroli-$short"
+          gh pr create --title "chore(fonts): sync Aroli Mono/Sans @$short" \
+            --body "Automated sync from \`eduardoaugustolb/aroli@main\` (\`$short\`).
+
+          Verification (enforced by \`scripts/sync-aroli-fonts.sh --apply\`):
+          - allowlisted filenames only, OTTO magic bytes, >= 10 KiB each
+          - fc-scan reports an Aroli family for every file
+          - lock file \`scripts/aroli-fonts.lock\` bumped with upstream commit + sha256
+
+          To land: review the diff, merge, then run \`scripts/sync-aroli-fonts.sh --install\` (or \`./install.sh config && ./install.sh final\`) on your machine." \
+            --label dependencies

@@ -38,6 +38,7 @@ jobs:
           bash -n home/.local/bin/aroli-backend
           bash -n home/.local/bin/rice
           bash -n scripts/migrate-from-legacy-rice.sh
+          bash -n scripts/sync-aroli-fonts.sh
       - name: Installer dry-run and shell interface
         run: |
           bash install.sh --help >/dev/null

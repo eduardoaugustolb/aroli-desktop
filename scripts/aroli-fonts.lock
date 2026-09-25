@@ -1,0 +1,15 @@
+{
+  "upstream": "eduardoaugustolb/aroli@main",
+  "upstream_commit": "be0b7e16e8745cdbb66ecb8ac7a72855516a58c6",
+  "upstream_version": "0.905",
+  "synced_at": "2026-09-25T03:35:30Z",
+  "files": {
+    "aroli-mono/AroliMonoNF-Regular.otf": "508b2084e1cdfebd2213ea4b6e27861b2832a7ee260661f9f2131a3dc552d214",
+    "aroli-mono/AroliMonoNF-Medium.otf": "4bff6ce6ed9b032c21e936ae07eba0b74d2c2169e46adcb2d0c7e5d997522ca4",
+    "aroli-mono/AroliMonoNF-SemiBold.otf": "6acb5d278e3a2618a0ab1cab534a03267f23b11f3dd7009715013512b834bc3a",
+    "aroli-sans/AroliSans-Regular.otf": "cd7aea1d80ffe2dcc21867d01973005d678098865ca9a87096bfab4c0b52dc82",
+    "aroli-sans/AroliSans-Medium.otf": "8f023c67d1678387eaf9741ebad47069158b9e68d773b94cc805e46c9b2c5ed5",
+    "aroli-sans/AroliSans-SemiBold.otf": "908f5fdb7f5399105b8f93891bed53e97a327b25a057c2e283033d7bd5795313",
+    "aroli-sans/AroliSans-Bold.otf": "78974bb87f63c4f980ec4409c01f55c175bbd094012fac5359dcee82d535c6ff"
+  }
+}
