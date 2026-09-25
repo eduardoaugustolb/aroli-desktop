@@ -33,26 +33,43 @@ Quase nulo por desenho, não por otimização tardia:
   estáticos; o service worker só roda no boot/instalação;
 - um único `setTimeout` até o próximo minuto (relógio `22h27`);
 - atividade GitHub: recarrega a cada abertura (sem token: últimos ~90
-  dias; com token: 365 dias); o cache só segura a pintura até chegar;
+  dias em até 3 páginas de eventos, ~300 no teto da API; com token:
+  365 dias); o cache só segura a pintura até chegar;
 - a paleta do wallpaper é derivada **uma vez** por troca, por
   `~/.config/hypr/scripts/aroli-newtab-pywal.sh`.
 
 Sem previsão do tempo, sem wallpaper diário remoto, sem favicons:
 tudo isso custa rede e timers permanentes.
 
+## Máquina
+
+Quadrado ao lado do ano com o essencial do Super+Shift+D: CPU (%,
+threads, sparkline), memória (% e GiB), disco (% e livres), temperatura
+e bateria, mais uptime. O Brave Origin não expõe `chrome.system.*`,
+então um host nativo stdlib (`host/aroli-sys.py`, ~12MB, 0,3ms por
+amostra) lê `/proc`/`/sys`. Uma instância por guia visível; oculta, a
+porta fecha e o processo morre. Registrado pelo `install.sh config` em
+`Brave-Origin/NativeMessagingHosts/com.aroli.sys.json` (nome pontilhado:
+este build rejeita `_` em host nativo).
+
 ## Tema do navegador
 
 A aba de ajustes alterna entre três modos, persistidos em
-`chrome.storage.local`:
+`chrome.storage.local`. O token do GitHub segue o mesmo cofre, com
+regras próprias: o campo nasce sempre vazio (nunca reexibido), valor
+inválido não é persistido, e há botão Remover. Ele só viaja para
+`api.github.com` via HTTPS; nada mais na extensão faz rede.
 
 - **Sistema** (padrão): segue o wallpaper via pywal;
 - **Aroli Dark**: charcoal `#101111`, texto Bone, acento sage-blue;
 - **Aroli Black**: mesma linguagem em Ink `#050505`.
 
-O modo repinta o navegador inteiro via `chrome.theme` (frame, toolbar,
-abas, omnibox, NTP, incógnito) na hora e no boot. Exige o Brave
-reiniciado uma vez após o install (a extensão carrega por
-`--load-extension` na abertura).
+O modo repinta o navegador inteiro: a chave da página manda o frame
+ao host (`set-frame`, uma vez por valor), que pinta via
+`omarchy-theme-set-browser-policy` com refresh — o único caminho que
+vence a policy no frame. Toolbar e abas vão por `chrome.theme`. O
+startup abre `chrome://newtab/` (o override serve a Aroli sem correria
+de boot); o id vive na allowlist gerenciada contra o bloqueio.
 
 ## Instalação
 

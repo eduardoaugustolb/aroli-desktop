@@ -1,0 +1,9 @@
+{
+  "name": "com.aroli.sys",
+  "description": "Aroli: retrato da máquina para a tela inicial (install.sh gera o live)",
+  "type": "stdio",
+  "path": "@EXT_DIR@/host/aroli-sys.py",
+  "allowed_origins": [
+    "chrome-extension://@EXT_ID@/"
+  ]
+}

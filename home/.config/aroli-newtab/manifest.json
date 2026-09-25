@@ -8,7 +8,7 @@
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
-  "permissions": ["storage", "theme"],
+  "permissions": ["storage", "theme", "nativeMessaging"],
   "background": {
     "service_worker": "background.js"
   },

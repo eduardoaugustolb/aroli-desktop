@@ -1250,9 +1250,57 @@ EOF
     #    flags merged and live theme seeded here (idempotent, keeps yours).
     configure_brave_newtab
 
+    # 8b) the machine widget's native host (user-level, no sudo).
+    configure_brave_native_host
+
     # 9) the language. Last, because it edits files that have just been laid
     #    down, and before the 'sddm' phase, which copies one of them into /usr.
     apply_language
+}
+
+# Extension ID unpacked: derived from the absolute path, like Chromium does.
+# Chromium resolves symlinks FIRST: with --link the live dir is a symlink
+# into the repo, so hashing the literal $HOME path gives an id the browser
+# never uses (and the page lands on ERR_BLOCKED_BY_CLIENT). readlink -f
+# keeps us on the same id in --link and --copy modes and wherever the
+# checkout lives. Stable per machine; changes only if the repo moves.
+aroli_ext_id() {
+    local p="$1"
+    if command -v readlink >/dev/null 2>&1; then
+        p="$(readlink -f "$p" 2>/dev/null)" || p="$1"
+    fi
+    python3 -c "import hashlib,sys;print(''.join(chr(ord('a')+((b>>4)&15))+chr(ord('a')+(b&15)) for b in hashlib.sha256(sys.argv[1].encode()).digest()[:16]))" "$p"
+}
+
+# Native host com.aroli.sys: lets the new tab read the machine (/proc,
+# /sys) through the same door Omarchy's own hosts use. User-level file, no
+# sudo. NOTE: host names with underscore are rejected by this build;
+# dots only.
+configure_brave_native_host() {
+    local ext="$HOME/.config/aroli-newtab"
+    local dir="$HOME/.config/BraveSoftware/Brave-Origin/NativeMessagingHosts"
+    local dest="$dir/com.aroli.sys.json" id="" want=""
+
+    [ -x "$ext/host/aroli-sys.py" ] || run chmod +x "$ext/host/aroli-sys.py"
+    command -v python3 >/dev/null 2>&1 || { warn "no python3: the machine widget stays hidden"; return 0; }
+    id="$(aroli_ext_id "$ext")" || { warn "could not derive the extension id"; return 0; }
+    want="$(printf '{\n  "name": "com.aroli.sys",\n  "description": "Aroli: machine snapshot for the start page",\n  "type": "stdio",\n  "path": "%s/host/aroli-sys.py",\n  "allowed_origins": [\n    "chrome-extension://%s/"\n  ]\n}\n' "$ext" "$id")"
+
+    if [ -f "$dest" ] && [ "$(cat "$dest")" = "$want" ]; then
+        skip "native host com.aroli.sys already registered"
+        return 0
+    fi
+    if [ "$DRY" = 1 ]; then
+        skip "would register the native host com.aroli.sys for Brave Origin"
+        return 0
+    fi
+    run mkdir -p "$dir"
+    printf '%s' "$want" > "$dest" \
+        && ok "native host com.aroli.sys registered (machine widget live)" \
+        || warn "could not write $dest"
+
+    # Retire the underscore-named manifest this build refuses to load.
+    [ -f "$dir/aroli-sys.json" ] && run rm -f "$dir/aroli-sys.json"
 }
 
 # 7f) Brave Origin + Aroli New Tab. The extension source ships in
@@ -1368,6 +1416,47 @@ phase_system() {
         fi
         ok "/etc/$rel"
     done < <(find "$root" -type f | sort)
+
+    # Brave opens on the Aroli page. Pointing startup straight at the
+    # extension URL races extension loading and lands on a BLOCKED page,
+    # so startup opens chrome://newtab/ instead: the registered override
+    # serves Aroli through the proper channel, which never blocks.
+    # (Preferences editing is not an option: Brave overwrites it running.)
+    if command -v python3 >/dev/null 2>&1; then
+        local start_file want_start have_start
+        start_file=/etc/brave/policies/managed/aroli.json
+        want_start='{"RestoreOnStartup":4,"RestoreOnStartupURLs":["chrome://newtab/"]}\n'
+        have_start="$(cat "$start_file" 2>/dev/null)"
+        if [ "$have_start" = "$want_start" ]; then
+            skip "Brave already starts on the Aroli page"
+        elif [ "$DRY" = 1 ]; then
+            skip "would point Brave startup at the Aroli page ($start_file)"
+        else
+            printf '%s' "$want_start" | sudo tee "$start_file" >/dev/null \
+                && ok "Brave starts on the Aroli page (relog Brave once)" \
+                || warn "could not write $start_file"
+        fi
+
+        # Loads unpacked sob navegador gerenciado pedem allowlist: sem o id
+        # aqui, a página trava no boot com ERR_BLOCKED_BY_CLIENT e só a
+        # recarga manual salva. Arquivo próprio (merge de policies soma
+        # listas de arquivos distintos; nunca edita o umbra-allow.json).
+        local allow_file=/etc/brave/policies/managed/aroli-allow.json
+        local want_allow have_allow
+        want_allow="$(printf '{"ExtensionInstallAllowlist":["%s"]}\n' "$ext_id")"
+        have_allow="$(cat "$allow_file" 2>/dev/null)"
+        if [ "$have_allow" = "$want_allow" ]; then
+            skip "Aroli extension already allowlisted"
+        elif [ "$DRY" = 1 ]; then
+            skip "would allowlist the Aroli extension ($allow_file)"
+        else
+            printf '%s' "$want_allow" | sudo tee "$allow_file" >/dev/null \
+                && ok "Aroli extension allowlisted (relog Brave once)" \
+                || warn "could not write $allow_file"
+        fi
+    else
+        warn "no python3: Brave startup page left unchanged"
+    fi
 
     # The paccache drop-in was renamed to uninstalled.conf for en-US. On a
     # copied install the old drop-in otherwise stays in /etc and paccache runs

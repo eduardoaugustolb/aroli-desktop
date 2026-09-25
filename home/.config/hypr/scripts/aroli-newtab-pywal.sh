@@ -142,4 +142,20 @@ TMP=$(mktemp "$OUT_DIR/theme-system.css.tmp.XXXXXX") || exit 0
 printf '%s\n' "$CSS" > "$TMP" && mv "$TMP" "$OUT_DIR/theme-system.css" || rm -f "$TMP"
 TMP=$(mktemp "$OUT_DIR/theme-system.json.tmp.XXXXXX") || exit 0
 printf '%s\n' "$JSON" > "$TMP" && mv "$TMP" "$OUT_DIR/theme-system.json" || rm -f "$TMP"
+
+# Frame pelo canal oficial: BrowserThemeColor é policy gerenciada e vence
+# chrome.theme no frame; brigar com o arquivo é inútil (o Omarchy o
+# reinstala). O escritor tem sudo sem senha e o refresh reaplica sem
+# reiniciar o navegador. Nunca falha o pipeline.
+if command -v omarchy-theme-set-browser-policy >/dev/null 2>&1; then
+  BGHEX=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['special']['background'])" "$J" 2>/dev/null)
+  case "$BGHEX" in
+    '#'??????)
+      sudo -n omarchy-theme-set-browser-policy "${BGHEX#'#'}" >/dev/null 2>&1 || true
+      if pgrep -f /opt/brave-origin-bin/brave-origin >/dev/null 2>&1; then
+        (brave-origin --refresh-platform-policy --no-startup-window >/dev/null 2>&1 &) || true
+      fi
+      ;;
+  esac
+fi
 exit 0

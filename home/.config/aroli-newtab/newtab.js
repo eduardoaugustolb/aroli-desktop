@@ -124,6 +124,11 @@
       renderAll();
       startClock();
       loadActivity();
+      sysStart();
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) sysStop();
+        else sysStart();
+      });
     });
   }
 
@@ -146,6 +151,7 @@
     });
     if (save !== false) persist(function () { paintBrowserFrame(); });
     else paintBrowserFrame();
+    applyFrame(mode);
   }
 
   function setThemeStatus(msg) {
@@ -329,22 +335,43 @@
       });
   }
 
+  function nextPage(link) {
+    if (!link) return "";
+    var m = String(link).match(/<([^>]+)>;\s*rel="next"/);
+    return m ? m[1] : "";
+  }
+
+  function addPush(counts, total, e) {
+    if (!e || e.type !== "PushEvent") return total;
+    var day = String(e.created_at || "").slice(0, 10);
+    var n = (e.payload && (e.payload.distinct_size || (e.payload.commits && e.payload.commits.length))) || 1;
+    counts[day] = (counts[day] || 0) + n;
+    return total + n;
+  }
+
+  // Até 3 páginas (~300 eventos, o teto da API): 1 página só alcança
+  // os dias mais recentes de quem commita muito. Se uma página falhar
+  // depois da primeira, salva o parcial em vez de jogar tudo fora.
   function fetchEvents(user) {
-    return fetch("https://api.github.com/users/" + encodeURIComponent(user) + "/events/public?per_page=100", { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-      .then(function (evts) {
+    var counts = {};
+    var total = 0;
+    var url = "https://api.github.com/users/" + encodeURIComponent(user) + "/events/public?per_page=100";
+    function step(n) {
+      return fetch(url, { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw 0;
+        url = nextPage(r.headers.get("Link"));
+        return r.json();
+      }).then(function (evts) {
         if (!Array.isArray(evts)) throw 0;
-        var counts = {};
-        var total = 0;
-        evts.forEach(function (e) {
-          if (!e || e.type !== "PushEvent") return;
-          var day = String(e.created_at || "").slice(0, 10);
-          var n = (e.payload && e.payload.commits && e.payload.commits.length) || 1;
-          counts[day] = (counts[day] || 0) + n;
-          total += n;
-        });
+        evts.forEach(function (e) { total = addPush(counts, total, e); });
+        if (url && n < 3) return step(n + 1);
         return { full: false, counts: counts, total: total };
+      }).catch(function () {
+        if (total > 0) return { full: false, counts: counts, total: total };
+        throw 0;
       });
+    }
+    return step(1);
   }
 
   function loadActivity() {
@@ -369,6 +396,54 @@
         document.getElementById("activityMonths").innerHTML = "";
         hint.textContent = token ? "Token ou usuário inválido." : "Não foi possível carregar agora.";
       }
+    });
+  }
+
+  /* Token: nunca reexibido, nunca logado. Fica em chrome.storage.local
+     (ou no fallback local) e só viaja para api.github.com via HTTPS.
+     Salvar testa antes (`viewer.login`); inválido não é persistido. */
+  function tokenStatus(msg) {
+    var s = document.getElementById("tokenStatus");
+    if (s) s.textContent = msg;
+  }
+
+  function testToken(token) {
+    return fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: JSON.stringify({ query: "{viewer{login}}" })
+    }).then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { return j && j.data && j.data.viewer && j.data.viewer.login; })
+      .catch(function () { return null; });
+  }
+
+  function refreshTokenStatus() {
+    if ((state.ghToken || "").trim()) tokenStatus("Token salvo neste navegador ✓ (ano inteiro, com privadas).");
+    else tokenStatus("Sem token: últimos ~90 dias públicos.");
+  }
+
+  function wireToken() {
+    var input = document.getElementById("ghToken");
+    // Proposital: o campo nasce sempre vazio, mesmo com token salvo.
+    input.value = "";
+    refreshTokenStatus();
+    document.getElementById("tokenSave").addEventListener("click", function () {
+      var token = input.value.trim().slice(0, 100);
+      if (!token) { tokenStatus("Cole um token primeiro."); return; }
+      tokenStatus("Testando…");
+      testToken(token).then(function (login) {
+        if (!login) { tokenStatus("Token inválido ou sem acesso."); return; }
+        state.ghToken = token;
+        state.activity = null;
+        input.value = "";
+        persist(function () { refreshTokenStatus(); loadActivity(); });
+      });
+    });
+    document.getElementById("tokenClear").addEventListener("click", function () {
+      state.ghToken = "";
+      state.activity = null;
+      input.value = "";
+      persist(function () { refreshTokenStatus(); loadActivity(); });
     });
   }
 
@@ -397,6 +472,202 @@
       toast.style.top = Math.max(0, y) + "px";
     });
     box.addEventListener("mouseleave", function () { toast.hidden = true; });
+  }
+
+  /* ---------- máquina: retrato via host nativo (aroli-sys.py) ---------- */
+  /* O Brave Origin não expõe chrome.system.*: um host stdlib lê /proc e
+     /sys (cpu, mem, disco, temp, uptime, bateria) — o painel inteiro do
+     Super+Shift+D. Uma instância por guia visível; oculta, a porta fecha
+     e o processo morre: custo zero em repouso. */
+
+  var SYS_MS = 5000, sysTimer = 0, sysPort = null, spark = [];
+  var SYS_WARN = "#e0a458", SYS_CRIT = "#e05c5c";
+
+  function nativeAvail() {
+    try { return !!(window.chrome && chrome.runtime && chrome.runtime.connectNative); }
+    catch (e) { return false; }
+  }
+
+  // Diagnóstico visível: em vez de sumir em silêncio, a zona diz a peça exata.
+  function sysMissing() {
+    try {
+      if (!window.chrome) return "sem chrome.* (página fora da extensão?)";
+      if (!chrome.runtime || !chrome.runtime.connectNative) return "sem nativeMessaging";
+      return "host com.aroli.sys ausente (rode o install.sh config)";
+    } catch (e) { return "exceção ao sondar APIs"; }
+  }
+
+  function upText(s) {
+    s = Math.max(0, s | 0);
+    var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+    if (d > 0) return d + " d " + h + " h";
+    if (h > 0) return h + " h " + m + " min";
+    return m + " min";
+  }
+
+  function sysTone(v, w, c) { return v >= c ? SYS_CRIT : v >= w ? SYS_WARN : ""; }
+
+  function gib(v) { return (v / 1073741824).toFixed(1).replace(".", ","); }
+
+  function setBar(barId, dotId, v, w, c) {
+    var bar = document.getElementById(barId);
+    var dot = document.getElementById(dotId);
+    var tone = sysTone(v, w, c);
+    if (bar) { bar.style.width = Math.max(0, Math.min(100, v)) + "%"; bar.style.background = tone || "var(--nt-accent)"; }
+    if (dot) dot.style.background = tone || "var(--nt-accent)";
+  }
+
+  function sysShow() {
+    var w = document.getElementById("sysWidget");
+    if (w) w.hidden = false;
+  }
+
+  function renderSys(s) {
+    if (!s) return;
+    sysShow();
+    if (typeof s.cpu === "number") {
+      var cpu = Math.max(0, Math.min(100, s.cpu));
+      document.getElementById("sysCpu").textContent = Math.round(cpu) + "%";
+      var ring = document.getElementById("cpuRing");
+      if (ring) {
+        ring.style.strokeDashoffset = (251.3 * (1 - cpu / 100)).toFixed(1);
+        ring.style.stroke = sysTone(cpu, 75, 90) || "var(--nt-accent)";
+      }
+      spark.push(cpu);
+      if (spark.length > 36) spark.shift();
+      drawSpark();
+    }
+    document.getElementById("sysThreads").textContent =
+      s.threads ? s.threads + (s.threads === 1 ? " thread" : " threads") : "–";
+    if (typeof s.mem === "number") {
+      document.getElementById("sysMem").textContent = Math.round(s.mem) + "%";
+      document.getElementById("sysMemSub").textContent = gib(s.mem_used) + " de " + gib(s.mem_total) + " GiB";
+      setBar("memBar", "memDot", s.mem, 80, 90);
+    }
+    if (typeof s.disk === "number") {
+      document.getElementById("sysDisk").textContent = Math.round(s.disk) + "%";
+      document.getElementById("sysDiskSub").textContent = gib(s.disk_free) + " livres de " + gib(s.disk_total) + " GiB";
+      setBar("diskBar", "diskDot", s.disk, 82, 92);
+    }
+    if (typeof s.temp === "number") {
+      document.getElementById("sysTemp").textContent = Math.round(s.temp) + "°";
+      document.getElementById("sysTempSub").textContent = s.temp_word || "";
+      var tt = document.getElementById("tempDot");
+      if (tt) tt.style.background = sysTone(s.temp, 68, 80) || "var(--nt-accent)";
+    } else {
+      document.getElementById("sysTemp").textContent = "–";
+      document.getElementById("sysTempSub").textContent = "sem leitura";
+    }
+    if (typeof s.bat === "number") {
+      document.getElementById("sysBat").textContent = s.bat + "%";
+      var bd = document.getElementById("batDot");
+      if (bd) bd.style.background = (!s.charging && s.bat < 18) ? SYS_CRIT : "var(--nt-accent)";
+      var bs = String(s.bat_status || "").toLowerCase();
+      document.getElementById("sysBatSub").textContent =
+        s.charging ? "carregando" : bs === "full" ? "carregada" : bs === "discharging" ? "na bateria" : bs || "na bateria";
+    } else {
+      document.getElementById("sysBat").textContent = "–";
+      document.getElementById("sysBatSub").textContent = "sem bateria";
+    }
+    document.getElementById("sysUptime").textContent = "up " + upText(s.uptime || 0);
+  }
+
+  function sysSend(obj) {
+    if (!sysPort) {
+      if (!nativeAvail()) return false;
+      try { sysPort = chrome.runtime.connectNative("com.aroli.sys"); }
+      catch (e) { sysPort = null; }
+      if (!sysPort) return false;
+      sysPort.onMessage.addListener(renderSys);
+      sysPort.onDisconnect.addListener(function () { sysPort = null; });
+    }
+    try { sysPort.postMessage(obj); return true; }
+    catch (e) { sysPort = null; return false; }
+  }
+
+  function sysTick() {
+    if (!sysSend({ cmd: "sample" })) {
+      var w = document.getElementById("sysWidget");
+      if (w && w.hidden) {
+        w.hidden = false;
+        document.getElementById("sysMemSub").textContent = sysMissing();
+      }
+    }
+  }
+
+  // Frame acompanha a chave de tema: manda uma vez por valor (dedup em
+  // state.frameHex), nunca a cada aba. O host valida e pinta via o canal
+  // oficial, que é o único que vence a policy no frame.
+  function applyFrame(mode) {
+    function send(hex) {
+      if (!hex || state.frameHex === hex) return;
+      if (sysSend({ cmd: "set-frame", hex: hex })) {
+        state.frameHex = hex;
+        persist();
+      }
+    }
+    if (mode === "dark") { send("101111"); return; }
+    if (mode === "black") { send("050505"); return; }
+    fetch("theme-system.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        var f = j && j.colors && j.colors.frame;
+        if (Array.isArray(f) && f.length === 3) {
+          send(f.map(function (v) { return ("0" + Math.max(0, Math.min(255, v)).toString(16)).slice(-2); }).join(""));
+        }
+      })
+      .catch(function () {});
+  }
+
+  function sysStart() {
+    if (sysTimer) return;
+    if (!nativeAvail()) {
+      var w0 = document.getElementById("sysWidget");
+      if (w0) {
+        w0.hidden = false;
+        document.getElementById("sysMemSub").textContent = sysMissing();
+      }
+      return;
+    }
+    sysTick();
+    sysTimer = setInterval(function () { if (!document.hidden) sysTick(); }, SYS_MS);
+  }
+
+  function sysStop() {
+    if (sysTimer) { clearInterval(sysTimer); sysTimer = 0; }
+    if (sysPort) {
+      try { sysPort.disconnect(); } catch (e) {}
+      sysPort = null;
+    }
+    spark = [];
+  }
+
+  function drawSpark() {
+    var cv = document.getElementById("sysSpark");
+    if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext("2d");
+    var W = cv.width, H = cv.height;
+    ctx.clearRect(0, 0, W, H);
+    if (spark.length < 2) return;
+    var max = 10, i;
+    for (i = 0; i < spark.length; i++) if (spark[i] > max) max = spark[i];
+    var acc = "#9ab7b0";
+    try { acc = (getComputedStyle(document.documentElement).getPropertyValue("--nt-accent") || acc).trim() || acc; }
+    catch (e) { /* fallback acima */ }
+    function X(j) { return j / (spark.length - 1) * (W - 2) + 1; }
+    function Y(v) { return H - 2 - (v / max) * (H - 5); }
+    ctx.beginPath();
+    for (i = 0; i < spark.length; i++) { if (i) ctx.lineTo(X(i), Y(spark[i])); else ctx.moveTo(X(i), Y(spark[i])); }
+    ctx.strokeStyle = acc;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.lineTo(X(spark.length - 1), H);
+    ctx.lineTo(X(0), H);
+    ctx.closePath();
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = acc;
+    ctx.fill();
+    ctx.globalAlpha = 1;
   }
 
   /* ---------- render ---------- */
@@ -564,16 +835,12 @@
     });
     var ghInput = document.getElementById("ghUser");
     ghInput.value = state.ghUser || "";
-    var ghReset = function () {
+    ghInput.addEventListener("change", function () {
       state.ghUser = ghInput.value.trim().slice(0, 39);
-      state.ghToken = ghToken.value.trim().slice(0, 100);
       state.activity = null;
       persist(loadActivity);
-    };
-    ghInput.addEventListener("change", ghReset);
-    var ghToken = document.getElementById("ghToken");
-    ghToken.value = state.ghToken || "";
-    ghToken.addEventListener("change", ghReset);
+    });
+    wireToken();
     wireToast();
     document.querySelectorAll(".seg button").forEach(function (b) {
       b.addEventListener("click", function () { applyMode(b.dataset.mode, true); });

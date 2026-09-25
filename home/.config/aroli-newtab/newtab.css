@@ -51,12 +51,17 @@ body {
 .screen {
   min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto auto auto auto 1fr;
   gap: clamp(16px, 3vh, 32px);
   padding: clamp(20px, 6vh, 56px) clamp(20px, 6vw, 72px);
-  max-width: 1280px;
+  /* A tela inicial é uma área de trabalho, não uma coluna de leitura.
+     Em monitores largos a grade pode respirar sem deixar o painel lateral
+     comprimido ou escapar do quadro. */
+  max-width: 1440px;
   margin: 0 auto;
+  overflow-x: clip;
 }
+.screen > * { min-width: 0; }
 .hero {
   display: flex;
   justify-content: space-between;
@@ -145,7 +150,7 @@ body {
 .zones {
   display: grid;
   grid-template-columns: 7fr 5fr;
-  gap: clamp(16px, 3vw, 40px);
+  gap: clamp(16px, 2vw, 28px);
   align-content: start;
 }
 .zone {
@@ -153,7 +158,7 @@ body {
   border: 1px solid var(--nt-border);
   border-radius: 18px;
   padding: 20px 20px 16px;
-  align-self: start;
+  min-width: 0;
 }
 .zonetitle {
   margin: 0 0 4px;
@@ -165,34 +170,115 @@ body {
 }
 .zonelink { color: inherit; text-decoration: none; }
 .zonelink:hover { color: var(--nt-accent); }
-.zone.wide { position: relative; margin-top: clamp(16px, 3vh, 32px); }
+.zone.wide { position: relative; margin-top: 0; display: flex; flex-direction: column; }
+.zone.wide .calwrap { flex: 1; align-content: center; }
+.duo {
+  display: grid;
+  /* O painel de máquina tem uma largura legível, mas nunca força rolagem
+     horizontal. A grade do ano recebe todo o espaço restante. */
+  grid-template-columns: minmax(0, 1fr) minmax(312px, .44fr);
+  gap: clamp(16px, 2vw, 28px);
+  align-items: stretch;
+  margin-top: clamp(16px, 3vh, 32px);
+}
+.duo > .zone { min-height: clamp(250px, 30vh, 320px); }
+.syszone {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  container-type: inline-size;
+}
+@container (max-width: 340px) {
+  .syszone { aspect-ratio: auto; justify-content: flex-start; gap: 10px; }
+  .sysmain { flex-direction: column; }
+  .ringwrap { margin: 0 auto; }
+  .sysbars { width: 100%; }
+}
+.syshead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.syshead .zonetitle { margin: 0; }
+.sysmain { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ringcol { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ringwrap { position: relative; flex: none; width: 88px; height: 88px; line-height: 0; }
+.ringcap { margin: 0; font-size: 11px; color: var(--nt-muted); white-space: nowrap; }
+.ringwrap svg { display: block; width: 100%; height: 100%; }
+#cpuRing { transition: stroke-dashoffset 600ms linear, stroke 280ms cubic-bezier(.2,0,0,1); }
+#sysSpark { position: absolute; left: 12px; top: 24px; opacity: .45; pointer-events: none; }
+.ringcenter {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0; line-height: 1.2;
+}
+.ringval {
+  font-family: "Aroli Mono NF", "Aroli Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 21px;
+}
+.ringcenter .syslabel { font-size: 10px; }
+.sysbars { flex: 1; min-width: 0; display: grid; gap: 6px; align-content: start; }
+.syshalf { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; position: relative; }
+.syshalf .sysrow { min-width: 0; display: flex; flex-direction: column; }
+@media (max-width: 1080px) {
+  .duo { grid-template-columns: 1fr; }
+  .syszone { max-width: none; min-height: 0; }
+  .sysmain { max-width: 460px; }
+}
+@media (max-width: 560px) {
+  .duo > .zone { min-height: 0; }
+  .syszone { max-width: none; }
+  .sysmain { flex-direction: column; }
+  .sysbars { width: 100%; }
+}
+.sysrow {
+  background: var(--nt-raised);
+  border: 1px solid var(--nt-border);
+  border-radius: 14px;
+  padding: 8px 10px 6px;
+  min-width: 0;
+}
+.sysline { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.syslabel { font-size: 12px; color: var(--nt-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sysval {
+  margin-left: auto;
+  font-family: "Aroli Mono NF", "Aroli Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 19px;
+  line-height: 1.1;
+}
+.syssub { margin: 3px 0 0; font-size: 12px; color: var(--nt-faint); text-align: right; }
+.sysbar { height: 3px; border-radius: 2px; background: var(--nt-hover); margin-top: 8px; overflow: hidden; }
+.sysbar i { display: block; height: 100%; width: 0; border-radius: 2px; background: var(--nt-accent); transition: width 600ms linear, background 280ms cubic-bezier(.2,0,0,1); }
+.syshalf { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sysrow.mini { padding: 6px 8px 4px; }
+.sysval.sm { font-size: 14px; letter-spacing: 0; white-space: nowrap; }
 .calhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .legend { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--nt-faint); }
-.legend .day { width: 12px; height: 12px; }
-.calwrap { display: grid; grid-template-columns: 30px 1fr; gap: 6px; overflow-x: auto; padding: 12px 0 4px; }
-.dow { display: grid; grid-template-rows: repeat(7, 12px); gap: 3px; font-size: 10px; color: var(--nt-faint); }
+.legend .day { flex: none; width: 12px; height: 12px; }
+.calwrap { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 6px; align-items: stretch; overflow-x: auto; padding: 12px 0 4px; }
+.dow { display: grid; grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 3px; font-size: 10px; color: var(--nt-faint); }
+.dow span { align-self: center; }
 .dow span:nth-child(1) { grid-row: 2; }
 .dow span:nth-child(2) { grid-row: 4; }
 .dow span:nth-child(3) { grid-row: 6; }
-.rightcol { display: grid; gap: 4px; align-content: start; }
+.rightcol { display: grid; gap: 4px; align-content: start; min-width: 0; }
 .cal {
   display: grid;
-  grid-template-rows: repeat(7, 12px);
+  grid-template-rows: repeat(7, minmax(0, 1fr));
   grid-auto-flow: column;
-  grid-auto-columns: 12px;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 3px;
-  justify-content: start;
 }
 .months {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 12px;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 3px;
   font-size: 10px;
   color: var(--nt-faint);
 }
 .months span { grid-column: span 4; overflow: visible; white-space: nowrap; }
-.day { width: 12px; height: 12px; border-radius: 3px; background: var(--nt-hover); }
+.day { width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 3px; background: var(--nt-hover); min-width: 0; }
 .day.l1 { background: color-mix(in srgb, var(--nt-accent) 32%, transparent); }
 .day.l2 { background: color-mix(in srgb, var(--nt-accent) 55%, transparent); }
 .day.l3 { background: color-mix(in srgb, var(--nt-accent) 78%, transparent); }
@@ -296,6 +382,21 @@ body {
 .addlink button:hover, .todoadd button:hover, .btn:hover { border-color: var(--nt-accent); }
 .addlink.col { flex-direction: column; margin-top: 0; }
 .addlink.col .btn { align-self: flex-start; }
+.btnrow { display: flex; gap: 8px; }
+.btn.danger { border-color: var(--nt-border); color: var(--nt-faint); }
+.btn.danger:hover { border-color: #e05c5c; color: var(--nt-fg); }
+.howto { font-size: 13px; color: var(--nt-muted); }
+.howto summary { cursor: pointer; color: var(--nt-fg); }
+.howto ol { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.howto a { color: var(--nt-link); }
+.howto code {
+  font-family: "Aroli Mono NF", "Aroli Mono", ui-monospace, monospace;
+  background: var(--nt-deep);
+  border: 1px solid var(--nt-border);
+  border-radius: 6px;
+  padding: 0 6px;
+  font-size: 12px;
+}
 .todo { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
 .todo li {
   display: flex; align-items: center; gap: 10px;
@@ -330,7 +431,7 @@ body {
 .todo .rm { margin-left: auto; border: 0; background: transparent; color: var(--nt-faint); cursor: pointer; }
 .todo .rm:hover { color: var(--nt-fg); }
 
-.footbar { display: flex; justify-content: flex-start; }
+.footbar { display: flex; justify-content: flex-start; align-self: end; }
 .foot { margin: 0; color: var(--nt-faint); font-size: 13px; }
 
 /* ── engrenagem ── */

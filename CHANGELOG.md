@@ -25,6 +25,9 @@ and version numbers follow [Semantic Versioning](https://semver.org/):
   texto com o mouse; atividade em cache (1 fetch/hora, sem token). O tema
   é derivado uma vez por wallpaper por `aroli-newtab-pywal.sh` e
   registrado via `brave-origin-flags.conf` pelo `install.sh config`.
+- Quadrado Máquina ao lado do ano (CPU, memória, disco, temperatura,
+  bateria, uptime via host nativo `aroli-sys.py`); o Brave abre direto
+  na página Aroli por policy gerenciada.
 
 ### Changed
 
