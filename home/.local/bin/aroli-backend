@@ -28,7 +28,7 @@ LOCK_FILE="$CACHE_DIR/aroli.lock"
 STATE_FILE="$CACHE_DIR/state.json"
 CHECK_INTERVAL=86400   # 24 h: releases ship a few times per month, not per hour
 NET_TIMEOUT=20
-REPO_SLUG="eduardoaugustolb/aroli-desktop"
+REPO_SLUG="getaroli/desktop"
 
 DRY=0
 ASSUME_YES=0

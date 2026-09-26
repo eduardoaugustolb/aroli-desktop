@@ -1,5 +1,5 @@
 {
-  "upstream": "eduardoaugustolb/aroli@main",
+  "upstream": "getaroli/aroli@main",
   "upstream_commit": "be0b7e16e8745cdbb66ecb8ac7a72855516a58c6",
   "upstream_version": "0.905",
   "synced_at": "2026-09-25T03:35:30Z",

@@ -134,7 +134,7 @@ jobs:
           fc-scan Aroli family. Human review required before merge."
           git push -u origin "fonts/sync-aroli-$short"
           gh pr create --title "chore(fonts): sync Aroli Mono/Sans @$short" \
-            --body "Automated sync from \`eduardoaugustolb/aroli@main\` (\`$short\`).
+            --body "Automated sync from \`getaroli/aroli@main\` (\`$short\`).
 
           Verification (enforced by \`scripts/sync-aroli-fonts.sh --apply\`):
           - allowlisted filenames only, OTTO magic bytes, >= 10 KiB each

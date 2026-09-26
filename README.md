@@ -6,10 +6,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/eduardoaugustolb/aroli-desktop/stargazers"><img src="https://img.shields.io/github/stars/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff&label=stars" alt="GitHub stars"></a>
-  <a href="https://github.com/eduardoaugustolb/aroli-desktop/releases"><img src="https://img.shields.io/github/v/release/eduardoaugustolb/aroli-desktop?display_name=tag&style=flat-square&color=8b7cff&label=release" alt="Latest release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff" alt="GPL-3.0 license"></a>
-  <a href="https://github.com/eduardoaugustolb/aroli-desktop/actions"><img src="https://img.shields.io/github/actions/workflow/status/eduardoaugustolb/aroli-desktop/release.yml?style=flat-square&label=build" alt="Build status"></a>
+  <a href="https://github.com/getaroli/desktop/stargazers"><img src="https://img.shields.io/github/stars/getaroli/desktop?style=flat-square&color=8b7cff&label=stars" alt="GitHub stars"></a>
+  <a href="https://github.com/getaroli/desktop/releases"><img src="https://img.shields.io/github/v/release/getaroli/desktop?display_name=tag&style=flat-square&color=8b7cff&label=release" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/getaroli/desktop?style=flat-square&color=8b7cff" alt="GPL-3.0 license"></a>
+  <a href="https://github.com/getaroli/desktop/actions"><img src="https://img.shields.io/github/actions/workflow/status/getaroli/desktop/release.yml?style=flat-square&label=build" alt="Build status"></a>
 </p>
 
 <p align="center">
@@ -39,9 +39,9 @@ your image without turning every application surface into its dominant colour.
 | Omarchy · Arch · Hyprland | Quickshell, notch, and dynamic palette | Wallpaper, language, and optionals |
 
 <p align="center">
-  <a href="https://github.com/eduardoaugustolb/aroli-desktop/commits/main"><img src="https://img.shields.io/github/commit-activity/m/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff&label=community%20activity" alt="Monthly commit activity"></a>
-  <a href="https://github.com/eduardoaugustolb/aroli-desktop/issues"><img src="https://img.shields.io/github/issues/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff&label=issues" alt="Open issues"></a>
-  <a href="https://github.com/eduardoaugustolb/aroli-desktop/network/members"><img src="https://img.shields.io/github/forks/eduardoaugustolb/aroli-desktop?style=flat-square&color=8b7cff&label=forks" alt="GitHub forks"></a>
+  <a href="https://github.com/getaroli/desktop/commits/main"><img src="https://img.shields.io/github/commit-activity/m/getaroli/desktop?style=flat-square&color=8b7cff&label=community%20activity" alt="Monthly commit activity"></a>
+  <a href="https://github.com/getaroli/desktop/issues"><img src="https://img.shields.io/github/issues/getaroli/desktop?style=flat-square&color=8b7cff&label=issues" alt="Open issues"></a>
+  <a href="https://github.com/getaroli/desktop/network/members"><img src="https://img.shields.io/github/forks/getaroli/desktop?style=flat-square&color=8b7cff&label=forks" alt="GitHub forks"></a>
 </p>
 
 <p align="center">
@@ -93,11 +93,11 @@ so already-running applications reload the XCursor.
 # Note: versioned `go install ...@vX.Y.Z` does not work for v2+ releases
 # because the module intentionally has no `/v2` suffix; use the binary.
 arch="$(uname -m)"; case "$arch" in x86_64) arch=amd64;; aarch64|arm64) arch=arm64;; esac
-curl -fL "https://github.com/eduardoaugustolb/aroli-desktop/releases/latest/download/aroli-linux-$arch" -o ~/.local/bin/aroli
+curl -fL "https://github.com/getaroli/desktop/releases/latest/download/aroli-linux-$arch" -o ~/.local/bin/aroli
 chmod +x ~/.local/bin/aroli
 
 # Or install from the current main branch (Go 1.27+, development version)
-go install github.com/eduardoaugustolb/aroli-desktop/cmd/aroli@main
+go install github.com/getaroli/desktop/cmd/aroli@main
 
 # Opens a guided terminal interface for first-time users
 aroli

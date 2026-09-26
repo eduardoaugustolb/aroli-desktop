@@ -3,7 +3,7 @@ name: aroli-report
 description: >
   Use when a real Aroli Desktop product bug must reach GitHub: reproduce it,
   gather the evidence bundle, and file (or update) an issue at
-  eduardoaugustolb/aroli-desktop. Triggers: file an issue, report a bug,
+  getaroli/desktop. Triggers: file an issue, report a bug,
   report upstream, github issue, bug report, upstream fix, issue template,
   evidence bundle.
 ---
@@ -30,7 +30,7 @@ commands run and their verbatim output (trimmed, not paraphrased).
 ## 2. File it
 
 ```sh
-gh issue create --repo eduardoaugustolb/aroli-desktop \
+gh issue create --repo getaroli/desktop \
   --title "<area>: <symptom>" \
   --body-file /tmp/aroli-issue.md
 ```

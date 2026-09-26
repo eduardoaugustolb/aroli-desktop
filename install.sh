@@ -4,7 +4,7 @@
 #
 # All the new machine needs is Arch and git:
 #
-#     git clone https://github.com/eduardoaugustolb/aroli-desktop.git
+#     git clone https://github.com/getaroli/desktop.git
 #     cd aroli-desktop
 #     ./install.sh
 #
@@ -835,7 +835,7 @@ phase_cursor() {
     heading "Aroli Pointer"
 
     local tmp="${TMPDIR:-/tmp}/aroli-pointer"
-    local url="https://github.com/eduardoaugustolb/aroli.git"
+    local url="https://github.com/getaroli/aroli.git"
     local source="$tmp/themes/cursor/aroli"
     local legacy_source="$tmp/themes/cursor/umbra"
     local target="$HOME/.local/share/icons/Aroli"

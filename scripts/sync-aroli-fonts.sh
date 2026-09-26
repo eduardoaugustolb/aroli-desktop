@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # sync-aroli-fonts.sh -- keeps the vendored Aroli OTFs in sync with upstream.
 #
-#   Upstream: github.com/eduardoaugustolb/aroli
+#   Upstream: github.com/getaroli/aroli
 #     fonts/aroli/dist/AroliMonoNF-{Regular,Medium,SemiBold}.otf
 #     fonts/aroli-sans/dist/AroliSans-{Regular,Medium,SemiBold,Bold}.otf
 #   Vendored here:

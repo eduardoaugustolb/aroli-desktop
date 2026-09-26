@@ -1,4 +1,4 @@
-module github.com/eduardoaugustolb/aroli-desktop
+module github.com/getaroli/desktop
 
 go 1.27.0
 

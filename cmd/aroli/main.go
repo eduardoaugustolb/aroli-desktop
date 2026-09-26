@@ -29,7 +29,7 @@ import (
 
 const (
 	project       = "Aroli Desktop"
-	repositoryURL = "https://github.com/eduardoaugustolb/aroli-desktop.git"
+	repositoryURL = "https://github.com/getaroli/desktop.git"
 	defaultLang   = "pt-BR"
 )
 
@@ -429,7 +429,7 @@ func showLogs(args []string) error {
 	return nil
 }
 
-const githubAPIRelease = "https://api.github.com/repos/eduardoaugustolb/aroli-desktop/releases/latest"
+const githubAPIRelease = "https://api.github.com/repos/getaroli/desktop/releases/latest"
 
 type githubRelease struct {
 	TagName string `json:"tag_name"`
@@ -457,7 +457,7 @@ func updateCLI(args []string) error {
 	if err != nil {
 		return err
 	}
-	base := "https://github.com/eduardoaugustolb/aroli-desktop/releases/download/" + release.TagName + "/"
+	base := "https://github.com/getaroli/desktop/releases/download/" + release.TagName + "/"
 	fmt.Printf("CLI atual: %s\nDisponível: %s\n", cliVersion(), strings.TrimPrefix(release.TagName, "v"))
 	if *dryRun {
 		fmt.Printf("seria baixado e verificado: %s%s\n", base, asset)
