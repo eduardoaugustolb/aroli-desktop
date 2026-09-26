@@ -20,7 +20,7 @@ nativo é renderizado pelo OS e não tem estilo). Relógio em `22h27` com
 dígitos tabulares e transição por algarismo. Tipografia Aroli Sans no
 texto e Aroli Mono NF no relógio (instaladas pelo rice, sem bundle).
 Animações via anime.js vendorizado (`vendor/anime.min.js`, MIT, sem CDN):
-entrada em cascata, dígitos do relógio, painel de ajustes, itens —
+entrada em cascata, dígitos do relógio, painel de ajustes, itens,
 sempre na curva de acomodação, com fallback instantâneo sob
 `prefers-reduced-motion`.
 
@@ -66,7 +66,7 @@ inválido não é persistido, e há botão Remover. Ele só viaja para
 
 O modo repinta o navegador inteiro: a chave da página manda o frame
 ao host (`set-frame`, uma vez por valor), que pinta via
-`omarchy-theme-set-browser-policy` com refresh — o único caminho que
+`omarchy-theme-set-browser-policy` com refresh, o único caminho que
 vence a policy no frame. Toolbar e abas vão por `chrome.theme`. O
 startup abre `chrome://newtab/` (o override serve a Aroli sem correria
 de boot); o id vive na allowlist gerenciada contra o bloqueio.

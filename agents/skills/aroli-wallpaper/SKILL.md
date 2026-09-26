@@ -18,10 +18,10 @@ Quickshell recolors itself by watching `~/.cache/wal/colors.json`.
 
 ## Debugging order (compare the three stages)
 
-1. `jq -r .wallpaper ~/.cache/wal/colors.json` — is the palette from the
+1. `jq -r .wallpaper ~/.cache/wal/colors.json`: is the palette from the
    wallpaper on screen? If old, re-run `set-wallpaper.sh` with the image.
 2. `~/.config/spicetify/Themes/aroli/color.ini` `[pywal]` vs `colors.json`
-   — `spicetify-colors.py` rewrites it; mismatch means the generator failed.
+   `spicetify-colors.py` rewrites it; mismatch means the generator failed.
 3. The app itself: for Spotify see `aroli-spotify`. Terminals recolor on
    `SIGUSR1` to kitty; rofi/btop/hyprlock read colors at launch (relaunch,
    no daemon to poke).

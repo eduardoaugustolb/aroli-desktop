@@ -5,7 +5,7 @@ shipped with the OS, discovered without being mentioned, grounded in
 evidence, protective of system integrity.
 
 - Source of truth: `agents/skills/<name>/SKILL.md` in this repo.
-- Installed (OS level): `~/.agents/skills/<name>` — symlinked in `--link`
+- Installed (OS level): `~/.agents/skills/<name>`, symlinked in `--link`
   mode so skill updates arrive with the rice, copied in `--copy` mode.
   Deployed by `install.sh` step 4c. Discovery also works for
   Claude-compatible agents from the same path.
@@ -15,7 +15,7 @@ evidence, protective of system integrity.
 
 | Skill | When |
 | --- | --- |
-| `aroli-desktop` | Anything Aroli — load first, then follow routing |
+| `aroli-desktop` | Anything Aroli, load first, then follow routing |
 | `aroli-diagnose` | Something broke or looks wrong |
 | `aroli-wallpaper` | Wallpaper/palette did not follow |
 | `aroli-spotify` | Spotify theming, spicetify errors |
