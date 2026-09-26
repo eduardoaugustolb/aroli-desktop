@@ -14,4 +14,4 @@ jobs:
       - name: Assign new issue to maintainer
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh issue edit ${{ github.event.issue.number }} --add-assignee eduardoaugustolb
+        run: gh issue edit ${{ github.event.issue.number }} --add-assignee eduardoaugustolb --repo ${{ github.repository }}
